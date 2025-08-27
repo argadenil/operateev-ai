@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Footer from "./components/footer";
 import Header from "./components/header";
 import Dashboard from "./components/dashboard";
@@ -27,25 +27,28 @@ export default function Home() {
   return (
     <div className="flex h-screen relative overflow-hidden bg-gray-100">
       {/* Sidebar */}
+      {/* Sidebar */}
       <aside
         className={`bg-gray-800 text-white transition-all duration-300 ${sidebarOpen ? "w-64" : "w-16"
-          } flex flex-col z-30`}
+          } flex flex-col z-30 relative`}
       >
-        <div className="flex items-center justify-between px-4 py-3">
-          <span className="text-lg font-bold">
-            {sidebarOpen ? "Menu" : ""}
-          </span>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)}>
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
+        {/* Brand / Logo */}
+        {sidebarOpen && (
+          <div className="px-4 py-3 mt-3 text-xl font-bold text-white">
+            operateev.ai
+          </div>
+        )}
 
+        {/* Top spacing in collapsed mode */}
+        {!sidebarOpen && <div className="mt-6" />}
+
+        {/* Navigation */}
         <nav className="flex flex-col px-4 space-y-2 mt-4">
           <button
             onClick={() => setActivePage("dashboard")}
             className={`rounded p-2 text-left transition-colors ${activePage === "dashboard"
-                ? "bg-gray-700 text-white font-semibold"
-                : "hover:bg-gray-700"
+              ? "bg-gray-700 text-white font-semibold"
+              : "hover:bg-gray-700"
               }`}
           >
             {sidebarOpen ? "Dashboard" : "🏠"}
@@ -54,14 +57,28 @@ export default function Home() {
           <button
             onClick={() => setActivePage("settings")}
             className={`rounded p-2 text-left transition-colors ${activePage === "settings"
-                ? "bg-gray-700 text-white font-semibold"
-                : "hover:bg-gray-700"
+              ? "bg-gray-700 text-white font-semibold"
+              : "hover:bg-gray-700"
               }`}
           >
             {sidebarOpen ? "Settings" : "⚙️"}
           </button>
         </nav>
+
+        {/* Collapse/Expand Arrow at sidebar edge */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className={`absolute top-1/2 -right-4 transform -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-colors
+      ${sidebarOpen ? "bg-indigo-500 hover:bg-indigo-600" : "bg-green-400 hover:bg-green-500"}`}
+        >
+          {sidebarOpen ? (
+            <ChevronLeft size={20} className="text-white" />
+          ) : (
+            <ChevronRight size={20} className="text-white" />
+          )}
+        </button>
       </aside>
+
 
       {/* Main Area */}
       <div className="flex flex-col flex-grow relative z-20 bg-white">
@@ -88,6 +105,7 @@ export default function Home() {
         />
       )}
 
+      {/* Slide-over panel */}
       <div
         className={`fixed inset-y-0 right-0 w-95 h-[96vh] bg-white shadow-xl transform transition-transform duration-300 z-50 ${slideOverOpen ? "translate-x-0" : "translate-x-full"
           }`}
