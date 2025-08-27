@@ -49,33 +49,33 @@ const columns: ColumnDef<AIInfra>[] = [
   {
     accessorKey: "status",
     header: "Status",
-cell: ({ getValue }) => {
-  const status = getValue() as string;
-  const color =
-    status === "Running"
-      ? "bg-green-100 text-green-700 border-green-700"
-      : status === "Idle"
-      ? "bg-yellow-100 text-yellow-700 border-yellow-700"
-      : "bg-red-100 text-red-700 border-red-700";
+    cell: ({ getValue }) => {
+      const status = getValue() as string;
+      const color =
+        status === "Running"
+          ? "bg-green-100 text-green-700 border-green-700"
+          : status === "Idle"
+            ? "bg-yellow-100 text-yellow-700 border-yellow-700"
+            : "bg-red-100 text-red-700 border-red-700";
 
-  return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>
-      {status}
-    </span>
-  );
-},
+      return (
+        <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>
+          {status}
+        </span>
+      );
+    },
 
   },
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => (
-    <button
-      onClick={() => alert(`Deploying ${row.original.model} on ${row.original.cluster}`)}
-      className="bg-[#3b19e6] hover:bg-[#2f13b0] text-white px-4 py-2 rounded"
-    >
-      Deploy
-    </button>
+      <button
+        onClick={() => alert(`Deploying ${row.original.model} on ${row.original.cluster}`)}
+        className="bg-[#3b19e6] hover:bg-[#2f13b0] text-white px-4 py-2 rounded"
+      >
+        Deploy
+      </button>
     ),
   },
 ];
@@ -96,36 +96,44 @@ export default function Dashboard() {
           <table className="w-full border-collapse">
             <thead className="sticky top-0 bg-gray-800 shadow-sm z-10">
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="text-left text-sm text-white">
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      className="px-4 py-3 border-b border-gray-700 font-semibold text-center"
-                    >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
+                <tr key={headerGroup.id} className="text-sm text-white">
+                  {headerGroup.headers.map((header) => {
+                    const isCenter = header.column.id === "status" || header.column.id === "actions";
+                    return (
+                      <th
+                        key={header.id}
+                        className={`px-4 py-3 border-b border-gray-700 font-semibold ${isCenter ? "text-center" : "text-start"}`}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    );
+                  })}
                 </tr>
               ))}
             </thead>
+
             <tbody className="text-sm text-gray-800">
               {table.getRowModel().rows.map((row, i) => (
                 <tr
                   key={row.id}
-                  className={`transition ${i % 2 === 0 ? "bg-gray-50" : "bg-white"
-                    } hover:bg-indigo-50`}
+                  className={`transition ${i % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-indigo-50`}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className="px-4 py-3 border-b border-gray-200 text-center"
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    // Center align for Status and Actions, left for others
+                    const isCenter = cell.column.id === "status" || cell.column.id === "actions";
+                    return (
+                      <td
+                        key={cell.id}
+                        className={`px-4 py-3 border-b border-gray-200 ${isCenter ? "text-center" : "text-start"}`}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
+
           </table>
         </div>
 
