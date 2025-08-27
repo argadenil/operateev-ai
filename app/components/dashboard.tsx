@@ -49,32 +49,33 @@ const columns: ColumnDef<AIInfra>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ getValue }) => {
-      const status = getValue() as string;
-      const color =
-        status === "Running"
-          ? "bg-green-100 text-green-700"
-          : status === "Idle"
-          ? "bg-yellow-100 text-yellow-700"
-          : "bg-red-100 text-red-700";
+cell: ({ getValue }) => {
+  const status = getValue() as string;
+  const color =
+    status === "Running"
+      ? "bg-green-100 text-green-700 border-green-700"
+      : status === "Idle"
+      ? "bg-yellow-100 text-yellow-700 border-yellow-700"
+      : "bg-red-100 text-red-700 border-red-700";
 
-      return (
-        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}>
-          {status}
-        </span>
-      );
-    },
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>
+      {status}
+    </span>
+  );
+},
+
   },
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => (
-      <button
-        onClick={() => alert(`Deploying ${row.original.model} on ${row.original.cluster}`)}
-        className="bg-indigo-600 text-white px-3 py-1 rounded-lg hover:bg-indigo-700 shadow-md transition"
-      >
-        Deploy
-      </button>
+    <button
+      onClick={() => alert(`Deploying ${row.original.model} on ${row.original.cluster}`)}
+      className="bg-[#3b19e6] hover:bg-[#2f13b0] text-white px-4 py-2 rounded"
+    >
+      Deploy
+    </button>
     ),
   },
 ];

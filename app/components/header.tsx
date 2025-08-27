@@ -6,13 +6,15 @@ export default function Header({ className = "", pageTitle = "" }: { className?:
     >
       {/* Left - Logo / Brand */}
       <div className="flex items-center space-x-3">
-        <div className="w-9 h-9 bg-white text-sky-500 font-bold rounded-full flex items-center justify-center shadow-md">
-          {/* Replace with actual logo */}
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="12" r="10" />
-          </svg>
+        <div className="w-9 h-9 text-sky-500 font-bold rounded-full flex items-center justify-center shadow-md ml-7">
+          <img
+            src="/images/logo.png"
+            alt="Operateev.ai Logo"
+            className="w-full h-full object-contain transform scale-200"
+          />
         </div>
-        <span className="font-bold text-xl tracking-wide text-white">Operateev.ai</span>
+
+        {/* <span className="font-bold text-xl tracking-wide text-white">Operateev.ai</span> */}
       </div>
       <div className="flex items-center space-x-4">
         <div
