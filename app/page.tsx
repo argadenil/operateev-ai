@@ -28,88 +28,62 @@ export default function Home() {
     <div className="flex h-screen relative overflow-hidden bg-gray-100">
       {/* Sidebar */}
       {/* Sidebar */}
-      <aside
-        className={`bg-gray-800 text-white transition-all duration-300 ${sidebarOpen ? "w-64" : "w-16"
-          } flex flex-col z-30 relative`}
+   <aside
+  className={`bg-gray-900 text-white transition-all duration-300 ${sidebarOpen ? "w-64" : "w-20"
+    } flex flex-col relative z-30 shadow-lg`}
+>
+  {/* Logo */}
+  <div className={`flex items-center justify-center ${sidebarOpen ? "h-20" : "h-16"} mt-3`}>
+    {sidebarOpen ? (
+      <h1 className="text-2xl font-bold text-white">
+        Operateev.<span className="text-sky-400">ai</span>
+      </h1>
+    ) : (
+      <div className="text-2xl font-bold text-sky-400">O</div>
+    )}
+  </div>
+
+  {/* Navigation */}
+  <nav className="flex flex-col mt-10 space-y-2">
+    {[
+      { name: "Dashboard", icon: "🏠", key: "dashboard" },
+      { name: "Projects", icon: "📁", key: "projects" },
+      { name: "Reports", icon: "📊", key: "reports" },
+      { name: "Settings", icon: "⚙️", key: "settings" },
+    ].map((item) => (
+      <button
+        key={item.key}
+        onClick={() => setActivePage(item.key)}
+        className={`group relative flex items-center p-3 mx-2 rounded-xl transition-all duration-300 ${
+          activePage === item.key
+            ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg"
+            : "hover:bg-gray-800 text-gray-200"
+        }`}
+        title={!sidebarOpen ? item.name : undefined}
       >
-        {/* Brand / Logo */}
-        {/* Brand / Logo */}
+        <span className="text-xl">{item.icon}</span>
         {sidebarOpen && (
-          <div className="px-4 py-3 mt-3 text-3xl font-bold">
-            <span className="text-white">Operateev.</span>
-            <span className="text-sky-400">ai</span>
-          </div>
+          <span className="ml-3 font-medium text-sm group-hover:text-white">
+            {item.name}
+          </span>
         )}
+      </button>
+    ))}
+  </nav>
 
-
-        {/* Top spacing in collapsed mode */}
-        {!sidebarOpen && <div className="mt-6" />}
-
-        {/* Navigation */}
-        <nav className="flex flex-col px-4 space-y-2 mt-20">
-          <button
-            onClick={() => setActivePage("dashboard")}
-            className={`rounded p-2 text-left transition-colors ${activePage === "dashboard"
-              ? "bg-gray-700 text-white font-semibold"
-              : "hover:bg-gray-700"
-              }`}
-          >
-            {sidebarOpen ? "Dashboard" : "🏠"}
-          </button>
-
-          <button
-            onClick={() => setActivePage("projects")}
-            className={`rounded p-2 text-left transition-colors ${activePage === "projects"
-              ? "bg-gray-700 text-white font-semibold"
-              : "hover:bg-gray-700"
-              }`}
-          >
-            {sidebarOpen ? "Projects" : "📁"}
-          </button>
-
-          <button
-            onClick={() => setActivePage("reports")}
-            className={`rounded p-2 text-left transition-colors ${activePage === "reports"
-              ? "bg-gray-700 text-white font-semibold"
-              : "hover:bg-gray-700"
-              }`}
-          >
-            {sidebarOpen ? "Reports" : "📊"}
-          </button>
-
-          <button
-            onClick={() => setActivePage("settings")}
-            className={`rounded p-2 text-left transition-colors ${activePage === "settings"
-              ? "bg-gray-700 text-white font-semibold"
-              : "hover:bg-gray-700"
-              }`}
-          >
-            {sidebarOpen ? "Settings" : "⚙️"}
-          </button>
-
-
-
-
-        </nav>
-
-        {/* Collapse/Expand Arrow at sidebar edge */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className={`absolute top-[5%] -right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-all duration-300
+  {/* Collapse / Expand */}
+  <button
+    onClick={() => setSidebarOpen(!sidebarOpen)}
+    className={`absolute top-5 -right-4 w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all duration-300
     ${sidebarOpen
-              ? "bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-purple-500 hover:to-indigo-500"
-              : "bg-gradient-to-br from-green-400 to-teal-400 hover:from-teal-400 hover:to-green-400"}`
-          }
-        >
-          {sidebarOpen ? (
-            <ChevronLeft size={20} className="text-white" />
-          ) : (
-            <ChevronRight size={20} className="text-white" />
-          )}
-        </button>
+        ? "bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-purple-600 hover:to-indigo-600"
+        : "bg-gradient-to-br from-green-400 to-teal-400 hover:from-teal-500 hover:to-green-500"
+      }`}
+  >
+    {sidebarOpen ? <ChevronLeft size={20} className="text-white" /> : <ChevronRight size={20} className="text-white" />}
+  </button>
+</aside>
 
-
-      </aside>
 
 
       {/* Main Area */}
