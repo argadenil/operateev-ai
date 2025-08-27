@@ -33,11 +33,14 @@ export default function Home() {
           } flex flex-col z-30 relative`}
       >
         {/* Brand / Logo */}
-        {sidebarOpen && (
-          <div className="px-4 py-3 mt-3 text-xl font-bold text-white">
-            operateev.ai
-          </div>
-        )}
+ {/* Brand / Logo */}
+{sidebarOpen && (
+  <div className="px-4 py-3 mt-3 text-3xl font-bold">
+    <span className="text-white">Operateev.</span>
+    <span className="text-sky-400">ai</span>
+  </div>
+)}
+
 
         {/* Top spacing in collapsed mode */}
         {!sidebarOpen && <div className="mt-6" />}
@@ -66,17 +69,22 @@ export default function Home() {
         </nav>
 
         {/* Collapse/Expand Arrow at sidebar edge */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className={`absolute top-1/2 -right-4 transform -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-colors
-      ${sidebarOpen ? "bg-indigo-500 hover:bg-indigo-600" : "bg-green-400 hover:bg-green-500"}`}
-        >
-          {sidebarOpen ? (
-            <ChevronLeft size={20} className="text-white" />
-          ) : (
-            <ChevronRight size={20} className="text-white" />
-          )}
-        </button>
+              <button
+  onClick={() => setSidebarOpen(!sidebarOpen)}
+  className={`absolute top-[5%] -right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-all duration-300
+    ${sidebarOpen 
+      ? "bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-purple-500 hover:to-indigo-500" 
+      : "bg-gradient-to-br from-green-400 to-teal-400 hover:from-teal-400 hover:to-green-400"}`
+  }
+>
+  {sidebarOpen ? (
+    <ChevronLeft size={20} className="text-white" />
+  ) : (
+    <ChevronRight size={20} className="text-white" />
+  )}
+</button>
+
+
       </aside>
 
 
