@@ -53,7 +53,7 @@ export default function Home() {
               key={item.key}
               onClick={() => setActivePage(item.key)}
               className={`group relative flex items-center p-3 mx-3 rounded-2xl transition-all duration-300 transform ${activePage === item.key
-                ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl scale-105"
+                ? "bg-indigo-500 text-white shadow-xl scale-105"
                 : "hover:bg-gray-800 hover:scale-105 text-gray-200"
                 }`}
               title={!sidebarOpen ? item.name : undefined}
@@ -84,8 +84,8 @@ export default function Home() {
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className={`absolute top-24 -right-5 w-10 h-10 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300
     ${sidebarOpen
-              ? "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-              : "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              ? "bg-indigo-500 text-white hover:bg-indigo-600"
+              : "bg-indigo-500 text-white hover:bg-indigo-600"
             }`}
         >
           {sidebarOpen

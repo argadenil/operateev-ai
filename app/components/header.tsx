@@ -34,7 +34,7 @@ export default function Header({
 
   return (
     <header
-      className={`bg-zinc-900 text-white shadow-lg px-6 py-4 flex items-center justify-between ${className}`}
+      className={`bg-gray-950 text-white shadow-lg px-6 py-4 flex items-center justify-between ${className}`}
       aria-label="Main site header"
     >
       {/* Left - Logo / Brand */}
