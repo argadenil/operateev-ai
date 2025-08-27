@@ -103,6 +103,11 @@ export default function Home() {
       <div className="flex flex-col flex-grow relative z-20 bg-white">
         <Header />
         <main className="flex-grow p-4 overflow-auto bg-white">
+          <div className="flex items-center justify-between mb-6 ml-3">
+            <h1 className="text-2xl font-semibold text-gray-800 tracking-wide">
+              {activePage.toUpperCase()}
+            </h1>
+          </div>
           {renderPage()}
         </main>
         <Footer />
