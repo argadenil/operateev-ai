@@ -8,7 +8,7 @@ export default function Chat() {
     { id: 1, sender: "bot", text: "Hello 👋 How can I help you today?" },
     { id: 2, sender: "user", text: "I just wanted to check system status." },
     { id: 3, sender: "bot", text: "System is running smoothly ✅" },
-    { id: 4, sender: "user", text: "Great! Can I see today’s activity logs?" },
+    { id: 4, sender: "user", text: "Great! Can I see today's activity logs?" },
     { id: 5, sender: "bot", text: "Sure! Fetching logs for you... 📊" },
     { id: 6, sender: "bot", text: "Logs show no errors, only routine checks." },
     { id: 7, sender: "user", text: "Perfect, thanks!" },
@@ -26,6 +26,7 @@ export default function Chat() {
     { id: 19, sender: "user", text: "Any pending system alerts?" },
     { id: 20, sender: "bot", text: "No pending alerts. All systems operational ✅" },
   ]);
+
 
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -58,45 +59,54 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-gray-50 to-white border rounded-xl shadow-lg">
-      {/* Chat header */}
-      <div className="p-4 border-b bg-indigo-600 text-white font-semibold rounded-t-xl">
-        Chat Assistant
+    <div className="flex flex-col h-full max-h-[90vh] bg-gray-50 border rounded-2xl shadow-xl overflow-hidden">
+      {/* Header */}
+      <div className="p-4 bg-indigo-600 text-white font-semibold text-lg flex items-center justify-between shadow-md">
+        <span>Chat Assistant</span>
       </div>
 
       {/* Messages */}
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
+      {/* Messages */}
+      <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100">
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex items-end ${
-              msg.sender === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex items-end ${msg.sender === "user" ? "justify-end" : "justify-start"
+              }`}
           >
-            {/* AI Avatar */}
+            {/* Bot Avatar */}
             {msg.sender === "bot" && (
               <img
-                src="/images/robot.png" // Robot icon
+                src="/images/robot.png"
                 alt="AI Avatar"
                 className="w-10 h-10 flex-shrink-0 rounded-full mr-3 shadow-md object-cover"
               />
             )}
 
-            {/* Chat bubble */}
-            <div
-              className={`px-5 py-3 rounded-2xl max-w-xs sm:max-w-sm md:max-w-md break-words shadow transition transform hover:scale-[1.02] ${
-                msg.sender === "user"
-                  ? "bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white rounded-br-none"
-                  : "bg-gradient-to-tr from-gray-200 to-gray-300 text-gray-800 rounded-bl-none"
-              }`}
-            >
-              {msg.text}
-            </div>
+            {/* Chat bubble with arrow */}
+     <div
+  className={`relative px-5 py-3 max-w-xs sm:max-w-sm md:max-w-md break-words shadow-md transition transform hover:scale-[1.02] rounded-[15px] ${
+    msg.sender === "user"
+      ? "bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white"
+      : "bg-gray-800 text-white"
+  }`}
+>
+  {msg.text}
+
+  {/* Arrow */}
+  <div
+    className={`absolute w-0 h-0 border-t-8 border-b-8 ${
+      msg.sender === "user"
+        ? "border-l-8 border-l-indigo-500 border-t-transparent border-b-transparent -right-2 top-1/2 transform -translate-y-1/2"
+        : "border-r-8 border-r-gray-800 border-t-transparent border-b-transparent -left-2 top-1/2 transform -translate-y-1/2"
+    }`}
+  />
+</div>
 
             {/* User Avatar */}
             {msg.sender === "user" && (
               <img
-                src="https://cdn-icons-png.flaticon.com/512/149/149071.png" // User icon
+                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
                 alt="User Avatar"
                 className="w-10 h-10 flex-shrink-0 rounded-full ml-3 shadow-md object-cover"
               />
@@ -106,19 +116,23 @@ export default function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
+
       {/* Input box */}
-      <div className="p-3 border-t flex items-center space-x-2 bg-white rounded-b-xl">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-        />
+      <div className="p-3 border-t flex items-center space-x-2 bg-white">
+        <div className="relative flex-grow">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            className="w-full px-4 py-2 pl-10 border rounded-full shadow-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          />
+          <Send className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+        </div>
         <button
           onClick={sendMessage}
-          className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition transform hover:scale-110"
+          className="p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition transform hover:scale-110 shadow-md"
         >
           <Send size={18} />
         </button>

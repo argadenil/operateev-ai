@@ -31,7 +31,7 @@ export default function Home() {
           } flex flex-col relative z-30 shadow-2xl`}
       >
         {/* Logo */}
-        <div className={`flex items-center justify-center ${sidebarOpen ? "h-24" : "h-20"} mt-4`}>
+        {/* <div className={`flex items-center justify-center ${sidebarOpen ? "h-24" : "h-20"} mt-4`}>
           {sidebarOpen ? (
             <h1 className="text-3xl font-extrabold text-white tracking-tight">
               Operateev.<span className="text-sky-400">ai</span>
@@ -39,10 +39,10 @@ export default function Home() {
           ) : (
             <div className="text-3xl font-bold text-sky-400 animate-pulse">O</div>
           )}
-        </div>
+        </div> */}
 
         {/* Navigation */}
-        <nav className="flex flex-col mt-12 space-y-3">
+        <nav className="flex flex-col mt-40 space-y-3">
           {[
             { name: "Dashboard", icon: "🏠", key: "dashboard" },
             { name: "Projects", icon: "📁", key: "projects" },
