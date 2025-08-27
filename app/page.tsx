@@ -26,63 +26,76 @@ export default function Home() {
 
   return (
     <div className="flex h-screen relative overflow-hidden bg-gray-100">
-      {/* Sidebar */}
-      {/* Sidebar */}
-   <aside
-  className={`bg-gray-900 text-white transition-all duration-300 ${sidebarOpen ? "w-64" : "w-20"
-    } flex flex-col relative z-30 shadow-lg`}
->
-  {/* Logo */}
-  <div className={`flex items-center justify-center ${sidebarOpen ? "h-20" : "h-16"} mt-3`}>
-    {sidebarOpen ? (
-      <h1 className="text-2xl font-bold text-white">
-        Operateev.<span className="text-sky-400">ai</span>
-      </h1>
-    ) : (
-      <div className="text-2xl font-bold text-sky-400">O</div>
-    )}
-  </div>
-
-  {/* Navigation */}
-  <nav className="flex flex-col mt-10 space-y-2">
-    {[
-      { name: "Dashboard", icon: "🏠", key: "dashboard" },
-      { name: "Projects", icon: "📁", key: "projects" },
-      { name: "Reports", icon: "📊", key: "reports" },
-      { name: "Settings", icon: "⚙️", key: "settings" },
-    ].map((item) => (
-      <button
-        key={item.key}
-        onClick={() => setActivePage(item.key)}
-        className={`group relative flex items-center p-3 mx-2 rounded-xl transition-all duration-300 ${
-          activePage === item.key
-            ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg"
-            : "hover:bg-gray-800 text-gray-200"
-        }`}
-        title={!sidebarOpen ? item.name : undefined}
+      <aside
+        className={`bg-gray-950 text-white transition-all duration-300 ${sidebarOpen ? "w-64" : "w-20"
+          } flex flex-col relative z-30 shadow-2xl`}
       >
-        <span className="text-xl">{item.icon}</span>
-        {sidebarOpen && (
-          <span className="ml-3 font-medium text-sm group-hover:text-white">
-            {item.name}
-          </span>
-        )}
-      </button>
-    ))}
-  </nav>
+        {/* Logo */}
+        <div className={`flex items-center justify-center ${sidebarOpen ? "h-24" : "h-20"} mt-4`}>
+          {sidebarOpen ? (
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">
+              Operateev.<span className="text-sky-400">ai</span>
+            </h1>
+          ) : (
+            <div className="text-3xl font-bold text-sky-400 animate-pulse">O</div>
+          )}
+        </div>
 
-  {/* Collapse / Expand */}
-  <button
-    onClick={() => setSidebarOpen(!sidebarOpen)}
-    className={`absolute top-5 -right-4 w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all duration-300
+        {/* Navigation */}
+        <nav className="flex flex-col mt-12 space-y-3">
+          {[
+            { name: "Dashboard", icon: "🏠", key: "dashboard" },
+            { name: "Projects", icon: "📁", key: "projects" },
+            { name: "Reports", icon: "📊", key: "reports" },
+            { name: "Settings", icon: "⚙️", key: "settings" },
+          ].map((item) => (
+            <button
+              key={item.key}
+              onClick={() => setActivePage(item.key)}
+              className={`group relative flex items-center p-3 mx-3 rounded-2xl transition-all duration-300 transform ${activePage === item.key
+                ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl scale-105"
+                : "hover:bg-gray-800 hover:scale-105 text-gray-200"
+                }`}
+              title={!sidebarOpen ? item.name : undefined}
+            >
+              <span className="text-2xl">{item.icon}</span>
+              {sidebarOpen && (
+                <span className="ml-4 font-semibold text-lg group-hover:text-white transition-all duration-300">
+                  {item.name}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+        <div className="mt-auto mb-4 px-4">
+          {sidebarOpen ? (
+            <span className="text-sm font-medium text-white-400 text-left block">
+              Version: v1.0.0
+            </span>
+          ) : (
+            <span className="text-sm font-medium text-white-400 text-left block" title="App Version">
+              v1.0.0
+            </span>
+          )}
+        </div>
+
+        {/* Collapse / Expand */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className={`absolute top-24 -right-5 w-10 h-10 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300
     ${sidebarOpen
-        ? "bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-purple-600 hover:to-indigo-600"
-        : "bg-gradient-to-br from-green-400 to-teal-400 hover:from-teal-500 hover:to-green-500"
-      }`}
-  >
-    {sidebarOpen ? <ChevronLeft size={20} className="text-white" /> : <ChevronRight size={20} className="text-white" />}
-  </button>
-</aside>
+              ? "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              : "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+            }`}
+        >
+          {sidebarOpen
+            ? <ChevronLeft size={22} strokeWidth={3} className="text-white" />
+            : <ChevronRight size={22} strokeWidth={3} className="text-white" />}
+        </button>
+
+      </aside>
+
+
 
 
 
