@@ -72,7 +72,7 @@ const columns: ColumnDef<AIInfra>[] = [
     cell: ({ row }) => (
       <button
         onClick={() => alert(`Deploying ${row.original.model} on ${row.original.cluster}`)}
-        className="bg-indigo-500 hover:bg-[#2f13b0] text-white px-4 py-2 rounded text-bold transition-colors"
+        className="bg-indigo-500 hover:bg-[#2f13b0] text-white px-4 py-2 rounded-[10px] text-bold transition-colors"
       >
         Deploy
       </button>
@@ -89,7 +89,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="p-6 h-[85vh] flex flex-col">
+    <div className="p-8 h-[85vh] flex flex-col">
       {/* Table container grows and scrolls */}
       <div className="flex-1 rounded-xl shadow-xl overflow-hidden bg-white border flex flex-col">
         <div className="flex-1 overflow-y-auto">
