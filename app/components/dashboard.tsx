@@ -72,7 +72,7 @@ const columns: ColumnDef<AIInfra>[] = [
     cell: ({ row }) => (
       <button
         onClick={() => alert(`Deploying ${row.original.model} on ${row.original.cluster}`)}
-        className="bg-[#3b19e6] hover:bg-[#2f13b0] text-white px-4 py-2 rounded"
+        className="bg-[#3b19e6] hover:bg-[#2f13b0] text-white px-4 py-2 rounded text-bold transition-colors"
       >
         Deploy
       </button>
