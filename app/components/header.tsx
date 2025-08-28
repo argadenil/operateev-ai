@@ -73,7 +73,7 @@ export default function Header({
       {/* Right - Actions */}
       <div className="flex items-center space-x-4">
         {/* Notifications */}
-        <div className="relative">
+        {/* <div className="relative">
           <button
             className="relative p-2 rounded-full hover:bg-gray-800 transition"
             onClick={() => setNotificationsOpen(!notificationsOpen)}
@@ -95,10 +95,10 @@ export default function Header({
               ))}
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* Quick Actions */}
-        <div className="relative">
+        {/* <div className="relative">
           <button
             className="p-2 rounded-full hover:bg-gray-800 transition"
             onClick={() => setQuickActionOpen(!quickActionOpen)}
@@ -118,7 +118,7 @@ export default function Header({
               ))}
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* Profile */}
         <div className="relative" ref={dropdownRef}>
