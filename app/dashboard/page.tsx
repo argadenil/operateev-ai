@@ -32,20 +32,23 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcEleme
 
 type GPUResource = {
   id: number;
-  model: string;
   gpu: string;
   memory: string;
   cluster: string;
   status: string;
+  uptime: string;
+  temperature: number;
+  power: number;
+  processes: number;
 };
 
 const data: GPUResource[] = [
-  { id: 1, model: "GPT-5", gpu: "NVIDIA A100", memory: "80 GB", cluster: "Cluster-A", status: "Running" },
-  { id: 2, model: "Stable Diffusion XL", gpu: "RTX 4090", memory: "24 GB", cluster: "Cluster-C", status: "Stopped" },
-  { id: 3, model: "BERT", gpu: "T4", memory: "16 GB", cluster: "Cluster-A", status: "Running" },
-  { id: 4, model: "Whisper Large", gpu: "A40", memory: "48 GB", cluster: "Cluster-D", status: "Idle" },
-  { id: 5, model: "Falcon-180B", gpu: "A100", memory: "80 GB", cluster: "Cluster-B", status: "Running" },
-  { id: 6, model: "GPT-NeoX", gpu: "RTX 6000 Ada", memory: "48 GB", cluster: "Cluster-B", status: "Idle" },
+  { id: 1, gpu: "NVIDIA A100", memory: "80 GB", cluster: "Cluster-A", status: "Running", uptime: "72h", temperature: 65, power: 250, processes: 12 },
+  { id: 2, gpu: "RTX 4090", memory: "24 GB", cluster: "Cluster-C", status: "Stopped", uptime: "0h", temperature: 40, power: 50, processes: 0 },
+  { id: 3, gpu: "T4", memory: "16 GB", cluster: "Cluster-A", status: "Running", uptime: "36h", temperature: 70, power: 200, processes: 5 },
+  { id: 4, gpu: "A40", memory: "48 GB", cluster: "Cluster-D", status: "Idle", uptime: "10h", temperature: 55, power: 120, processes: 1 },
+  { id: 5, gpu: "A100", memory: "80 GB", cluster: "Cluster-B", status: "Running", uptime: "96h", temperature: 72, power: 280, processes: 20 },
+  { id: 6, gpu: "RTX 6000 Ada", memory: "48 GB", cluster: "Cluster-B", status: "Idle", uptime: "8h", temperature: 50, power: 100, processes: 2 },
 ];
 
 export default function Dashboard() {
@@ -56,10 +59,13 @@ export default function Dashboard() {
   const [selectedModel, setSelectedModel] = React.useState<GPUResource | null>(null);
 
   const columns: ColumnDef<GPUResource>[] = [
-    { accessorKey: "model", header: "Model" },
     { accessorKey: "gpu", header: "GPU" },
     { accessorKey: "memory", header: "Memory" },
     { accessorKey: "cluster", header: "Cluster" },
+    { accessorKey: "uptime", header: "Uptime" },
+    { accessorKey: "temperature", header: "Temperature (°C)" },
+    { accessorKey: "power", header: "Power Usage (W)" },
+    { accessorKey: "processes", header: "Processes" },
     {
       accessorKey: "status",
       header: "Status",
@@ -69,8 +75,8 @@ export default function Dashboard() {
           status === "Running"
             ? "bg-green-100 text-green-700 border-green-700"
             : status === "Idle"
-              ? "bg-yellow-100 text-yellow-700 border-yellow-700"
-              : "bg-red-100 text-red-700 border-red-700";
+            ? "bg-yellow-100 text-yellow-700 border-yellow-700"
+            : "bg-red-100 text-red-700 border-red-700";
 
         return (
           <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>
@@ -155,7 +161,7 @@ export default function Dashboard() {
         <input
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search models, GPUs, clusters..."
+          placeholder="Search GPUs, clusters..."
           className="px-4 py-2 border rounded-lg w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
@@ -168,7 +174,7 @@ export default function Dashboard() {
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="text-sm text-white">
                   {headerGroup.headers.map((header) => {
-                    const isCenter = header.column.id === "status" || header.column.id === "actions";
+                    const isCenter = ["status", "actions"].includes(header.column.id);
                     return (
                       <th
                         key={header.id}
@@ -195,7 +201,7 @@ export default function Dashboard() {
                   className={`transition ${i % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-indigo-50`}
                 >
                   {row.getVisibleCells().map((cell) => {
-                    const isCenter = cell.column.id === "status" || cell.column.id === "actions";
+                    const isCenter = ["status", "actions"].includes(cell.column.id);
                     return (
                       <td
                         key={cell.id}
@@ -250,14 +256,13 @@ export default function Dashboard() {
 
             {/* Info Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-              <div><span className="font-semibold">Model:</span> {selectedModel.model}</div>
               <div><span className="font-semibold">GPU:</span> {selectedModel.gpu}</div>
               <div><span className="font-semibold">Memory:</span> {selectedModel.memory}</div>
               <div><span className="font-semibold">Cluster:</span> {selectedModel.cluster}</div>
-              <div><span className="font-semibold">Uptime:</span> 72 hours</div>
-              <div><span className="font-semibold">Temperature:</span> 65°C</div>
-              <div><span className="font-semibold">Power Usage:</span> 250W</div>
-              <div><span className="font-semibold">Processes Running:</span> 12</div>
+              <div><span className="font-semibold">Uptime:</span> {selectedModel.uptime}</div>
+              <div><span className="font-semibold">Temperature:</span> {selectedModel.temperature}°C</div>
+              <div><span className="font-semibold">Power Usage:</span> {selectedModel.power}W</div>
+              <div><span className="font-semibold">Processes Running:</span> {selectedModel.processes}</div>
               <div className="col-span-2">
                 <span className="font-semibold">Status:</span>{" "}
                 <span
@@ -274,11 +279,10 @@ export default function Dashboard() {
             </div>
 
             {/* Charts */}
-            {/* Charts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div className="bg-gray-50 rounded-xl p-4 shadow">
                 <h3 className="text-sm font-semibold text-gray-700 mb-2">GPU Utilization Over Time</h3>
-                <div className="h-48"> {/* smaller fixed height */}
+                <div className="h-48">
                   <Line
                     data={lineChartData}
                     options={{
@@ -291,7 +295,7 @@ export default function Dashboard() {
               </div>
               <div className="bg-gray-50 rounded-xl p-4 shadow">
                 <h3 className="text-sm font-semibold text-gray-700 mb-2">Memory Usage</h3>
-                <div className="h-48"> {/* smaller fixed height */}
+                <div className="h-48">
                   <Pie
                     data={pieChartData}
                     options={{
@@ -303,7 +307,6 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-
 
             {/* Additional Stats */}
             <div className="bg-gray-50 rounded-xl p-4 shadow mb-6">
