@@ -17,8 +17,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     // Map of routes to names for dynamic page title
     const routeMap: Record<string, string> = {
         "/dashboard": "Dashboard",
-        "/projects": "Projects",
-        "/reports": "Reports",
+        "/gpu-resources": "GPU Resources",
+        "/job-management": "Job Management",
         "/settings": "Settings",
     };
 
@@ -32,8 +32,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 <nav className="flex flex-col mt-40 space-y-3">
                     {[
                         { name: "Dashboard", icon: "🏠", href: "/dashboard" },
-                        { name: "Projects", icon: "📁", href: "/projects" },
-                        { name: "Reports", icon: "📊", href: "/reports" },
+                        { name: "GPU Resources", icon: "📁", href: "/gpu-resources" },
+                        { name: "Job Management", icon: "📊", href: "/job-management" },
                         { name: "Settings", icon: "⚙️", href: "/settings" },
                     ].map((item) => (
                         <Link
@@ -75,7 +75,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                     <div className="flex items-center justify-between mb-6 ml-8">
                         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight relative">
                             <span className="bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent">
-                                {routeMap[pathname]?.toUpperCase() || "PAGE"}
+                                {pathname && routeMap[pathname]?.toUpperCase() || "PAGE"}
                             </span>
                             <span className="absolute left-0 -bottom-1 w-12 h-1 bg-indigo-500 rounded-full"></span>
                         </h1>
