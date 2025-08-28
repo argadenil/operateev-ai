@@ -147,28 +147,28 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-8 h-[85vh] flex flex-col">
+    <div className="p-4 sm:p-8 h-[85vh] flex flex-col">
       {/* Header */}
       <div className="mb-6 ml-2">
-        <h1 className="text-2xl font-bold text-gray-800 tracking-wide">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 tracking-wide">
           Customer Dashboard: <span className="text-indigo-600">ACME Corp</span>
         </h1>
       </div>
 
       {/* Search */}
-      <div className="mb-4 flex items-center gap-4">
+      <div className="mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
         <input
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder="Search GPUs, clusters..."
-          className="px-4 py-2 border rounded-lg w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="px-4 py-2 border rounded-lg w-full sm:w-1/2 md:w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
 
       {/* Table */}
       <div className="flex-1 rounded-xl shadow-xl overflow-hidden bg-white border flex flex-col">
-        <div className="flex-1 overflow-y-auto">
-          <table className="w-full border-collapse">
+        <div className="flex-1 overflow-x-auto overflow-y-auto">
+          <table className="w-full min-w-[700px] border-collapse">
             <thead className="sticky top-0 bg-gray-800 shadow-sm z-10">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="text-sm text-white">
@@ -217,34 +217,36 @@ export default function Dashboard() {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-end items-center gap-3 p-4 bg-gray-50 border-t">
-          <span className="text-sm font-medium text-gray-700 mr-4">
+        <div className="flex flex-col sm:flex-row justify-end items-center gap-3 p-4 bg-gray-50 border-t">
+          <span className="text-sm font-medium text-gray-700">
             Page <strong>{table.getState().pagination.pageIndex + 1} of {table.getPageCount()}</strong>
           </span>
-          <button
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-            className="px-4 py-2 rounded-md border border-gray-300 text-sm bg-white hover:bg-gray-100 disabled:opacity-50"
-          >
-            ⬅ Previous
-          </button>
-          <button
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-            className="px-4 py-2 rounded-md border border-gray-300 text-sm bg-white hover:bg-gray-100 disabled:opacity-50"
-          >
-            Next ➡
-          </button>
+          <div className="flex gap-2 mt-2 sm:mt-0">
+            <button
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className="px-4 py-2 rounded-md border border-gray-300 text-sm bg-white hover:bg-gray-100 disabled:opacity-50"
+            >
+              ⬅ Previous
+            </button>
+            <button
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className="px-4 py-2 rounded-md border border-gray-300 text-sm bg-white hover:bg-gray-100 disabled:opacity-50"
+            >
+              Next ➡
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Modal */}
       {selectedModel && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-[75%] max-h-[90vh] overflow-y-auto p-6 relative">
+          <div className="bg-white rounded-2xl shadow-2xl w-full sm:w-[90%] md:w-[75%] max-h-[90vh] overflow-y-auto p-6 relative">
             {/* Header with close icon */}
             <div className="flex justify-between items-center border-b pb-3 mb-4">
-              <h2 className="text-xl font-semibold text-gray-800">GPU Resource Details</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">GPU Resource Details</h2>
               <button
                 onClick={() => setSelectedModel(null)}
                 className="text-gray-500 hover:text-gray-800 transition"
@@ -254,7 +256,7 @@ export default function Dashboard() {
             </div>
 
             {/* Info Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <div><span className="font-semibold">GPU:</span> {selectedModel.gpu}</div>
               <div><span className="font-semibold">Memory:</span> {selectedModel.memory}</div>
               <div><span className="font-semibold">Cluster:</span> {selectedModel.cluster}</div>
@@ -262,7 +264,7 @@ export default function Dashboard() {
               <div><span className="font-semibold">Temperature:</span> {selectedModel.temperature}°C</div>
               <div><span className="font-semibold">Power Usage:</span> {selectedModel.power}W</div>
               <div><span className="font-semibold">Processes Running:</span> {selectedModel.processes}</div>
-              <div className="col-span-2">
+              <div className="col-span-1 sm:col-span-2">
                 <span className="font-semibold">Status:</span>{" "}
                 <span
                   className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold border ${selectedModel.status === "Running"
@@ -281,7 +283,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div className="bg-gray-50 rounded-xl p-4 shadow">
                 <h3 className="text-sm font-semibold text-gray-700 mb-2">GPU Utilization Over Time</h3>
-                <div className="h-48">
+                <div className="h-48 sm:h-56">
                   <Line
                     data={lineChartData}
                     options={{
@@ -294,7 +296,7 @@ export default function Dashboard() {
               </div>
               <div className="bg-gray-50 rounded-xl p-4 shadow">
                 <h3 className="text-sm font-semibold text-gray-700 mb-2">Memory Usage</h3>
-                <div className="h-48">
+                <div className="h-48 sm:h-56">
                   <Pie
                     data={pieChartData}
                     options={{
@@ -310,7 +312,7 @@ export default function Dashboard() {
             {/* Additional Stats */}
             <div className="bg-gray-50 rounded-xl p-4 shadow mb-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-2">Detailed GPU Statistics</h3>
-              <ul className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-700">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700">
                 <li>Driver Version: <span className="font-medium">535.86</span></li>
                 <li>CUDA Version: <span className="font-medium">12.1</span></li>
                 <li>SM Utilization: <span className="font-medium">68%</span></li>
