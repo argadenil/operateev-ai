@@ -92,10 +92,6 @@ export default function GPUResourcesPage() {
   return (
     <div className="p-8 h-[85vh] flex flex-col">
       {/* Header */}
-      <div className="mb-6 ml-2">
-        <h1 className="text-2xl font-bold text-gray-800 tracking-wide">GPU Resources</h1>
-        <p className="text-gray-600 text-sm">Manage and monitor GPU availability & allocation</p>
-      </div>
 
       {/* Search */}
       <div className="mb-4 flex items-center gap-4">
