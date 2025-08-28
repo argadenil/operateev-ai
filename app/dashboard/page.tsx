@@ -13,7 +13,7 @@ import {
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
 
-type AIInfra = {
+type GPUResource = {
   id: number;
   model: string;
   gpu: string;
@@ -22,30 +22,17 @@ type AIInfra = {
   status: string;
 };
 
-const data: AIInfra[] = [
+// Example: GPUs allocated to a single customer (e.g. "ACME Corp")
+const data: GPUResource[] = [
   { id: 1, model: "GPT-5", gpu: "NVIDIA A100", memory: "80 GB", cluster: "Cluster-A", status: "Running" },
-  { id: 2, model: "LLaMA-3", gpu: "H100", memory: "120 GB", cluster: "Cluster-B", status: "Idle" },
-  { id: 3, model: "Stable Diffusion XL", gpu: "RTX 4090", memory: "24 GB", cluster: "Cluster-C", status: "Stopped" },
-  { id: 4, model: "BERT", gpu: "T4", memory: "16 GB", cluster: "Cluster-A", status: "Running" },
-  { id: 5, model: "Whisper Large", gpu: "A40", memory: "48 GB", cluster: "Cluster-D", status: "Idle" },
-  { id: 6, model: "Falcon-180B", gpu: "A100", memory: "80 GB", cluster: "Cluster-B", status: "Running" },
-  { id: 7, model: "Mistral 7B", gpu: "V100", memory: "32 GB", cluster: "Cluster-E", status: "Stopped" },
-  { id: 8, model: "Claude-3 Opus", gpu: "H100", memory: "120 GB", cluster: "Cluster-C", status: "Running" },
-  { id: 9, model: "Gemini Ultra", gpu: "TPU v5e", memory: "96 GB", cluster: "Cluster-F", status: "Running" },
-  { id: 10, model: "GPT-NeoX", gpu: "RTX 6000 Ada", memory: "48 GB", cluster: "Cluster-B", status: "Idle" },
-  { id: 11, model: "LLaMA-2 70B", gpu: "A100", memory: "80 GB", cluster: "Cluster-G", status: "Stopped" },
-  { id: 12, model: "GPT-J", gpu: "RTX 3090", memory: "24 GB", cluster: "Cluster-A", status: "Running" },
-  { id: 13, model: "DeepSeek V3", gpu: "H200", memory: "141 GB", cluster: "Cluster-H", status: "Running" },
-  { id: 14, model: "Mixtral 8x7B", gpu: "A100", memory: "80 GB", cluster: "Cluster-I", status: "Idle" },
-  { id: 15, model: "PaLM-2", gpu: "TPU v4", memory: "128 GB", cluster: "Cluster-J", status: "Stopped" },
-  { id: 16, model: "ChatGLM-3", gpu: "RTX 4090", memory: "24 GB", cluster: "Cluster-C", status: "Running" },
-  { id: 17, model: "Qwen-72B", gpu: "H100", memory: "120 GB", cluster: "Cluster-K", status: "Running" },
-  { id: 18, model: "Stable Cascade", gpu: "A40", memory: "48 GB", cluster: "Cluster-L", status: "Idle" },
-  { id: 19, model: "Bloom", gpu: "V100", memory: "32 GB", cluster: "Cluster-M", status: "Stopped" },
-  { id: 20, model: "Phi-3", gpu: "RTX 6000 Ada", memory: "48 GB", cluster: "Cluster-N", status: "Running" },
+  { id: 2, model: "Stable Diffusion XL", gpu: "RTX 4090", memory: "24 GB", cluster: "Cluster-C", status: "Stopped" },
+  { id: 3, model: "BERT", gpu: "T4", memory: "16 GB", cluster: "Cluster-A", status: "Running" },
+  { id: 4, model: "Whisper Large", gpu: "A40", memory: "48 GB", cluster: "Cluster-D", status: "Idle" },
+  { id: 5, model: "Falcon-180B", gpu: "A100", memory: "80 GB", cluster: "Cluster-B", status: "Running" },
+  { id: 6, model: "GPT-NeoX", gpu: "RTX 6000 Ada", memory: "48 GB", cluster: "Cluster-B", status: "Idle" },
 ];
 
-const columns: ColumnDef<AIInfra>[] = [
+const columns: ColumnDef<GPUResource>[] = [
   { accessorKey: "model", header: "Model" },
   { accessorKey: "gpu", header: "GPU" },
   { accessorKey: "memory", header: "Memory" },
@@ -59,8 +46,8 @@ const columns: ColumnDef<AIInfra>[] = [
         status === "Running"
           ? "bg-green-100 text-green-700 border-green-700"
           : status === "Idle"
-            ? "bg-yellow-100 text-yellow-700 border-yellow-700"
-            : "bg-red-100 text-red-700 border-red-700";
+          ? "bg-yellow-100 text-yellow-700 border-yellow-700"
+          : "bg-red-100 text-red-700 border-red-700";
 
       return (
         <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>
@@ -74,7 +61,9 @@ const columns: ColumnDef<AIInfra>[] = [
     header: "Actions",
     cell: ({ row }) => (
       <button
-        onClick={() => alert(`Deploying ${row.original.model} on ${row.original.cluster}`)}
+        onClick={() =>
+          alert(`Deploying ${row.original.model} on ${row.original.cluster}`)
+        }
         className="bg-indigo-500 hover:bg-[#2f13b0] text-white px-4 py-2 rounded-[10px] text-bold transition-colors"
       >
         Deploy
@@ -106,7 +95,7 @@ export default function Dashboard() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1000); 
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -116,6 +105,14 @@ export default function Dashboard() {
 
   return (
     <div className="p-8 h-[85vh] flex flex-col">
+      {/* Customer Header */}
+      <div className="mb-6 ml-2">
+        <h1 className="text-2xl font-bold text-gray-800 tracking-wide">
+          Customer Dashboard: <span className="text-indigo-600">ACME Corp</span>
+        </h1>
+        <p className="text-gray-600 text-sm">GPU allocations and usage for this customer</p>
+      </div>
+
       {/* Search box */}
       <div className="mb-4 flex items-center gap-4">
         <input
@@ -126,6 +123,7 @@ export default function Dashboard() {
         />
       </div>
 
+      {/* Table */}
       <div className="flex-1 rounded-xl shadow-xl overflow-hidden bg-white border flex flex-col">
         <div className="flex-1 overflow-y-auto">
           <table className="w-full border-collapse">
