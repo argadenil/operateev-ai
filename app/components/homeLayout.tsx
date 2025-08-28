@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Header from "./header";
 import Footer from "./footer";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Chat from "./chat";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -40,8 +40,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                             key={item.href}
                             href={item.href}
                             className={`group relative flex items-center p-3 mx-3 rounded-2xl transition-all duration-300 transform ${pathname === item.href
-                                    ? "bg-indigo-500 text-white shadow-xl scale-105"
-                                    : "hover:bg-gray-800 hover:scale-105 text-gray-200"
+                                ? "bg-indigo-500 text-white shadow-xl scale-105"
+                                : "hover:bg-gray-800 hover:scale-105 text-gray-200"
                                 }`}
                             title={!sidebarOpen ? item.name : undefined}
                         >
@@ -107,6 +107,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             >
                 <div className="flex justify-between items-center p-4 border-b">
                     <span className="text-lg font-semibold text-gray-800">👋 Welcome Nilesh</span>
+                    <X onClick={() => setSlideOverOpen(false)}></X>
+
                 </div>
 
                 <div className="p-4 space-y-4 h-[88vh] overflow-y-auto">
