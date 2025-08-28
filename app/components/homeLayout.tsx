@@ -91,7 +91,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             {!slideOverOpen && (
                 <video
                     src="images/agent.webm"
-                    className="fixed top-1/2 right-6 w-[65px] h-[65px] -translate-y-1/2 rounded-full cursor-pointer shadow-lg border-2 border-white bg-transparent z-40"
+                    className="fixed top-[20%] right-6 w-[65px] h-[65px] -translate-y-1/2 rounded-full cursor-pointer shadow-lg border-2 border-white bg-transparent z-40"
                     width={70}
                     height={70}
                     muted
