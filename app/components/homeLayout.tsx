@@ -26,7 +26,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         <div className="flex h-screen relative overflow-hidden bg-gray-100">
             {/* Sidebar */}
             <aside
-                className={`bg-gray-950 text-white transition-all duration-100 ${sidebarOpen ? "w-64" : "w-20"
+                className={`bg-gray-950 text-white transition-all duration-300 ${sidebarOpen ? "w-64" : "w-20"
                     } flex flex-col relative z-30 shadow-2xl`}
             >
                 <nav className="flex flex-col mt-40 space-y-3">
