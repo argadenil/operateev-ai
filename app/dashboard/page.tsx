@@ -12,6 +12,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
+import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 
 // Chart.js
 import {
@@ -75,8 +76,8 @@ export default function Dashboard() {
           status === "Running"
             ? "bg-green-100 text-green-700 border-green-700"
             : status === "Idle"
-            ? "bg-yellow-100 text-yellow-700 border-yellow-700"
-            : "bg-red-100 text-red-700 border-red-700";
+              ? "bg-yellow-100 text-yellow-700 border-yellow-700"
+              : "bg-red-100 text-red-700 border-red-700";
 
         return (
           <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>
@@ -151,7 +152,7 @@ export default function Dashboard() {
       {/* Header */}
       <div className="mb-6 ml-2">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-800 tracking-wide">
-          Customer Dashboard: <span className="text-indigo-600">ACME Corp</span>
+          Customer Dashboard: <span className="text-indigo-600">TEST Corp</span>
         </h1>
       </div>
 
@@ -166,6 +167,7 @@ export default function Dashboard() {
       </div>
 
       {/* Table */}
+      {/* Table */}
       <div className="flex-1 rounded-xl shadow-xl overflow-hidden bg-white border flex flex-col">
         <div className="flex-1 overflow-x-auto overflow-y-auto">
           <table className="w-full min-w-[700px] border-collapse">
@@ -178,8 +180,7 @@ export default function Dashboard() {
                       <th
                         key={header.id}
                         onClick={header.column.getToggleSortingHandler()}
-                        className={`px-4 py-3 border-b border-gray-700 font-semibold cursor-pointer select-none ${isCenter ? "text-center" : "text-start"
-                          }`}
+                        className={`px-4 py-3 border-b border-gray-200 font-semibold cursor-pointer select-none ${isCenter ? "text-center" : "text-start"}`}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {{
@@ -217,24 +218,68 @@ export default function Dashboard() {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-end items-center gap-3 p-4 bg-gray-50 border-t">
-          <span className="text-sm font-medium text-gray-700">
-            Page <strong>{table.getState().pagination.pageIndex + 1} of {table.getPageCount()}</strong>
-          </span>
-          <div className="flex gap-2 mt-2 sm:mt-0">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 p-4 bg-gray-50 border-t border-gray-200">
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <span>Rows per page:</span>
+            <select
+              value={table.getState().pagination.pageSize}
+              onChange={(e) => table.setPageSize(Number(e.target.value))}
+              className="border rounded-md px-2 py-1 text-sm"
+            >
+              {[5, 10, 20, 50].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <span>
+              Page <strong>{table.getState().pagination.pageIndex + 1}</strong> of{" "}
+              {table.getPageCount()}
+            </span>
+            <input
+              type="number"
+              min={1}
+              max={table.getPageCount()}
+              defaultValue={table.getState().pagination.pageIndex + 1}
+              onChange={(e) => {
+                const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                table.setPageIndex(page);
+              }}
+              className="w-16 border rounded-md px-2 py-1 text-sm"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={() => table.firstPage()}
+              disabled={!table.getCanPreviousPage()}
+              className="px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
+            >
+              <ChevronsLeft size={18} />
+            </button>
             <button
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="px-4 py-2 rounded-md border border-gray-300 text-sm bg-white hover:bg-gray-100 disabled:opacity-50"
+              className="px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
             >
-              ⬅ Previous
+              <ChevronLeft size={18} />
             </button>
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="px-4 py-2 rounded-md border border-gray-300 text-sm bg-white hover:bg-gray-100 disabled:opacity-50"
+              className="px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
             >
-              Next ➡
+              <ChevronRight size={18} />
+            </button>
+            <button
+              onClick={() => table.lastPage()}
+              disabled={!table.getCanNextPage()}
+              className="px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
+            >
+              <ChevronsRight size={18} />
             </button>
           </div>
         </div>
@@ -268,10 +313,10 @@ export default function Dashboard() {
                 <span className="font-semibold">Status:</span>{" "}
                 <span
                   className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold border ${selectedModel.status === "Running"
-                      ? "bg-green-100 text-green-700 border-green-700"
-                      : selectedModel.status === "Idle"
-                        ? "bg-yellow-100 text-yellow-700 border-yellow-700"
-                        : "bg-red-100 text-red-700 border-red-700"
+                    ? "bg-green-100 text-green-700 border-green-700"
+                    : selectedModel.status === "Idle"
+                      ? "bg-yellow-100 text-yellow-700 border-yellow-700"
+                      : "bg-red-100 text-red-700 border-red-700"
                     }`}
                 >
                   {selectedModel.status}

@@ -26,7 +26,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         <div className="flex h-screen relative overflow-hidden bg-gray-100">
             {/* Sidebar */}
             <aside
-                className={`bg-gray-950 text-white transition-all duration-300 ${sidebarOpen ? "w-64" : "w-20"
+                className={`bg-gray-950 text-white transition-all duration-100 ${sidebarOpen ? "w-64" : "w-20"
                     } flex flex-col relative z-30 shadow-2xl`}
             >
                 <nav className="flex flex-col mt-40 space-y-3">
@@ -105,19 +105,28 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
             {/* Slide-over panel */}
             <div
-                className={`fixed inset-y-0 right-0 w-95 h-[96vh] bg-white shadow-xl transform transition-transform duration-300 z-50 ${slideOverOpen ? "translate-x-0" : "translate-x-full"
+                className={`fixed inset-y-0 right-0 w-95 h-[96vh] bg-white shadow-xl transform transition-transform duration-800 z-50 ${slideOverOpen ? "translate-x-0" : "translate-x-full"
                     }`}
             >
-                <div className="flex justify-between items-center p-4 border-b">
-                    <span className="text-lg font-semibold text-gray-800">👋 Welcome Nilesh</span>
-                    <X onClick={() => setSlideOverOpen(false)}></X>
+                <div className="flex flex-col h-full">
+                    {/* Chat assistant header inside chat window */}
+                    <div className="flex justify-between items-center p-4 border-b bg-gray-50 rounded-t-2xl">
+                        <span className="text-lg font-semibold text-gray-800">👋 Welcome Nilesh</span>
+                        <button
+                            onClick={() => setSlideOverOpen(false)}
+                            className="p-1 rounded-full hover:bg-gray-200"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
 
-                </div>
-
-                <div className="p-4 space-y-4 h-[88vh] overflow-y-auto">
-                    <Chat />
+                    {/* Chat body takes the rest of height */}
+                    <div className="flex-grow overflow-y-auto">
+                        <Chat />
+                    </div>
                 </div>
             </div>
+
 
             {/* Overlay */}
             {slideOverOpen && (
