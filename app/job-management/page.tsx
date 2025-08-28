@@ -158,7 +158,7 @@ export default function JobManagementPage() {
 
   // Chart options - ensure charts are responsive and do not maintain aspect ratio,
   // and give some padding so nothing gets cut off.
-  const commonChartOptions: any = {
+  const commonChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
