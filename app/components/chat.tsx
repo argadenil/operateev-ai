@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Send } from "lucide-react";
+import Image from "next/image";
 
 export default function Chat() {
   const [messages, setMessages] = useState([
@@ -76,39 +77,42 @@ export default function Chat() {
           >
             {/* Bot Avatar */}
             {msg.sender === "bot" && (
-              <img
+              <Image
                 src="/images/robot.png"
                 alt="AI Avatar"
+                width={40}
+                height={40}
                 className="w-10 h-10 flex-shrink-0 rounded-full mr-3 shadow-md object-cover"
               />
             )}
 
             {/* Chat bubble with arrow */}
-     <div
-  className={`relative px-5 py-3 max-w-xs sm:max-w-sm md:max-w-md break-words shadow-md transition transform hover:scale-[1.02] rounded-[15px] ${
-    msg.sender === "user"
-      ? "bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white"
-      : "bg-gray-800 text-white"
-  }`}
->
-  {msg.text}
+            <div
+              className={`relative px-5 py-3 max-w-xs sm:max-w-sm md:max-w-md break-words shadow-md transition transform hover:scale-[1.02] rounded-[15px] ${msg.sender === "user"
+                  ? "bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white"
+                  : "bg-gray-800 text-white"
+                }`}
+            >
+              {msg.text}
 
-  {/* Arrow */}
-  <div
-    className={`absolute w-0 h-0 border-t-8 border-b-8 ${
-      msg.sender === "user"
-        ? "border-l-8 border-l-indigo-500 border-t-transparent border-b-transparent -right-2 top-1/2 transform -translate-y-1/2"
-        : "border-r-8 border-r-gray-800 border-t-transparent border-b-transparent -left-2 top-1/2 transform -translate-y-1/2"
-    }`}
-  />
-</div>
+              {/* Arrow */}
+              <div
+                className={`absolute w-0 h-0 border-t-8 border-b-8 ${msg.sender === "user"
+                    ? "border-l-8 border-l-indigo-500 border-t-transparent border-b-transparent -right-2 top-1/2 transform -translate-y-1/2"
+                    : "border-r-8 border-r-gray-800 border-t-transparent border-b-transparent -left-2 top-1/2 transform -translate-y-1/2"
+                  }`}
+              />
+            </div>
 
             {/* User Avatar */}
             {msg.sender === "user" && (
-              <img
+              <Image
                 src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
                 alt="User Avatar"
+                width={40}
+                height={40}
                 className="w-10 h-10 flex-shrink-0 rounded-full ml-3 shadow-md object-cover"
+                unoptimized
               />
             )}
           </div>

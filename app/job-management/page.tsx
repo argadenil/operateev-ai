@@ -215,7 +215,7 @@ export default function JobManagementPage() {
       <div className="flex items-center gap-4">
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as any)}
+          onChange={(e) => setStatusFilter(e.target.value as "all" | Job["status"])}
           className="px-4 py-2 border rounded-lg"
         >
           <option value="all">All Status</option>
