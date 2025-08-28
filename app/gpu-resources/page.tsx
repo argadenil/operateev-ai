@@ -12,7 +12,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { X } from "lucide-react";
+import { X, Copy } from "lucide-react";
 
 type GPU = {
   id: number;
@@ -31,6 +31,7 @@ const gpuList: GPU[] = [
 export default function GPUResourcesPage() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<GPU["status"] | "all">("all");
   const [loading, setLoading] = React.useState(true);
   const [selectedGPU, setSelectedGPU] = React.useState<GPU | null>(null);
 
@@ -70,8 +71,12 @@ export default function GPUResourcesPage() {
     },
   ];
 
+  const filteredData = gpuList.filter(
+    (gpu) => statusFilter === "all" || gpu.status === statusFilter
+  );
+
   const table = useReactTable({
-    data: gpuList,
+    data: filteredData,
     columns,
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
@@ -87,13 +92,43 @@ export default function GPUResourcesPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  const gpuSummary = {
+    available: gpuList.filter((g) => g.status === "available").length,
+    allocated: gpuList.filter((g) => g.status === "allocated").length,
+    offline: gpuList.filter((g) => g.status === "offline").length,
+  };
+
+  const exportCSV = () => {
+    const header = ["ID", "Model", "Memory", "Cluster", "Status"];
+    const rows = filteredData.map((g) => [g.id, g.model, g.memory, g.cluster, g.status]);
+    const csvContent = [header, ...rows].map((e) => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "gpu_list.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) return <Loader />;
 
   return (
     <div className="p-8 h-[85vh] flex flex-col">
-      {/* Header */}
+      {/* Summary Cards */}
+      <div className="flex gap-4 mb-6">
+        <div className="bg-green-100 text-green-700 p-4 rounded-lg flex-1 text-center font-semibold">
+          Available: {gpuSummary.available}
+        </div>
+        <div className="bg-blue-100 text-blue-700 p-4 rounded-lg flex-1 text-center font-semibold">
+          Allocated: {gpuSummary.allocated}
+        </div>
+        <div className="bg-red-100 text-red-700 p-4 rounded-lg flex-1 text-center font-semibold">
+          Offline: {gpuSummary.offline}
+        </div>
+      </div>
 
-      {/* Search */}
+      {/* Filters & Search */}
       <div className="mb-4 flex items-center gap-4">
         <input
           value={globalFilter ?? ""}
@@ -101,6 +136,22 @@ export default function GPUResourcesPage() {
           placeholder="Search GPUs..."
           className="px-4 py-2 border rounded-lg w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as GPU["status"] | "all")}
+          className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="all">All Status</option>
+          <option value="available">Available</option>
+          <option value="allocated">Allocated</option>
+          <option value="offline">Offline</option>
+        </select>
+        <button
+          onClick={exportCSV}
+          className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 flex items-center gap-2"
+        >
+          <Copy size={16} /> Export CSV
+        </button>
       </div>
 
       {/* Table */}
@@ -141,6 +192,27 @@ export default function GPUResourcesPage() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-end gap-2 mt-2 py-2 px-4 border-t border-gray-200">
+          <button
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+          <span className="px-3 py-1">
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          </span>
+          <button
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
 
