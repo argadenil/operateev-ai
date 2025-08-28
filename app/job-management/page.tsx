@@ -165,10 +165,6 @@ export default function JobManagementPage() {
   return (
     <div className="p-8 h-[85vh] flex flex-col gap-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800 tracking-wide">Job Management</h1>
-        <p className="text-gray-600 text-sm">Track and manage AI/ML jobs running on GPUs</p>
-      </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-4">

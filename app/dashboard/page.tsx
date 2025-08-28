@@ -153,7 +153,6 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold text-gray-800 tracking-wide">
           Customer Dashboard: <span className="text-indigo-600">ACME Corp</span>
         </h1>
-        <p className="text-gray-600 text-sm">GPU allocations and usage for this customer</p>
       </div>
 
       {/* Search */}
