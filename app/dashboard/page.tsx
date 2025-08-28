@@ -5,8 +5,11 @@ import {
   useReactTable,
   getCoreRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
   flexRender,
   ColumnDef,
+  SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
 
@@ -65,7 +68,6 @@ const columns: ColumnDef<AIInfra>[] = [
         </span>
       );
     },
-
   },
   {
     id: "actions",
@@ -82,27 +84,48 @@ const columns: ColumnDef<AIInfra>[] = [
 ];
 
 export default function Dashboard() {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [loading, setLoading] = React.useState(true);
+
   const table = useReactTable({
     data,
     columns,
+    state: {
+      sorting,
+      globalFilter,
+    },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
-  const [loading, setLoading] = React.useState(true);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1000); // 1 second loader for demo
+    }, 1000); 
     return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
     return <Loader />;
   }
-  
+
   return (
     <div className="p-8 h-[85vh] flex flex-col">
-      {/* Table container grows and scrolls */}
+      {/* Search box */}
+      <div className="mb-4 flex items-center gap-4">
+        <input
+          value={globalFilter ?? ""}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          placeholder="Search models, GPUs, clusters..."
+          className="px-4 py-2 border rounded-lg w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
+
       <div className="flex-1 rounded-xl shadow-xl overflow-hidden bg-white border flex flex-col">
         <div className="flex-1 overflow-y-auto">
           <table className="w-full border-collapse">
@@ -114,9 +137,16 @@ export default function Dashboard() {
                     return (
                       <th
                         key={header.id}
-                        className={`px-4 py-3 border-b border-gray-700 font-semibold ${isCenter ? "text-center" : "text-start"}`}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className={`px-4 py-3 border-b border-gray-700 font-semibold cursor-pointer select-none ${
+                          isCenter ? "text-center" : "text-start"
+                        }`}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
+                        {{
+                          asc: " 🔼",
+                          desc: " 🔽",
+                        }[header.column.getIsSorted() as string] ?? null}
                       </th>
                     );
                   })}
@@ -131,7 +161,6 @@ export default function Dashboard() {
                   className={`transition ${i % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-indigo-50`}
                 >
                   {row.getVisibleCells().map((cell) => {
-                    // Center align for Status and Actions, left for others
                     const isCenter = cell.column.id === "status" || cell.column.id === "actions";
                     return (
                       <td
@@ -145,11 +174,10 @@ export default function Dashboard() {
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
 
-        {/* Pagination always at bottom of table card */}
+        {/* Pagination */}
         <div className="flex justify-end items-center gap-3 p-4 bg-gray-50 border-t">
           <span className="text-sm font-medium text-gray-700 mr-4">
             Page{" "}
