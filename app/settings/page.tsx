@@ -16,15 +16,15 @@ export default function Settings() {
       return <Loader />;
     }
   return (
-    <div className="min-h-screen p-4 sm:p-6 md:p-8 bg-gray-50">
+    <div className="min-h-screen p-4 sm:p-6 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Page Header */}
-        <div className="mb-4 text-center md:text-left">
+        {/* <div className="mb-4 text-center md:text-left">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1">Account Settings</h1>
           <p className="text-gray-600 text-sm sm:text-base">
             Manage your profile, security, notifications, and integrations in one place.
           </p>
-        </div>
+        </div> */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Profile */}
