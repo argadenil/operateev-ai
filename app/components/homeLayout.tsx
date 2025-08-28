@@ -72,9 +72,12 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             <div className="flex flex-col flex-grow relative z-20 bg-white">
                 <Header />
                 <main className="flex-grow p-4 overflow-auto bg-white">
-                    <div className="flex items-center justify-between mb-6 ml-3">
-                        <h1 className="text-2xl font-semibold text-gray-800 tracking-wide">
-                            {routeMap[pathname]?.toUpperCase() || "PAGE"}
+                    <div className="flex items-center justify-between mb-6 ml-8">
+                        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight relative">
+                            <span className="bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent">
+                                {routeMap[pathname]?.toUpperCase() || "PAGE"}
+                            </span>
+                            <span className="absolute left-0 -bottom-1 w-12 h-1 bg-indigo-500 rounded-full"></span>
                         </h1>
                     </div>
 
