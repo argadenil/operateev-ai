@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -8,6 +8,7 @@ import {
   flexRender,
   ColumnDef,
 } from "@tanstack/react-table";
+import Loader from "../components/loader";
 
 type AIInfra = {
   id: number;
@@ -87,7 +88,18 @@ export default function Dashboard() {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+  const [loading, setLoading] = React.useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000); // 1 second loader for demo
+    return () => clearTimeout(timer);
+  }, []);
 
+  if (loading) {
+    return <Loader />;
+  }
+  
   return (
     <div className="p-8 h-[85vh] flex flex-col">
       {/* Table container grows and scrolls */}

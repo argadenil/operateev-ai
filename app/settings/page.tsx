@@ -1,4 +1,20 @@
+"use client";
+
+import React, { useEffect } from "react";
+import Loader from "../components/loader";
+
 export default function Settings() {
+  const [loading, setLoading] = React.useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000); // 1 second loader for demo
+    return () => clearTimeout(timer);
+  }, []);
+
+    if (loading) {
+      return <Loader />;
+    }
   return (
     <div className="min-h-screen p-4 sm:p-6 md:p-8 bg-gray-50">
       <div className="max-w-6xl mx-auto space-y-8">
