@@ -1,17 +1,22 @@
 // app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
-import HomeLayout from "./components/homeLayout";
-
+import HomeLayout from "./homeLayout";
+import { Inter } from "next/font/google";
 export const metadata: Metadata = {
   title: "Operateev.ai",
   description: "",
 };
 
+const interFont = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"], 
+});
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body className={interFont.className}>
         <HomeLayout>{children}</HomeLayout>
       </body>
     </html>
