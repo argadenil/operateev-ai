@@ -1,18 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
-import Header from "./header";
-import Footer from "./footer";
+import React, { useState, useTransition } from "react";
+import Header from "./components/header";
+import Footer from "./components/footer";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import Chat from "./chat";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Chat from "./components/chat";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [slideOverOpen, setSlideOverOpen] = useState(false);
 
     const pathname = usePathname(); // current route
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+    const [activeHref, setActiveHref] = useState<string | null>(null);
 
     // Map of routes to names for dynamic page title
     const routeMap: Record<string, string> = {
@@ -35,24 +37,37 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                         { name: "GPU Resources", icon: "📁", href: "/gpu-resources" },
                         { name: "Job Management", icon: "📊", href: "/job-management" },
                         { name: "Settings", icon: "⚙️", href: "/settings" },
-                    ].map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`group relative flex items-center p-3 mx-3 rounded-2xl transition-all duration-300 transform ${pathname === item.href
-                                ? "bg-indigo-500 text-white shadow-xl scale-105"
-                                : "hover:bg-gray-800 hover:scale-105 text-gray-200"
-                                }`}
-                            title={!sidebarOpen ? item.name : undefined}
-                        >
-                            <span className="text-2xl">{item.icon}</span>
-                            {sidebarOpen && (
-                                <span className="ml-4 font-semibold text-lg group-hover:text-white transition-all duration-300">
-                                    {item.name}
-                                </span>
-                            )}
-                        </Link>
-                    ))}
+                    ].map((item) => {
+                        const isActive = pathname === item.href || activeHref === item.href;
+                        return (
+                            <button
+                                key={item.href}
+                                type="button"
+                                onClick={() => {
+                                    // provide immediate visual feedback then navigate
+                                    setActiveHref(item.href);
+                                    startTransition(() => {
+                                        router.push(item.href);
+                                    });
+                                }}
+                                className={`group relative flex items-center p-3 mx-3 rounded-2xl cursor-pointer transition-all duration-300 transform ${isActive
+                                    ? "bg-indigo-500 text-white shadow-xl scale-105"
+                                    : "hover:bg-gray-800 hover:scale-105 text-gray-200"
+                                    }`}
+                                title={!sidebarOpen ? item.name : undefined}
+                                aria-current={pathname === item.href ? 'page' : undefined}
+                            >
+                                <span className="text-2xl">{item.icon}</span>
+                                {sidebarOpen && (
+                                    <span className="ml-4 font-semibold text-lg group-hover:text-white transition-all duration-300">
+                                        {item.name}
+                                    </span>
+                                )}
+
+                                {/* pending indicator removed to avoid visual dot on click */}
+                            </button>
+                        );
+                    })}
                 </nav>
 
                 <div className="mt-auto mb-4 px-4 text-white text-sm">
