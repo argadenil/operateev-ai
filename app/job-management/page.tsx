@@ -397,7 +397,7 @@ export default function JobManagementPage() {
         {/* Filters */}
         <section>
           <div className="flex flex-wrap items-center gap-4">
-            <select
+            {/* <select
               value={statusFilter}
               className="px-4 py-2 border rounded-lg"
             >
@@ -406,7 +406,7 @@ export default function JobManagementPage() {
               <option value="completed">Completed</option>
               <option value="failed">Failed</option>
               <option value="queued">Queued</option>
-            </select>
+            </select> */}
             <input
               value={globalFilter ?? ""}
               onChange={(e) => setGlobalFilter(e.target.value)}
