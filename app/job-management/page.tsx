@@ -399,7 +399,6 @@ export default function JobManagementPage() {
           <div className="flex flex-wrap items-center gap-4">
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as "all" | Job["status"])}
               className="px-4 py-2 border rounded-lg"
             >
               <option value="all">All Status</option>
