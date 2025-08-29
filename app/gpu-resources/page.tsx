@@ -129,12 +129,12 @@ export default function GPUResourcesPage() {
 
       {/* Filters & Search */}
       <div className="mb-4 flex items-center gap-4">
-        <input
+        {/* <input
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder="Search GPUs..."
           className="px-4 py-2 border rounded-lg w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+        /> */}
         {/* <select
           value={statusFilter}
           className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
