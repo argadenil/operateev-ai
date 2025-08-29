@@ -135,7 +135,7 @@ export default function GPUResourcesPage() {
           placeholder="Search GPUs..."
           className="px-4 py-2 border rounded-lg w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <select
+        {/* <select
           value={statusFilter}
           className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
@@ -143,7 +143,7 @@ export default function GPUResourcesPage() {
           <option value="available">Available</option>
           <option value="allocated">Allocated</option>
           <option value="offline">Offline</option>
-        </select>
+        </select> */}
         <button
           onClick={exportCSV}
           className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 flex items-center gap-2"
