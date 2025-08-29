@@ -137,7 +137,6 @@ export default function GPUResourcesPage() {
         />
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as GPU["status"] | "all")}
           className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="all">All Status</option>
