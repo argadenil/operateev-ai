@@ -462,7 +462,7 @@ export default function JobManagementPage() {
         </section>
 
         {/* Recent Activity */}
-        <section>
+        <section className="mb-8">
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Recent Activity</h2>
           <div className="bg-white rounded-xl shadow border p-4">
             <ul className="text-sm text-gray-700 space-y-2">
