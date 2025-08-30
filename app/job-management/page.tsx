@@ -304,7 +304,7 @@ export default function JobManagementPage() {
   if (loading) return <Loader />;
 
   return (
-    <div className="p-8 h-[85vh] overflow-y-auto">
+    <div className="p-8 h-[85vh]">
       <div className="max-w-7xl mx-auto flex flex-col gap-8">
         {/* Page Header */}
 
