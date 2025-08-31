@@ -114,7 +114,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                                 type="button"
                                 onClick={() => handleNavigation(item.href)}
                                 className={`group relative flex items-center p-4 mx-3 rounded-2xl cursor-pointer transition-all duration-200 transform touch-manipulation ${isActive
-                                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-xl shadow-indigo-500/25"
+                                    ? "bg-indigo-500 text-white shadow-xl shadow-indigo-500/25"
                                     : "hover:bg-white/10 hover:backdrop-blur-sm text-gray-300 hover:text-white"
                                     }`}
                                 title={!sidebarOpen && !isMobile ? item.name : undefined}
@@ -151,7 +151,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 {!isMobile && (
                     <button
                         onClick={toggleSidebar}
-                        className="hover:cursor-pointer absolute top-24 -right-5 w-12 h-12 rounded-full flex items-center justify-center shadow-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 hover:scale-110 z-40 touch-manipulation"
+                        className="hover:cursor-pointer absolute top-24 -right-5 w-12 h-12 rounded-full flex items-center justify-center shadow-2xl bg-indigo-500 text-white transition-all duration-200 hover:scale-110 z-40 touch-manipulation"
                         aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
                         style={{ transform: 'translateZ(0)' }}
                     >
