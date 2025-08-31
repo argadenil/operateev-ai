@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -12,9 +12,9 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
+import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap } from "lucide-react";
 
-// Chart.js
+// Chart.js - Register once
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -29,7 +29,10 @@ import {
 import { Line, Pie } from "react-chartjs-2";
 import { X } from "lucide-react";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
+// Register ChartJS components once
+if (typeof window !== 'undefined') {
+  ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
+}
 
 type GPUResource = {
   id: number;
@@ -43,7 +46,8 @@ type GPUResource = {
   processes: number;
 };
 
-const data: GPUResource[] = [
+// Move data outside component to prevent recreation
+const mockGPUData: GPUResource[] = [
   { id: 1, gpu: "NVIDIA A100", memory: "80 GB", cluster: "Cluster-A", status: "Running", uptime: "72h", temperature: 65, power: 250, processes: 12 },
   { id: 2, gpu: "RTX 4090", memory: "24 GB", cluster: "Cluster-C", status: "Stopped", uptime: "0h", temperature: 40, power: 50, processes: 0 },
   { id: 3, gpu: "T4", memory: "16 GB", cluster: "Cluster-A", status: "Running", uptime: "36h", temperature: 70, power: 200, processes: 5 },
@@ -52,14 +56,116 @@ const data: GPUResource[] = [
   { id: 6, gpu: "RTX 6000 Ada", memory: "48 GB", cluster: "Cluster-B", status: "Idle", uptime: "8h", temperature: 50, power: 100, processes: 2 },
 ];
 
-export default function Dashboard() {
+// Status color mapping - moved outside component
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "Running":
+      return "bg-green-100 text-green-700";
+    case "Idle":
+      return "bg-yellow-100 text-yellow-700";
+    default:
+      return "bg-red-100 text-red-700";
+  }
+};
+
+// Chart data - moved outside component to prevent recreation
+const createLineChartData = () => ({
+  labels: ["1m", "2m", "3m", "4m", "5m", "6m"],
+  datasets: [
+    {
+      label: "GPU Utilization (%)",
+      data: [30, 45, 60, 50, 70, 85],
+      borderColor: "#6366f1",
+      backgroundColor: "rgba(99,102,241,0.3)",
+      fill: true,
+      tension: 0.4,
+    },
+  ],
+});
+
+const createPieChartData = () => ({
+  labels: ["Used Memory", "Free Memory"],
+  datasets: [
+    {
+      label: "Memory (GB)",
+      data: [56, 24],
+      backgroundColor: ["#f87171", "#34d399"],
+      borderWidth: 2,
+    },
+  ],
+});
+
+// Chart options - memoized to prevent recreation
+const chartOptions = {
+  line: {
+    maintainAspectRatio: false,
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        titleFont: { size: 12 },
+        bodyFont: { size: 11 }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { font: { size: 10 } }
+      },
+      y: {
+        ticks: { font: { size: 10 } }
+      }
+    }
+  },
+  pie: {
+    maintainAspectRatio: false,
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "bottom" as const,
+        labels: {
+          font: { size: 11 },
+          padding: 15
+        }
+      },
+      tooltip: {
+        titleFont: { size: 12 },
+        bodyFont: { size: 11 }
+      }
+    }
+  }
+};
+
+const Dashboard = React.memo(() => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [loading, setLoading] = React.useState(true);
-
   const [selectedModel, setSelectedModel] = React.useState<GPUResource | null>(null);
 
-  const columns: ColumnDef<GPUResource>[] = [
+  // Memoize chart data
+  const lineChartData = useMemo(() => createLineChartData(), []);
+  const pieChartData = useMemo(() => createPieChartData(), []);
+
+  // Memoize expensive calculations
+  const statsData = useMemo(() => {
+    const runningCount = mockGPUData.filter(gpu => gpu.status === 'Running').length;
+    const idleCount = mockGPUData.filter(gpu => gpu.status === 'Idle').length;
+    const avgPower = Math.round(mockGPUData.reduce((acc, gpu) => acc + gpu.power, 0) / mockGPUData.length);
+
+    return {
+      total: mockGPUData.length,
+      running: runningCount,
+      idle: idleCount,
+      avgPower
+    };
+  }, []);
+
+  // Memoize modal close handler
+  const handleCloseModal = useCallback(() => {
+    setSelectedModel(null);
+  }, []);
+
+  // Memoize columns to prevent recreation
+  const columns = useMemo<ColumnDef<GPUResource>[]>(() => [
     { accessorKey: "gpu", header: "GPU" },
     { accessorKey: "memory", header: "Memory" },
     { accessorKey: "cluster", header: "Cluster" },
@@ -72,15 +178,10 @@ export default function Dashboard() {
       header: "Status",
       cell: ({ getValue }) => {
         const status = getValue() as string;
-        const color =
-          status === "Running"
-            ? "bg-green-100 text-green-700 border-green-700"
-            : status === "Idle"
-              ? "bg-yellow-100 text-yellow-700 border-yellow-700"
-              : "bg-red-100 text-red-700 border-red-700";
+        const colorClass = getStatusColor(status);
 
         return (
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>
+          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border-0 shadow-sm ${colorClass}`}>
             {status}
           </span>
         );
@@ -92,16 +193,16 @@ export default function Dashboard() {
       cell: ({ row }) => (
         <button
           onClick={() => setSelectedModel(row.original)}
-          className="bg-indigo-500 hover:bg-[#2f13b0] text-white px-4 py-2 rounded-[10px] font-semibold transition-colors"
+          className="bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
         >
           Details
         </button>
       ),
     },
-  ];
+  ], []);
 
   const table = useReactTable({
-    data,
+    data: mockGPUData,
     columns,
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
@@ -119,59 +220,148 @@ export default function Dashboard() {
 
   if (loading) return <Loader />;
 
-  // Mock line chart data (GPU utilization)
-  const lineChartData = {
-    labels: ["1m", "2m", "3m", "4m", "5m", "6m"],
-    datasets: [
-      {
-        label: "GPU Utilization (%)",
-        data: [30, 45, 60, 50, 70, 85],
-        borderColor: "#6366f1",
-        backgroundColor: "rgba(99,102,241,0.3)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
-
-  // Mock pie chart data (memory usage breakdown)
-  const pieChartData = {
-    labels: ["Used Memory", "Free Memory"],
-    datasets: [
-      {
-        label: "Memory (GB)",
-        data: [56, 24], // mock values
-        backgroundColor: ["#f87171", "#34d399"],
-        borderWidth: 2,
-      },
-    ],
-  };
-
   return (
-    <div className="p-4 sm:p-8 h-[85vh] flex flex-col">
-      {/* Header */}
-      <div className="mb-6 ml-2">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 tracking-wide">
-          Customer Dashboard: <span className="text-indigo-600">TEST Corp</span>
-        </h1>
+    <div className="space-y-6 animate-slide-up">
+      {/* Customer Info */}
+      <div className="bg-gradient-to-r from-white via-indigo-50/30 to-purple-50/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100/50 shadow-lg backdrop-blur-sm">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+          Customer Dashboard: <span className="text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text">TEST Corp</span>
+        </h2>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/10" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
+            <div className="mb-2 sm:mb-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Total GPUs</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">{statsData.total}</p>
+            </div>
+            <div className="group relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-400/50 to-purple-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-indigo-500/30 shadow-inner shadow-indigo-500/20">
+                <Cpu className="text-indigo-600 group-hover:scale-110 transition-transform" size={22} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/10" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
+            <div className="mb-2 sm:mb-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Running</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-600 tracking-tight">{statsData.running}</p>
+            </div>
+            <div className="group relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
+                <PlayCircle className="text-emerald-600 group-hover:scale-110 transition-transform" size={22} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/10" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
+            <div className="mb-2 sm:mb-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Idle</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-amber-600 tracking-tight">{statsData.idle}</p>
+            </div>
+            <div className="group relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400/50 to-yellow-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-amber-500/30 shadow-inner shadow-amber-500/20">
+                <PauseCircle className="text-amber-600 group-hover:scale-110 transition-transform" size={22} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-600/10" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
+            <div className="mb-2 sm:mb-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Avg. Power</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-600 tracking-tight">{statsData.avgPower}W</p>
+            </div>
+            <div className="group relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-400/50 to-purple-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-indigo-500/30 shadow-inner shadow-indigo-500/20">
+                <Zap className="text-indigo-600 group-hover:scale-110 transition-transform" size={22} />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Search */}
-      <div className="mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-        <input
-          value={globalFilter ?? ""}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search GPUs, clusters..."
-          className="px-4 py-2 border rounded-lg w-full sm:w-1/2 md:w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+        <div className="relative flex-1 max-w-full sm:max-w-md">
+          <input
+            value={globalFilter ?? ""}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Search GPUs, clusters..."
+            className="w-full px-4 sm:px-5 py-2.5 sm:py-3 pl-10 sm:pl-12 border border-gray-200 rounded-xl sm:rounded-2xl shadow-sm bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 placeholder-gray-500 text-sm sm:text-base"
+          />
+          <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm sm:text-base">
+            🔍
+          </div>
+        </div>
       </div>
 
       {/* Table */}
-      {/* Table */}
-      <div className="flex-1 rounded-xl shadow-xl overflow-hidden bg-white border flex flex-col">
-        <div className="flex-1 overflow-x-auto overflow-y-auto">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        {/* Mobile Card View (hidden on desktop) */}
+        <div className="block lg:hidden">
+          <div className="p-4 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
+            <h3 className="font-semibold text-sm sm:text-base">GPU Resources ({statsData.total})</h3>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {table.getRowModel().rows.map((row, i) => (
+              <div key={row.id} className="p-4 hover:bg-gray-50 transition-colors">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-gray-900 text-sm">{row.original.gpu}</div>
+                      <div className="text-xs text-gray-600">{row.original.memory} • {row.original.cluster}</div>
+                    </div>
+                    <div className="text-right">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.original.status === "Running"
+                          ? "bg-green-100 text-green-700"
+                          : row.original.status === "Idle"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-700"
+                        }`}>
+                        {row.original.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                    <div>Uptime: <span className="font-medium">{row.original.uptime}</span></div>
+                    <div>Temp: <span className="font-medium">{row.original.temperature}°C</span></div>
+                    <div>Power: <span className="font-medium">{row.original.power}W</span></div>
+                    <div>Processes: <span className="font-medium">{row.original.processes}</span></div>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedModel(row.original)}
+                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table View (hidden on mobile) */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full min-w-[700px] border-collapse">
-            <thead className="sticky top-0 bg-gray-800 shadow-sm z-10">
+            <thead className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="text-sm text-white">
                   {headerGroup.headers.map((header) => {
@@ -180,13 +370,17 @@ export default function Dashboard() {
                       <th
                         key={header.id}
                         onClick={header.column.getToggleSortingHandler()}
-                        className={`px-4 py-3 border-b border-gray-200 font-semibold cursor-pointer select-none ${isCenter ? "text-center" : "text-start"}`}
+                        className={`px-6 py-4 font-semibold cursor-pointer select-none transition-colors duration-200 hover:bg-white/10 ${isCenter ? "text-center" : "text-left"}`}
                       >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {{
-                          asc: " 🔼",
-                          desc: " 🔽",
-                        }[header.column.getIsSorted() as string] ?? null}
+                        <div className="flex items-center gap-2">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          <span className="text-white/60">
+                            {{
+                              asc: "↑",
+                              desc: "↓",
+                            }[header.column.getIsSorted() as string] ?? "↕️"}
+                          </span>
+                        </div>
                       </th>
                     );
                   })}
@@ -194,18 +388,18 @@ export default function Dashboard() {
               ))}
             </thead>
 
-            <tbody className="text-sm text-gray-800">
+            <tbody className="text-sm text-gray-800 bg-white">
               {table.getRowModel().rows.map((row, i) => (
                 <tr
                   key={row.id}
-                  className={`transition ${i % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-indigo-50`}
+                  className={`border-b border-gray-100 hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-200 ${i % 2 === 0 ? "bg-gray-50/30" : "bg-white"}`}
                 >
                   {row.getVisibleCells().map((cell) => {
                     const isCenter = ["status", "actions"].includes(cell.column.id);
                     return (
                       <td
                         key={cell.id}
-                        className={`px-4 py-3 border-b border-gray-200 ${isCenter ? "text-center" : "text-start"}`}
+                        className={`px-6 py-4 ${isCenter ? "text-center" : "text-left"}`}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
@@ -218,13 +412,14 @@ export default function Dashboard() {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 p-4 bg-gray-50 border-t border-gray-200">
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <span>Rows per page:</span>
+        <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row justify-between items-center gap-3 p-3 sm:p-4 bg-gray-50 border-t border-gray-200">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700">
+            <span className="hidden sm:inline">Rows per page:</span>
+            <span className="sm:hidden">Per page:</span>
             <select
               value={table.getState().pagination.pageSize}
               onChange={(e) => table.setPageSize(Number(e.target.value))}
-              className="border rounded-md px-2 py-1 text-sm"
+              className="border rounded-md px-2 py-1 text-xs sm:text-sm"
             >
               {[5, 10, 20, 50].map((size) => (
                 <option key={size} value={size}>
@@ -234,10 +429,13 @@ export default function Dashboard() {
             </select>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <span>
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 order-last sm:order-none">
+            <span className="hidden sm:inline">
               Page <strong>{table.getState().pagination.pageIndex + 1}</strong> of{" "}
               {table.getPageCount()}
+            </span>
+            <span className="sm:hidden">
+              <strong>{table.getState().pagination.pageIndex + 1}</strong>/{table.getPageCount()}
             </span>
             <input
               type="number"
@@ -248,127 +446,138 @@ export default function Dashboard() {
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
                 table.setPageIndex(page);
               }}
-              className="w-16 border rounded-md px-2 py-1 text-sm"
+              className="w-12 sm:w-16 border rounded-md px-1 sm:px-2 py-1 text-xs sm:text-sm"
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2">
             <button
               onClick={() => table.firstPage()}
               disabled={!table.getCanPreviousPage()}
-              className="px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
+              aria-label="Go to first page"
+              className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center text-xs sm:text-sm"
             >
-              <ChevronsLeft size={18} />
+              <ChevronsLeft size={14} className="sm:hidden" />
+              <ChevronsLeft size={18} className="hidden sm:block" />
             </button>
+
             <button
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
+              aria-label="Go to previous page"
+              className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center text-xs sm:text-sm"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={14} className="sm:hidden" />
+              <ChevronLeft size={18} className="hidden sm:block" />
             </button>
+
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
+              aria-label="Go to next page"
+              className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center text-xs sm:text-sm"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={14} className="sm:hidden" />
+              <ChevronRight size={18} className="hidden sm:block" />
             </button>
+
             <button
               onClick={() => table.lastPage()}
               disabled={!table.getCanNextPage()}
-              className="px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
+              aria-label="Go to last page"
+              className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center text-xs sm:text-sm"
             >
-              <ChevronsRight size={18} />
+              <ChevronsRight size={14} className="sm:hidden" />
+              <ChevronsRight size={18} className="hidden sm:block" />
             </button>
           </div>
+
         </div>
       </div>
 
       {/* Modal */}
       {selectedModel && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full sm:w-[90%] md:w-[75%] max-h-[90vh] overflow-y-auto p-6 relative">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto relative">
             {/* Header with close icon */}
-            <div className="flex justify-between items-center border-b pb-3 mb-4">
+            <div className="flex justify-between items-center border-b p-4 sm:p-6 sticky top-0 bg-white z-10">
               <h2 className="text-lg sm:text-xl font-semibold text-gray-800">GPU Resource Details</h2>
               <button
-                onClick={() => setSelectedModel(null)}
-                className="text-gray-500 hover:text-gray-800 transition"
+                onClick={handleCloseModal}
+                className="text-gray-500 hover:text-gray-800 transition p-1"
               >
-                <X size={22} />
+                <X size={20} className="sm:hidden" />
+                <X size={22} className="hidden sm:block" />
               </button>
             </div>
 
-            {/* Info Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              <div><span className="font-semibold">GPU:</span> {selectedModel.gpu}</div>
-              <div><span className="font-semibold">Memory:</span> {selectedModel.memory}</div>
-              <div><span className="font-semibold">Cluster:</span> {selectedModel.cluster}</div>
-              <div><span className="font-semibold">Uptime:</span> {selectedModel.uptime}</div>
-              <div><span className="font-semibold">Temperature:</span> {selectedModel.temperature}°C</div>
-              <div><span className="font-semibold">Power Usage:</span> {selectedModel.power}W</div>
-              <div><span className="font-semibold">Processes Running:</span> {selectedModel.processes}</div>
-              <div className="col-span-1 sm:col-span-2">
-                <span className="font-semibold">Status:</span>{" "}
-                <span
-                  className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold border ${selectedModel.status === "Running"
-                    ? "bg-green-100 text-green-700 border-green-700"
-                    : selectedModel.status === "Idle"
-                      ? "bg-yellow-100 text-yellow-700 border-yellow-700"
-                      : "bg-red-100 text-red-700 border-red-700"
-                    }`}
-                >
-                  {selectedModel.status}
-                </span>
-              </div>
-            </div>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="bg-gray-50 rounded-xl p-4 shadow">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">GPU Utilization Over Time</h3>
-                <div className="h-48 sm:h-56">
-                  <Line
-                    data={lineChartData}
-                    options={{
-                      maintainAspectRatio: false,
-                      responsive: true,
-                      plugins: { legend: { display: false } }
-                    }}
-                  />
+            <div className="p-4 sm:p-6">
+              {/* Info Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div className="text-sm sm:text-base"><span className="font-semibold">GPU:</span> {selectedModel.gpu}</div>
+                <div className="text-sm sm:text-base"><span className="font-semibold">Memory:</span> {selectedModel.memory}</div>
+                <div className="text-sm sm:text-base"><span className="font-semibold">Cluster:</span> {selectedModel.cluster}</div>
+                <div className="text-sm sm:text-base"><span className="font-semibold">Uptime:</span> {selectedModel.uptime}</div>
+                <div className="text-sm sm:text-base"><span className="font-semibold">Temperature:</span> {selectedModel.temperature}°C</div>
+                <div className="text-sm sm:text-base"><span className="font-semibold">Power Usage:</span> {selectedModel.power}W</div>
+                <div className="text-sm sm:text-base"><span className="font-semibold">Processes Running:</span> {selectedModel.processes}</div>
+                <div className="col-span-1 sm:col-span-2 text-sm sm:text-base">
+                  <span className="font-semibold">Status:</span>{" "}
+                  <span
+                    className={`ml-2 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold border ${selectedModel.status === "Running"
+                      ? "bg-green-100 text-green-700 border-green-700"
+                      : selectedModel.status === "Idle"
+                        ? "bg-yellow-100 text-yellow-700 border-yellow-700"
+                        : "bg-red-100 text-red-700 border-red-700"
+                      }`}
+                  >
+                    {selectedModel.status}
+                  </span>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4 shadow">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">Memory Usage</h3>
-                <div className="h-48 sm:h-56">
-                  <Pie
-                    data={pieChartData}
-                    options={{
-                      maintainAspectRatio: false,
-                      responsive: true,
-                      plugins: { legend: { position: "bottom" } }
-                    }}
-                  />
+
+              {/* Charts */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                <div className="bg-gray-50 rounded-xl p-3 sm:p-4 shadow">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">GPU Utilization Over Time</h3>
+                  <div className="h-40 sm:h-48 lg:h-56">
+                    <Line
+                      data={lineChartData}
+                      options={chartOptions.line}
+                    />
+                  </div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3 sm:p-4 shadow">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Memory Usage</h3>
+                  <div className="h-40 sm:h-48 lg:h-56">
+                    <Pie
+                      data={pieChartData}
+                      options={chartOptions.pie}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Additional Stats */}
-            <div className="bg-gray-50 rounded-xl p-4 shadow mb-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Detailed GPU Statistics</h3>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700">
-                <li>Driver Version: <span className="font-medium">535.86</span></li>
-                <li>CUDA Version: <span className="font-medium">12.1</span></li>
-                <li>SM Utilization: <span className="font-medium">68%</span></li>
-                <li>Memory Bandwidth: <span className="font-medium">1555 GB/s</span></li>
-                <li>PCIe Bandwidth: <span className="font-medium">32 GB/s</span></li>
-                <li>Error Rate: <span className="font-medium">0%</span></li>
-              </ul>
+              {/* Additional Stats */}
+              <div className="bg-gray-50 rounded-xl p-3 sm:p-4 shadow">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Detailed GPU Statistics</h3>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-700">
+                  <li>Driver Version: <span className="font-medium">535.86</span></li>
+                  <li>CUDA Version: <span className="font-medium">12.1</span></li>
+                  <li>SM Utilization: <span className="font-medium">68%</span></li>
+                  <li>Memory Bandwidth: <span className="font-medium">1555 GB/s</span></li>
+                  <li>PCIe Bandwidth: <span className="font-medium">32 GB/s</span></li>
+                  <li>Error Rate: <span className="font-medium">0%</span></li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-}
+});
+
+Dashboard.displayName = 'Dashboard';
+
+export default Dashboard;

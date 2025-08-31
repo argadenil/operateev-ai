@@ -13,7 +13,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { X } from "lucide-react";
+import { X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -304,13 +304,13 @@ export default function JobManagementPage() {
   if (loading) return <Loader />;
 
   return (
-    <div className="p-8 h-[85vh]">
-      <div className="mx-auto flex flex-col gap-8">
+    <div className="space-y-6">
+      <div className="mx-auto flex flex-col gap-6">
         {/* Page Header */}
 
         {/* KPI Cards */}
         <section>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
             <div className="bg-white rounded-xl p-4 shadow border">
               <p className="text-gray-500 text-sm">Total Jobs</p>
               <h2 className="text-2xl font-bold">{total}</h2>
@@ -342,7 +342,7 @@ export default function JobManagementPage() {
         <section>
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Analytics</h2>
           {/* items-stretch ensures all cards get full height in the row */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
             <div className="bg-white shadow rounded-xl p-4 border h-64 flex flex-col">
               <h3 className="text-sm font-semibold mb-2">Job Status Distribution</h3>
               <div className="flex-1">
@@ -396,7 +396,7 @@ export default function JobManagementPage() {
 
         {/* Filters */}
         <section>
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             {/* <select
               value={statusFilter}
               className="px-4 py-2 border rounded-lg"
@@ -411,7 +411,7 @@ export default function JobManagementPage() {
               value={globalFilter ?? ""}
               onChange={(e) => setGlobalFilter(e.target.value)}
               placeholder="Search Jobs..."
-              className="px-4 py-2 border rounded-lg w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="px-3 sm:px-4 py-2 border rounded-lg w-full sm:w-64 md:w-80 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
           </div>
         </section>
@@ -419,37 +419,40 @@ export default function JobManagementPage() {
         {/* Table */}
         <section>
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Job List</h2>
-          <div className="rounded-xl shadow-xl overflow-hidden bg-white border flex flex-col">
-            <div className="flex-1 overflow-y-auto">
-              <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-gray-800 shadow-sm z-10">
+          <div className="rounded-xl shadow-xl overflow-hidden bg-white border border-gray-100 flex flex-col">
+            <div className="overflow-x-auto hidden lg:block">
+              <table className="w-full min-w-[780px] border-collapse">
+                <thead className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id} className="text-sm text-white">
                       {headerGroup.headers.map((header) => (
                         <th
                           key={header.id}
                           onClick={header.column.getToggleSortingHandler()}
-                          className="px-4 py-3 border-b border-gray-700 font-semibold cursor-pointer select-none text-start"
+                          className="px-6 py-4 font-semibold cursor-pointer select-none transition-colors duration-200 hover:bg-white/10 text-left"
                         >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {{
-                            asc: " 🔼",
-                            desc: " 🔽",
-                          }[header.column.getIsSorted() as string] ?? null}
+                          <div className="flex items-center gap-2">
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            <span className="text-white/60">
+                              {{
+                                asc: "↑",
+                                desc: "↓",
+                              }[header.column.getIsSorted() as string] ?? "↕️"}
+                            </span>
+                          </div>
                         </th>
                       ))}
                     </tr>
                   ))}
                 </thead>
-                <tbody className="text-sm text-gray-800">
+                <tbody className="text-sm text-gray-800 bg-white">
                   {table.getRowModel().rows.map((row, i) => (
                     <tr
                       key={row.id}
-                      className={`transition ${i % 2 === 0 ? "bg-gray-50" : "bg-white"
-                        } hover:bg-indigo-50`}
+                      className={`border-b border-gray-100 hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-200 ${i % 2 === 0 ? "bg-gray-50/30" : "bg-white"}`}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="px-4 py-3 border-b border-gray-200">
+                        <td key={cell.id} className="px-6 py-4 text-left">
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </td>
                       ))}
@@ -457,6 +460,105 @@ export default function JobManagementPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="block lg:hidden">
+              <div className="p-4 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
+                <h3 className="font-semibold text-sm">Jobs ({filteredData.length})</h3>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {table.getRowModel().rows.map((row) => (
+                  <div key={row.id} className="p-4 hover:bg-gray-50 transition-colors">
+                    <div className="space-y-3">
+                      <div>
+                        <div className="font-semibold text-gray-900 text-sm">{row.original.name}</div>
+                        <div className="text-xs text-gray-600">{row.original.gpu} • {row.original.owner}</div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span className="font-medium">{row.original.status}</span>
+                        <span>{row.original.duration}</span>
+                      </div>
+                      <button
+                        onClick={() => setSelectedJob(row.original)}
+                        className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pagination */}
+            <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row justify-between items-center gap-3 p-3 sm:p-4 bg-gray-50 border-t border-gray-200">
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700">
+                <span className="hidden sm:inline">Rows per page:</span>
+                <span className="sm:hidden">Per page:</span>
+                <select
+                  value={table.getState().pagination.pageSize}
+                  onChange={(e) => table.setPageSize(Number(e.target.value))}
+                  className="border rounded-md px-2 py-1 text-xs sm:text-sm"
+                >
+                  {[5, 10, 20, 50].map((size) => (
+                    <option key={size} value={size}>{size}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 order-last sm:order-none">
+                <span className="hidden sm:inline">Page <strong>{table.getState().pagination.pageIndex + 1}</strong> of {table.getPageCount()}</span>
+                <span className="sm:hidden"><strong>{table.getState().pagination.pageIndex + 1}</strong>/{table.getPageCount()}</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={table.getPageCount()}
+                  defaultValue={table.getState().pagination.pageIndex + 1}
+                  onChange={(e) => {
+                    const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                    table.setPageIndex(page);
+                  }}
+                  className="w-12 sm:w-16 border rounded-md px-1 sm:px-2 py-1 text-xs sm:text-sm"
+                />
+              </div>
+              <div className="flex gap-1 sm:gap-2">
+                <button
+                  onClick={() => table.firstPage()}
+                  disabled={!table.getCanPreviousPage()}
+                  aria-label="Go to first page"
+                  className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center text-xs sm:text-sm"
+                >
+                  <ChevronsLeft size={14} className="sm:hidden" />
+                  <ChevronsLeft size={18} className="hidden sm:block" />
+                </button>
+                <button
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                  aria-label="Go to previous page"
+                  className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center text-xs sm:text-sm"
+                >
+                  <ChevronLeft size={14} className="sm:hidden" />
+                  <ChevronLeft size={18} className="hidden sm:block" />
+                </button>
+                <button
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                  aria-label="Go to next page"
+                  className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center text-xs sm:text-sm"
+                >
+                  <ChevronRight size={14} className="sm:hidden" />
+                  <ChevronRight size={18} className="hidden sm:block" />
+                </button>
+                <button
+                  onClick={() => table.lastPage()}
+                  disabled={!table.getCanNextPage()}
+                  aria-label="Go to last page"
+                  className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center text-xs sm:text-sm"
+                >
+                  <ChevronsRight size={14} className="sm:hidden" />
+                  <ChevronsRight size={18} className="hidden sm:block" />
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -475,9 +577,13 @@ export default function JobManagementPage() {
         </section>
 
         {/* Modal (same as before) */}
-        {selectedJob && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-[60%] p-6 relative">
+             {selectedJob && (
+          <div className="fixed inset-0 z-50">
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setSelectedJob(null)}
+            />
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] sm:w-auto max-w-lg sm:max-w-2xl bg-white rounded-xl sm:rounded-2xl shadow-2xl p-4 sm:p-6">
               <div className="flex justify-between items-center border-b pb-3 mb-4">
                 <h2 className="text-xl font-semibold text-gray-800">Job Details</h2>
                 <button
@@ -487,7 +593,7 @@ export default function JobManagementPage() {
                   <X size={22} />
                 </button>
               </div>
-              <ul className="grid grid-cols-2 gap-4 text-sm text-gray-700">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm text-gray-700">
                 <li><span className="font-semibold">Job Name:</span> {selectedJob.name}</li>
                 <li><span className="font-semibold">Owner:</span> {selectedJob.owner}</li>
                 <li><span className="font-semibold">GPU:</span> {selectedJob.gpu}</li>

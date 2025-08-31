@@ -11,7 +11,19 @@ export default function Header({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Close dropdowns if clicked outside
   useEffect(() => {
@@ -48,95 +60,112 @@ export default function Header({
 
   return (
     <header
-      className={`bg-gray-950 text-white shadow-lg px-6 py-4 flex items-center justify-between ${className}`}
+      className={`bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl border-b border-slate-700/50 backdrop-blur-xl relative z-[100] ${
+        isMobile ? 'mobile-header px-4 py-3' : 'px-6 py-4'
+      } flex items-center justify-between ${className}`}
       aria-label="Main site header"
     >
       {/* Left - Logo / Brand */}
       <div className="flex items-center space-x-3">
-        <div className="w-9 h-9 text-sky-500 font-bold rounded-full flex items-center justify-center shadow-md ml-15">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Operateev.<span className="text-indigo-500">ai</span>
-          </h1>
+        <div className="flex items-center space-x-2">
+          <div className={`bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg ${
+            isMobile ? 'w-8 h-8' : 'w-10 h-10'
+          }`}>
+            <span className={`font-bold text-white ${isMobile ? 'text-sm' : 'text-xl'}`}>O</span>
+          </div>
+          {!isMobile && (
+            <h1 className="text-3xl font-bold text-white tracking-tight">
+              Operateev.<span className="text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">ai</span>
+            </h1>
+          )}
         </div>
       </div>
 
-      {/* Center - Search */}
-      <div className="flex-1 mx-6 relative max-w-xs">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="w-full bg-gray-800 text-white rounded-md px-3 py-1.5 pl-9 text-sm placeholder-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-        <Search className="absolute left-2.5 top-1.5 text-white w-4 h-4" />
-      </div>
+      {/* Center - Search (Hidden on mobile) */}
+      {!isMobile && (
+        <div className="flex-1 mx-8 relative max-w-md">
+          <div className="relative">
+            <label htmlFor="search-input" className="sr-only">
+              Search anything
+            </label>
+            <input
+              id="search-input"
+              type="text"
+              placeholder="Search anything..."
+              className="w-full bg-white/10 backdrop-blur-sm text-white rounded-2xl px-4 py-3 pl-12 text-sm placeholder-white/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-300 hover:bg-white/15"
+            />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 w-5 h-5" aria-hidden="true" />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <kbd className="px-2 py-1 text-xs font-semibold text-white/50 bg-white/10 border border-white/20 rounded">⌘K</kbd>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Right - Actions */}
-      <div className="flex items-center space-x-4">
-        {/* Notifications */}
-        {/* <div className="relative">
-          <button
-            className="relative p-2 rounded-full hover:bg-gray-800 transition"
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
+      <div className="flex items-center space-x-2 sm:space-x-4">
+        {/* Search icon for mobile */}
+        {isMobile && (
+          <button 
+            className="p-2 rounded-full hover:bg-white/10 transition"
+            aria-label="Open search"
           >
-            <Bell className="w-5 h-5 text-white" />
-            <span className="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full px-1">
-              {notifications.length}
-            </span>
+            <Search className="w-5 h-5 text-white/80" aria-hidden="true" />
           </button>
-          {notificationsOpen && (
-            <div className="absolute right-0 mt-2 w-60 bg-white text-zinc-900 rounded-md shadow-lg overflow-hidden z-50">
-              {notifications.map((note, index) => (
-                <div
-                  key={index}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                >
-                  {note}
-                </div>
-              ))}
-            </div>
-          )}
-        </div> */}
-
-        {/* Quick Actions */}
-        {/* <div className="relative">
-          <button
-            className="p-2 rounded-full hover:bg-gray-800 transition"
-            onClick={() => setQuickActionOpen(!quickActionOpen)}
-          >
-            <Zap className="w-5 h-5 text-white" />
-          </button>
-          {quickActionOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white text-zinc-900 rounded-md shadow-lg overflow-hidden z-50">
-              {quickActions.map((action, index) => (
-                <button
-                  key={index}
-                  onClick={action.onClick}
-                  className="w-full text-left px-4 py-2 hover:bg-indigo-500 hover:text-white transition"
-                >
-                  {action.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div> */}
+        )}
 
         {/* Profile */}
         <div className="relative" ref={dropdownRef}>
           <div
-            className="w-9 h-9 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold cursor-pointer hover:scale-105 transition"
+            className={`rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold cursor-pointer hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl ring-2 ring-white/10 hover:ring-white/20 ${
+              isMobile ? 'w-9 h-9' : 'w-11 h-11'
+            }`}
             title="Profile"
             onClick={() => setDropdownOpen(!dropdownOpen)}
+            id="profile-button"
+            role="button"
+            tabIndex={0}
+            aria-label="Open user profile menu"
+            aria-expanded={dropdownOpen}
+            aria-haspopup="true"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setDropdownOpen(!dropdownOpen);
+              }
+            }}
           >
-            N
+            <span className={isMobile ? 'text-sm' : 'text-lg'} aria-hidden="true">N</span>
           </div>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white text-zinc-900 rounded-md shadow-lg overflow-hidden z-50">
+            <div className={`fixed bg-white/95 backdrop-blur-xl text-gray-900 rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden z-[9999] animate-slide-up ${
+              isMobile 
+                ? 'top-14 right-2 w-44' 
+                : 'top-16 right-6 w-48'
+            }`}>
+              <div className={`border-b border-gray-200/60 bg-gradient-to-r from-indigo-50 to-purple-50 ${
+                isMobile ? 'p-3' : 'p-4'
+              }`}>
+                <div className="flex items-center space-x-3">
+                  <div className={`rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-medium ${
+                    isMobile ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-sm'
+                  }`}>
+                    N
+                  </div>
+                  <div>
+                    <div className={`font-semibold text-gray-900 ${isMobile ? 'text-xs' : 'text-sm'}`}>Nilesh</div>
+                    <div className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-xs'}`}>Administrator</div>
+                  </div>
+                </div>
+              </div>
               {menuItems.map((item, index) => (
                 <button
                   key={index}
                   onClick={item.onClick}
-                  className="w-full text-left px-4 py-2 hover:bg-indigo-500 hover:text-white transition"
+                  className={`w-full text-left hover:bg-indigo-50 transition-colors duration-200 text-gray-700 hover:text-indigo-700 font-medium ${
+                    isMobile ? 'px-3 py-2 text-sm' : 'px-4 py-3'
+                  }`}
                 >
                   {item.label}
                 </button>
