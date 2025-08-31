@@ -9,9 +9,8 @@ import (
 )
 
 func main() {
-	dsn := "postgres://postgres:nilesh3496@localhost:5432/postgres?sslmode=disable"
-	if err := db.Connect(dsn); err != nil {
-		log.Fatal("db connection failed: ", err)
+	if err := db.InitializeDB(); err != nil {
+		log.Fatal("failed to initialize database: ", err)
 	}
 	defer db.Conn.Close()
 

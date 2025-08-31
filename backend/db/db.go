@@ -26,6 +26,15 @@ func Connect(dsn string) error {
 	return nil
 }
 
+// InitializeDB connects to the database using the default DSN and sets up the global connection.
+func InitializeDB() error {
+	dsn := "postgres://postgres:nilesh3496@localhost:5432/postgres?sslmode=disable"
+	if err := Connect(dsn); err != nil {
+		log.Fatal("db connection failed: ", err)
+	}
+	return nil
+}
+
 // HealthCheck pings the database to ensure it is reachable.
 func HealthCheck(ctx context.Context) error {
 	if Conn == nil {
