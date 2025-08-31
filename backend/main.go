@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
-	"myapp/api/db"
-	"myapp/api/routes"
+	"operateev/db"
+	"operateev/routes"
 
 	"github.com/labstack/echo/v4"
 )

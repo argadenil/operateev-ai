@@ -4,8 +4,8 @@ package controllers
 import (
 	"context"
 	"database/sql"
-	"myapp/api/db"
-	"myapp/api/models"
+	"operateev/db"
+	"operateev/models"
 	"net/http"
 
 	"github.com/labstack/echo/v4"

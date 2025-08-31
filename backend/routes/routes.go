@@ -2,7 +2,7 @@
 package routes
 
 import (
-	"myapp/api/controllers"
+	"operateev/controllers"
 
 	"github.com/labstack/echo/v4"
 )
