@@ -305,7 +305,7 @@ export default function JobManagementPage() {
 
   return (
     <div className="p-8 h-[85vh]">
-      <div className="max-w-7xl mx-auto flex flex-col gap-8">
+      <div className="mx-auto flex flex-col gap-8">
         {/* Page Header */}
 
         {/* KPI Cards */}
