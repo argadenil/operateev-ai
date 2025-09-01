@@ -12,7 +12,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap } from "lucide-react";
+import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, BarChart3, RefreshCw, Activity, Settings2 } from "lucide-react";
 
 // Chart.js - Register once
 import {
@@ -235,34 +235,108 @@ const Dashboard = React.memo(() => {
 
   return (
     <div className="space-y-6 animate-slide-up">
-      {/* Customer Info (Enhanced) */}
-      <div className="relative group rounded-2xl p-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-xl shadow-indigo-500/20">
-        <div className="relative rounded-2xl overflow-hidden bg-white/80 dark:bg-gray-900/70 backdrop-blur-xl border border-white/60 dark:border-gray-700/60 px-5 sm:px-7 py-5 sm:py-6">
-          <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[radial-gradient(circle_at_15%_20%,rgba(99,102,241,0.25),transparent_60%),radial-gradient(circle_at_85%_80%,rgba(168,85,247,0.25),transparent_65%)]" />
-          <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
-              <div className="relative w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30">
-                <Cpu size={26} className="drop-shadow" />
-                <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-60 transition duration-500 blur-lg bg-gradient-to-br from-indigo-500/40 via-fuchsia-500/30 to-purple-600/40" />
+      {/* Customer Info (Innovative Enhanced) */}
+      <div className="relative group rounded-2xl p-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-xl shadow-indigo-500/20 overflow-hidden">
+        {/* Animated border sheen */}
+        <div className="pointer-events-none absolute inset-0 rounded-2xl before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:bg-[conic-gradient(from_180deg_at_50%_50%,rgba(255,255,255,0.05)_0deg,rgba(255,255,255,0.35)_140deg,rgba(255,255,255,0.05)_300deg)] before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-700" />
+        <div className="relative rounded-2xl overflow-hidden bg-white/85 dark:bg-gray-900/70 backdrop-blur-xl border border-white/60 dark:border-gray-700/60 px-5 sm:px-7 py-5 sm:py-6">
+          {/* Decorative gradients */}
+          <div className="pointer-events-none absolute -top-20 -right-32 w-80 h-80 bg-gradient-to-br from-fuchsia-500/10 via-purple-500/10 to-indigo-500/10 rounded-full blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-28 -left-20 w-72 h-72 bg-gradient-to-tr from-indigo-500/10 via-sky-500/5 to-pink-500/10 rounded-full blur-3xl" />
+
+          <div className="relative flex flex-col gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+              <div className="flex items-start sm:items-center gap-4">
+                <div className="relative w-14 h-14 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-600 text-white shadow-lg shadow-indigo-500/30">
+                  <Cpu size={30} className="drop-shadow" />
+                  <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-60 transition duration-500 blur-lg bg-gradient-to-br from-indigo-500/40 via-fuchsia-500/30 to-purple-600/40" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-50 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">Customer Dashboard</h2>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">Live
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping ml-1" />
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 font-medium flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[11px] tracking-wide">Acct</span>
+                    <span className="text-gray-900 dark:text-gray-100">TEST Corp</span>
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-50 flex items-center gap-2">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">Customer Dashboard</span>
-                  <span className="hidden sm:inline-block text-xs font-medium ml-1 px-2 py-0.5 rounded-full bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">Live</span>
-                </h2>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 font-medium">
-                  Account: <span className="text-gray-900 dark:text-gray-100">TEST Corp</span>
-                </p>
+
+              {/* Quick actions */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <button className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white/60 dark:bg-gray-800/60 backdrop-blur hover:bg-white/80 dark:hover:bg-gray-800/80 transition shadow-sm">
+                  <RefreshCw size={14} className="opacity-70" /> Refresh
+                </button>
+                <button className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow hover:shadow-md transition active:scale-[0.97]">
+                  <PlusCircle size={15} /> Add GPU
+                </button>
+                <button className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg border border-indigo-300/50 dark:border-indigo-500/40 bg-indigo-50/60 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/50 transition">
+                  <BarChart3 size={15} /> Reports
+                </button>
+                <button className="hidden lg:inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg border border-gray-300/60 dark:border-gray-600/60 bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-800/70 transition">
+                  <Settings2 size={15} /> Settings
+                </button>
               </div>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="hidden sm:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-white/60 dark:bg-gray-800/70 px-3 py-1.5 rounded-lg border border-gray-200/60 dark:border-gray-700/60 shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Resources synced</span>
+
+            {/* Mini KPI strip */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3 overflow-hidden">
+                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.15),transparent_60%)]" />
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 tracking-wide">UTIL%</span>
+                  <Activity size={14} className="text-indigo-500" />
+                </div>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">72%</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold">+5%</span>
+                </div>
+                <div className="mt-2 h-1.5 w-full rounded bg-gray-200/70 dark:bg-gray-700/60 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-[pulse_3s_ease-in-out_infinite] rounded" style={{ width: '72%' }} />
+                </div>
               </div>
-              <button className="relative inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg border border-indigo-200 dark:border-indigo-500/40 bg-gradient-to-r from-indigo-50 via-white to-purple-50 dark:from-indigo-600/30 dark:via-indigo-700/10 dark:to-purple-700/20 text-indigo-700 dark:text-indigo-200 shadow hover:shadow-md transition active:scale-[0.97]">
-                <span className="bg-indigo-500 w-1.5 h-1.5 rounded-full shadow-inner" /> Refresh
-              </button>
+              <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 tracking-wide">AVG TEMP</span>
+                  <span className="text-xs font-semibold text-amber-600">℃</span>
+                </div>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">62</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">+2</span>
+                </div>
+                <div className="mt-2 h-1 w-full flex gap-0.5">
+                  {Array.from({length:12}).map((_,i)=>(<span key={i} className={`flex-1 rounded-sm ${i<8?'bg-amber-400/70 dark:bg-amber-400/80':'bg-amber-200/50 dark:bg-amber-900/40'} h-full`}/>))}
+                </div>
+              </div>
+              <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 tracking-wide">POWER W</span>
+                  <Zap size={14} className="text-indigo-500" />
+                </div>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{statsData.avgPower}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">stable</span>
+                </div>
+                <div className="mt-2 flex items-end gap-0.5 h-8">
+                  { [5,7,6,8,5,9,6,7].map((v,i)=>(<span key={i} className="flex-1 bg-gradient-to-t from-indigo-500/30 to-indigo-500/70 rounded-t" style={{height:`${v*6}px`}} />)) }
+                </div>
+              </div>
+              <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 tracking-wide">STATUS</span>
+                  <span className="text-xs font-semibold text-emerald-600">Live</span>
+                </div>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{statsData.running}/{statsData.total}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold">Running</span>
+                </div>
+                <div className="mt-2 h-1.5 w-full rounded bg-emerald-100 dark:bg-emerald-900/30 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-500" style={{ width: `${(statsData.running / statsData.total) * 100}%` }} />
+                </div>
+              </div>
             </div>
           </div>
         </div>
