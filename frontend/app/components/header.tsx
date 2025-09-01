@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell, Search, Zap } from "lucide-react"; // Icons for notifications, search, quick actions
+import { Search } from "lucide-react"; // Icon
 
 interface HeaderProps {
   className?: string;
@@ -10,13 +10,10 @@ interface HeaderProps {
 
 export default function Header({
   className = "",
-  pageTitle = "",
   showSearch = true,
   showUserMenu = true,
 }: HeaderProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [quickActionOpen, setQuickActionOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -39,8 +36,6 @@ export default function Header({
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setDropdownOpen(false);
-        setQuickActionOpen(false);
-        setNotificationsOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -53,16 +48,7 @@ export default function Header({
     { label: "Logout", onClick: () => console.log("Logging out") },
   ];
 
-  const quickActions = [
-    { label: "New Project", onClick: () => console.log("New Project") },
-    { label: "Upload File", onClick: () => console.log("Upload File") },
-  ];
-
-  const notifications = [
-    "New comment on your post",
-    "Server backup completed",
-    "New user registered",
-  ];
+  // (Quick actions / notifications removed until implemented to avoid unused variable warnings)
 
   return (
     <header

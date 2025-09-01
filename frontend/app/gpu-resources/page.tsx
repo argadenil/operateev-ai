@@ -61,7 +61,7 @@ const renderStatusBadge = (status: GPU["status"]) => {
 export default function GPUResourcesPage() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [statusFilter, setStatusFilter] = React.useState<GPU["status"] | "all">("all");
+  const [statusFilter] = React.useState<GPU["status"] | "all">("all"); // setter removed (unused)
   const [loading, setLoading] = React.useState(true);
   const [selectedGPU, setSelectedGPU] = React.useState<GPU | null>(null);
 
@@ -265,7 +265,7 @@ export default function GPUResourcesPage() {
             <h3 className="font-semibold text-sm">GPU Resources ({filteredData.length})</h3>
           </div>
           <div className="divide-y divide-gray-100">
-            {table.getRowModel().rows.map((row, i) => (
+              {table.getRowModel().rows.map((row) => (
               <div key={row.id} className="p-4 hover:bg-gray-50 transition-colors">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
