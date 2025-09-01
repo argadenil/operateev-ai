@@ -197,7 +197,7 @@ const Dashboard = React.memo(() => {
       header: "Status",
       cell: ({ getValue }) => {
         const status = getValue() as string;
-  return renderStatusBadge(status);
+        return renderStatusBadge(status);
       },
     },
     {
@@ -252,33 +252,45 @@ const Dashboard = React.memo(() => {
                   <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-60 transition duration-500 blur-lg bg-gradient-to-br from-indigo-500/40 via-fuchsia-500/30 to-purple-600/40" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-50 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">Customer Dashboard</h2>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">Live
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping ml-1" />
-                    </span>
-                  </div>
+                  <div className="flex items-center gap-2 flex-wrap" />
                   <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 font-medium flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[11px] tracking-wide">Acct</span>
-                    <span className="text-gray-900 dark:text-gray-100">TEST Corp</span>
+                    {/* Company name badge (enhanced) */}
+                    <span
+                      className="relative inline-flex items-center gap-2 pl-3 pr-4 py-1.5 rounded-lg text-base sm:text-2xl font-extrabold tracking-tight
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-2 ring-gray-300 dark:ring-gray-600 shadow-sm
+                        focus:outline-none cursor-default select-none"
+                      aria-label="Company: TEST Corp"
+                      title="TEST Corp"
+                    >
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow" />
+                      <span className="leading-none">TEST Corp</span>
+                    </span>
                   </p>
                 </div>
               </div>
 
               {/* Quick actions */}
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                <button className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white/60 dark:bg-gray-800/60 backdrop-blur hover:bg-white/80 dark:hover:bg-gray-800/80 transition shadow-sm">
-                  <RefreshCw size={14} className="opacity-70" /> Refresh
-                </button>
-                <button className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow hover:shadow-md transition active:scale-[0.97]">
-                  <PlusCircle size={15} /> Add GPU
-                </button>
-                <button className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg border border-indigo-300/50 dark:border-indigo-500/40 bg-indigo-50/60 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/50 transition">
-                  <BarChart3 size={15} /> Reports
-                </button>
-                <button className="hidden lg:inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg border border-gray-300/60 dark:border-gray-600/60 bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-800/70 transition">
-                  <Settings2 size={15} /> Settings
-                </button>
+                {/* Shared button style extracted for consistency */}
+                {(() => {
+                  const btn = "inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg bg-indigo-500 text-white hover:cursor-pointer shadow hover:shadow-lg transition active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-indigo-400/50";
+                  return (
+                    <>
+                      <button className={btn}>
+                        <RefreshCw size={14} /> Refresh
+                      </button>
+                      <button className={btn}>
+                        <PlusCircle size={15} /> Add GPU
+                      </button>
+                      <button className={btn}>
+                        <BarChart3 size={15} /> Reports
+                      </button>
+                      <button className={`hidden lg:inline-flex ${btn}`}>
+                        <Settings2 size={15} /> Settings
+                      </button>
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
@@ -308,7 +320,7 @@ const Dashboard = React.memo(() => {
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">+2</span>
                 </div>
                 <div className="mt-2 h-1 w-full flex gap-0.5">
-                  {Array.from({length:12}).map((_,i)=>(<span key={i} className={`flex-1 rounded-sm ${i<8?'bg-amber-400/70 dark:bg-amber-400/80':'bg-amber-200/50 dark:bg-amber-900/40'} h-full`}/>))}
+                  {Array.from({ length: 12 }).map((_, i) => (<span key={i} className={`flex-1 rounded-sm ${i < 8 ? 'bg-amber-400/70 dark:bg-amber-400/80' : 'bg-amber-200/50 dark:bg-amber-900/40'} h-full`} />))}
                 </div>
               </div>
               <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3">
@@ -321,7 +333,7 @@ const Dashboard = React.memo(() => {
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">stable</span>
                 </div>
                 <div className="mt-2 flex items-end gap-0.5 h-8">
-                  { [5,7,6,8,5,9,6,7].map((v,i)=>(<span key={i} className="flex-1 bg-gradient-to-t from-indigo-500/30 to-indigo-500/70 rounded-t" style={{height:`${v*6}px`}} />)) }
+                  {[5, 7, 6, 8, 5, 9, 6, 7].map((v, i) => (<span key={i} className="flex-1 bg-gradient-to-t from-indigo-500/30 to-indigo-500/70 rounded-t" style={{ height: `${v * 6}px` }} />))}
                 </div>
               </div>
               <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3">
