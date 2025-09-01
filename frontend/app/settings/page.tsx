@@ -16,8 +16,7 @@ export default function Settings() {
       return <Loader />;
     }
   return (
-    <div className="">
-      <div className="mx-auto space-y-6">
+  <div className="space-y-6 animate-slide-up">
         {/* Page Header */}
         {/* <div className="mb-4 text-center md:text-left">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1">Account Settings</h1>
@@ -354,9 +353,8 @@ export default function Settings() {
               </div>
             </div>
           </section>
-        </div>
-      </div>
     </div>
+  </div>
   );
 }
 
