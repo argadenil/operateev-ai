@@ -80,7 +80,7 @@ export default function GPUResourcesPage() {
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => (
+  cell: () => (
         <button
           className="bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
         >
