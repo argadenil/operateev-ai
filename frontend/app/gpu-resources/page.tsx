@@ -103,12 +103,18 @@ export default function GPUResourcesPage() {
     return "bg-rose-500";
   };
 
-  const columns: ColumnDef<GPU>[] = [
+  const columns: ColumnDef<GPU>[] = React.useMemo(() => [
     { accessorKey: "model", header: "Model" },
     { accessorKey: "cluster", header: "Cluster" },
     {
       accessorKey: "memory",
       header: "Memory (Used)",
+      sortingFn: (a, b, id) => {
+        const parse = (v: string) => {
+          const m = v.match(/(\d+)/); return m ? parseInt(m[1], 10) : 0;
+        };
+        return parse(a.getValue(id) as string) - parse(b.getValue(id) as string);
+      },
       cell: ({ row }) => {
         const g = row.original;
         const total = parseTotalMemory(g);
@@ -158,6 +164,7 @@ export default function GPUResourcesPage() {
     {
       accessorKey: "status",
       header: "Status",
+      sortingFn: (a, b, id) => (a.getValue(id) as string).localeCompare(b.getValue(id) as string),
       cell: ({ getValue }) => {
         const status = getValue() as GPU["status"];
         return renderStatusBadge(status);
@@ -166,6 +173,7 @@ export default function GPUResourcesPage() {
     {
       id: "actions",
       header: "Actions",
+      enableSorting: false,
       cell: ({ row }) => (
         <button
           onClick={() => setSelectedGPU(row.original)}
@@ -175,13 +183,15 @@ export default function GPUResourcesPage() {
         </button>
       ),
     },
-  ];
+  ], [setSelectedGPU]);
 
-  const filteredData = gpuData.filter((gpu) =>
-    (statusFilter === "all" || gpu.status === statusFilter) &&
-    (clusterFilter === "all" || gpu.cluster === clusterFilter) &&
-    (globalFilter === "" || Object.values(gpu).some(v => String(v).toLowerCase().includes(globalFilter.toLowerCase())))
-  );
+  const filteredData = React.useMemo(() => (
+    gpuData.filter((gpu) =>
+      (statusFilter === "all" || gpu.status === statusFilter) &&
+      (clusterFilter === "all" || gpu.cluster === clusterFilter) &&
+      (globalFilter === "" || Object.values(gpu).some(v => String(v).toLowerCase().includes(globalFilter.toLowerCase())))
+    )
+  ), [gpuData, statusFilter, clusterFilter, globalFilter]);
 
   const table = useReactTable({
     data: filteredData,
@@ -347,6 +357,8 @@ export default function GPUResourcesPage() {
           <div className="flex flex-col w-full sm:w-64">
             <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Search</label>
             <input
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
               placeholder="Search model, cluster, status..."
               className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
@@ -354,6 +366,8 @@ export default function GPUResourcesPage() {
             <div className="flex flex-col w-full sm:w-40">
             <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Status</label>
             <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as any)}
               className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             >
               <option value="all">All</option>
@@ -365,6 +379,8 @@ export default function GPUResourcesPage() {
           <div className="flex flex-col w-full sm:w-44">
             <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Cluster</label>
             <select
+              value={clusterFilter}
+              onChange={(e) => setClusterFilter(e.target.value)}
               className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             >
               <option value="all">All</option>
@@ -390,23 +406,26 @@ export default function GPUResourcesPage() {
             <thead className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="text-sm text-white">
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      onClick={header.column.getToggleSortingHandler()}
-                      className="px-6 py-4 font-semibold cursor-pointer select-none transition-colors duration-200 hover:bg-white/10 text-left"
-                    >
-                      <div className="flex items-center gap-2">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        <span className="text-white/60">
-                          {{
-                            asc: "↑",
-                            desc: "↓",
-                          }[header.column.getIsSorted() as string] ?? "↕️"}
-                        </span>
-                      </div>
-                    </th>
-                  ))}
+                  {headerGroup.headers.map((header) => {
+                    const isCenter = ["status", "actions"].includes(header.column.id);
+                    return (
+                      <th
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className={`px-6 py-4 font-semibold cursor-pointer select-none transition-colors duration-200 hover:bg-white/10 ${isCenter ? 'text-center' : 'text-left'}`}
+                      >
+                        <div className={`flex items-center gap-2 ${isCenter ? 'justify-center' : ''}`}>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          <span className="text-white/60">
+                            {{
+                              asc: "↑",
+                              desc: "↓",
+                            }[header.column.getIsSorted() as string] ?? "↕️"}
+                          </span>
+                        </div>
+                      </th>
+                    );
+                  })}
                 </tr>
               ))}
             </thead>
@@ -416,11 +435,14 @@ export default function GPUResourcesPage() {
                   key={row.id}
                   className={`border-b border-gray-100 hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-200 ${i % 2 === 0 ? "bg-gray-50/30" : "bg-white"}`}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-6 py-4 text-left">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const isCenter = ["status", "actions"].includes(cell.column.id);
+                    return (
+                      <td key={cell.id} className={`px-6 py-4 ${isCenter ? 'text-center' : 'text-left'}`}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
