@@ -64,12 +64,12 @@ const renderStatusBadge = (status: string) => {
     "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide shadow-sm backdrop-blur-sm border transition-colors duration-300";
   const styles: Record<string, string> = {
     Running:
-      "bg-gradient-to-r from-emerald-500/15 via-emerald-400/10 to-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 ring-1 ring-inset ring-emerald-500/20", // green
+      "bg-gradient-to-r from-emerald-500/15 via-emerald-400/10 to-emerald-500/20 text-emerald-700 border-emerald-500/30 ring-1 ring-inset ring-emerald-500/20", // green
     Idle:
-      "bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30 ring-1 ring-inset ring-amber-500/20", // amber
+      "bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/20 text-amber-700 border-amber-500/30 ring-1 ring-inset ring-amber-500/20", // amber
   };
   const fallback =
-    "bg-gradient-to-r from-rose-500/15 via-rose-400/10 to-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/30 ring-1 ring-inset ring-rose-500/20";
+    "bg-gradient-to-r from-rose-500/15 via-rose-400/10 to-rose-500/20 text-rose-700 border-rose-500/30 ring-1 ring-inset ring-rose-500/20";
 
   const cls = styles[status] || fallback;
   const dotColor =
@@ -239,7 +239,7 @@ const Dashboard = React.memo(() => {
       <div className="relative group rounded-2xl p-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-xl shadow-indigo-500/20 overflow-hidden">
         {/* Animated border sheen */}
         <div className="pointer-events-none absolute inset-0 rounded-2xl before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:bg-[conic-gradient(from_180deg_at_50%_50%,rgba(255,255,255,0.05)_0deg,rgba(255,255,255,0.35)_140deg,rgba(255,255,255,0.05)_300deg)] before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-700" />
-        <div className="relative rounded-2xl overflow-hidden bg-white/85 dark:bg-gray-900/70 backdrop-blur-xl border border-white/60 dark:border-gray-700/60 px-5 sm:px-7 py-5 sm:py-6">
+  <div className="relative rounded-2xl overflow-hidden bg-white/85 backdrop-blur-xl border border-white/60 px-5 sm:px-7 py-5 sm:py-6">
           {/* Decorative gradients */}
           <div className="pointer-events-none absolute -top-20 -right-32 w-80 h-80 bg-gradient-to-br from-fuchsia-500/10 via-purple-500/10 to-indigo-500/10 rounded-full blur-3xl" />
           <div className="pointer-events-none absolute -bottom-28 -left-20 w-72 h-72 bg-gradient-to-tr from-indigo-500/10 via-sky-500/5 to-pink-500/10 rounded-full blur-3xl" />
@@ -253,12 +253,10 @@ const Dashboard = React.memo(() => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap" />
-                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 font-medium flex items-center gap-2">
+                  <p className="mt-1 text-sm text-gray-600 font-medium flex items-center gap-2">
                     {/* Company name badge (enhanced) */}
                     <span
-                      className="relative inline-flex items-center gap-2 pl-3 pr-4 py-1.5 rounded-lg text-base sm:text-2xl font-extrabold tracking-tight
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-2 ring-gray-300 dark:ring-gray-600 shadow-sm
-                        focus:outline-none cursor-default select-none"
+                      className="relative inline-flex items-center gap-2 pl-3 pr-4 py-1.5 rounded-lg text-base sm:text-2xl font-extrabold tracking-tight bg-white text-gray-900 ring-2 ring-gray-300 shadow-sm focus:outline-none cursor-default select-none"
                       aria-label="Company: TEST Corp"
                       title="TEST Corp"
                     >
@@ -296,56 +294,56 @@ const Dashboard = React.memo(() => {
 
             {/* Mini KPI strip */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3 overflow-hidden">
+              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/70 backdrop-blur px-3 py-3 overflow-hidden">
                 <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.15),transparent_60%)]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 tracking-wide">UTIL%</span>
+                  <span className="text-[11px] font-medium text-gray-600 tracking-wide">UTIL%</span>
                   <Activity size={14} className="text-indigo-500" />
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">72%</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold">+5%</span>
+                  <span className="text-lg font-semibold text-gray-900">72%</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 font-semibold">+5%</span>
                 </div>
-                <div className="mt-2 h-1.5 w-full rounded bg-gray-200/70 dark:bg-gray-700/60 overflow-hidden">
+                <div className="mt-2 h-1.5 w-full rounded bg-gray-200/70 overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-[pulse_3s_ease-in-out_infinite] rounded" style={{ width: '72%' }} />
                 </div>
               </div>
-              <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3">
+              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/70 backdrop-blur px-3 py-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 tracking-wide">AVG TEMP</span>
+                  <span className="text-[11px] font-medium text-gray-600 tracking-wide">AVG TEMP</span>
                   <span className="text-xs font-semibold text-amber-600">℃</span>
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">62</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">+2</span>
+                  <span className="text-lg font-semibold text-gray-900">62</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 font-semibold">+2</span>
                 </div>
                 <div className="mt-2 h-1 w-full flex gap-0.5">
-                  {Array.from({ length: 12 }).map((_, i) => (<span key={i} className={`flex-1 rounded-sm ${i < 8 ? 'bg-amber-400/70 dark:bg-amber-400/80' : 'bg-amber-200/50 dark:bg-amber-900/40'} h-full`} />))}
+                  {Array.from({ length: 12 }).map((_, i) => (<span key={i} className={`flex-1 rounded-sm ${i < 8 ? 'bg-amber-400/70' : 'bg-amber-200/50'} h-full`} />))}
                 </div>
               </div>
-              <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3">
+              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/70 backdrop-blur px-3 py-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 tracking-wide">POWER W</span>
+                  <span className="text-[11px] font-medium text-gray-600 tracking-wide">POWER W</span>
                   <Zap size={14} className="text-indigo-500" />
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{statsData.avgPower}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">stable</span>
+                  <span className="text-lg font-semibold text-gray-900">{statsData.avgPower}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-600 font-semibold">stable</span>
                 </div>
                 <div className="mt-2 flex items-end gap-0.5 h-8">
                   {[5, 7, 6, 8, 5, 9, 6, 7].map((v, i) => (<span key={i} className="flex-1 bg-gradient-to-t from-indigo-500/30 to-indigo-500/70 rounded-t" style={{ height: `${v * 6}px` }} />))}
                 </div>
               </div>
-              <div className="relative group/kpi rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-3 py-3">
+              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/70 backdrop-blur px-3 py-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 tracking-wide">STATUS</span>
+                  <span className="text-[11px] font-medium text-gray-600 tracking-wide">STATUS</span>
                   <span className="text-xs font-semibold text-emerald-600">Live</span>
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{statsData.running}/{statsData.total}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold">Running</span>
+                  <span className="text-lg font-semibold text-gray-900">{statsData.running}/{statsData.total}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 font-semibold">Running</span>
                 </div>
-                <div className="mt-2 h-1.5 w-full rounded bg-emerald-100 dark:bg-emerald-900/30 overflow-hidden">
+                <div className="mt-2 h-1.5 w-full rounded bg-emerald-100 overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-500" style={{ width: `${(statsData.running / statsData.total) * 100}%` }} />
                 </div>
               </div>
@@ -356,23 +354,23 @@ const Dashboard = React.memo(() => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        <div className="bg-gray-100/70 dark:bg-gray-800/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-300 dark:border-gray-600 ring-1 ring-inset ring-gray-400/20 dark:ring-gray-500/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-400/20 via-transparent to-gray-500/30 dark:from-gray-600/30 dark:to-gray-500/20" />
+        <div className="bg-gray-100/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-300 ring-1 ring-inset ring-gray-400/20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-400/20 via-transparent to-gray-500/30" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
               <p className="text-xs sm:text-sm font-medium text-gray-600">Total GPUs</p>
               <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">{statsData.total}</p>
             </div>
             <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-300/60 to-gray-400/50 dark:from-gray-600/60 dark:to-gray-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/20 dark:bg-gray-700/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-gray-400/40 dark:ring-gray-500/40 shadow-inner shadow-gray-400/30">
-                <Cpu className="text-gray-700 dark:text-gray-200 group-hover:scale-110 transition-transform" size={22} />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-300/60 to-gray-400/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-gray-400/40 shadow-inner shadow-gray-400/30">
+                <Cpu className="text-gray-700 group-hover:scale-110 transition-transform" size={22} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-emerald-50/70 dark:bg-emerald-50/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30 relative overflow-hidden">
+        <div className="bg-emerald-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/10" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
@@ -388,7 +386,7 @@ const Dashboard = React.memo(() => {
           </div>
         </div>
 
-        <div className="bg-amber-50/70 dark:bg-amber-50/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-amber-300/70 ring-1 ring-inset ring-amber-400/30 relative overflow-hidden">
+  <div className="bg-amber-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-amber-300/70 ring-1 ring-inset ring-amber-400/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/10" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
@@ -404,7 +402,7 @@ const Dashboard = React.memo(() => {
           </div>
         </div>
 
-        <div className="bg-indigo-50/70 dark:bg-indigo-50/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-indigo-300/70 ring-1 ring-inset ring-indigo-400/30 relative overflow-hidden">
+  <div className="bg-indigo-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-indigo-300/70 ring-1 ring-inset ring-indigo-400/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-600/10" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
