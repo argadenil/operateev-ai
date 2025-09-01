@@ -1,11 +1,43 @@
 "use client";
 
-import React, { useState, useTransition, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import { ChevronLeft, ChevronRight, X, Menu } from "lucide-react";
 import Chat from "./components/chat";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+
+// Lightweight memo wrappers to avoid re-rendering when layout state changes
+const MemoHeader = React.memo(Header);
+const MemoFooter = React.memo(Footer);
+const MemoChat = React.memo(Chat);
+
+interface NavItemType { name: string; icon: string; href: string; }
+
+// Individual nav item (memoized)
+const NavItem = React.memo(function NavItem({ item, isActive, sidebarOpen, isMobile, onNavigate }: { item: NavItemType; isActive: boolean; sidebarOpen: boolean; isMobile: boolean; onNavigate: () => void; }) {
+    return (
+        <Link
+            href={item.href}
+            prefetch
+            onClick={onNavigate}
+            className={`group will-change-transform relative flex items-center p-4 mx-3 rounded-2xl cursor-pointer transition-all duration-200 transform touch-manipulation ${isActive
+                ? "bg-indigo-500 text-white shadow-xl shadow-indigo-500/25"
+                : "hover:bg-white/10 hover:backdrop-blur-sm text-gray-300 hover:text-white"}`}
+            title={!sidebarOpen && !isMobile ? item.name : undefined}
+            aria-current={isActive ? 'page' : undefined}
+            style={{ transform: 'translateZ(0)' }}
+        >
+            <span className="text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>{item.icon}</span>
+            <span className={`ml-4 font-medium text-base group-hover:text-white transition-all duration-200 whitespace-nowrap overflow-hidden ${(sidebarOpen || isMobile) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
+                style={{ transform: 'translateZ(0)' }}>
+                {item.name}
+            </span>
+        </Link>
+    );
+});
+NavItem.displayName = 'NavItem';
 
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,8 +46,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
     const pathname = usePathname(); // current route
     const router = useRouter();
-    const [, startTransition] = useTransition(); // drop unused isPending
-    const [activeHref, setActiveHref] = useState<string | null>(null);
 
     // Debounced resize handler for better performance
     const handleResize = useCallback(() => {
@@ -44,26 +74,27 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     }, [handleResize]);
 
     // Memoized navigation items to prevent re-renders
-    const navigationItems = useMemo(() => [
+    const navigationItems: NavItemType[] = useMemo(() => [
         { name: "Dashboard", icon: "🏠", href: "/dashboard" },
         { name: "GPU Resources", icon: "📁", href: "/gpu-resources" },
         { name: "Job Management", icon: "📊", href: "/job-management" },
         { name: "Settings", icon: "⚙️", href: "/settings" },
     ], []);
 
+    // Preload (prefetch) target routes once on mount for snappier nav
+    useEffect(() => {
+        navigationItems.forEach(i => router.prefetch(i.href));
+    }, [navigationItems, router]);
+
     // Optimized sidebar toggle function
     const toggleSidebar = useCallback(() => {
         setSidebarOpen(prev => !prev);
     }, []);
 
-    // Optimized navigation handler
-    const handleNavigation = useCallback((href: string) => {
-        setActiveHref(href);
-        if (isMobile) setSidebarOpen(false); // Close sidebar on mobile after selection
-        startTransition(() => {
-            router.push(href);
-        });
-    }, [isMobile, router]);
+    // Navigation handler (close sidebar on mobile only). Route change handled by Link.
+    const handleNavigateClose = useCallback(() => {
+        if (isMobile) setSidebarOpen(false);
+    }, [isMobile]);
 
     // Map of routes to names for dynamic page title
     const routeMap: Record<string, string> = {
@@ -113,32 +144,16 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
                 
                 <nav className={`flex flex-col ${isMobile ? 'mt-16' : 'mt-40'} space-y-2 relative z-10`}>
-                    {navigationItems.map((item) => {
-                        const isActive = pathname === item.href || activeHref === item.href;
-                        return (
-                            <button
-                                key={item.href}
-                                type="button"
-                                onClick={() => handleNavigation(item.href)}
-                                className={`group relative flex items-center p-4 mx-3 rounded-2xl cursor-pointer transition-all duration-200 transform touch-manipulation ${isActive
-                                    ? "bg-indigo-500 text-white shadow-xl shadow-indigo-500/25"
-                                    : "hover:bg-white/10 hover:backdrop-blur-sm text-gray-300 hover:text-white"
-                                    }`}
-                                title={!sidebarOpen && !isMobile ? item.name : undefined}
-                                aria-current={pathname === item.href ? 'page' : undefined}
-                                style={{ transform: 'translateZ(0)' }} // Force hardware acceleration
-                            >
-                                <span className="text-2xl transition-transform duration-200 group-hover:scale-110">{item.icon}</span>
-                                <span className={`ml-4 font-medium text-base group-hover:text-white transition-all duration-200 whitespace-nowrap overflow-hidden ${
-                                    (sidebarOpen || isMobile) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-                                }`}
-                                style={{ transform: 'translateZ(0)' }} // Force hardware acceleration
-                                >
-                                    {item.name}
-                                </span>
-                            </button>
-                        );
-                    })}
+                    {navigationItems.map((item) => (
+                        <NavItem
+                            key={item.href}
+                            item={item}
+                            isActive={pathname === item.href}
+                            sidebarOpen={sidebarOpen}
+                            isMobile={isMobile}
+                            onNavigate={handleNavigateClose}
+                        />
+                    ))}
                 </nav>
 
                 <div className="mt-auto mb-4 px-4 text-white/70 text-sm relative z-10">
@@ -175,7 +190,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             <div className={`flex flex-col flex-grow relative z-20 bg-white/80 backdrop-blur-sm main-content-transition ${
                 isMobile ? 'main-content-mobile' : ''
             }`}>
-                <Header />
+                <MemoHeader />
                 <main className={`flex-grow overflow-auto bg-gradient-to-br from-white/90 via-indigo-50/30 to-purple-50/30 main-content-transition ${
                     isMobile 
                         ? 'px-4 py-4' 
@@ -199,7 +214,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                         {children}
                     </div>
                 </main>
-                <Footer />
+                <MemoFooter />
             </div>
 
             {/* Floating Action Button */}
@@ -271,7 +286,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
                     {/* Chat body takes the rest of height */}
                     <div className="flex-grow overflow-y-auto">
-                        <Chat />
+                        <MemoChat />
                     </div>
                 </div>
             </div>
