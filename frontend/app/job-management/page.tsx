@@ -192,22 +192,22 @@ const renderStatusBadge = (status: Job["status"]) => {
   const map: Record<Job["status"], { wrap: string; dot: string }> = {
     running: {
       wrap:
-        "bg-gradient-to-r from-emerald-500/15 via-emerald-400/10 to-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 ring-1 ring-inset ring-emerald-500/20",
+        "bg-gradient-to-r from-emerald-500/15 via-emerald-400/10 to-emerald-500/20 text-emerald-700 border-emerald-500/30 ring-1 ring-inset ring-emerald-500/20",
       dot: "bg-emerald-500 animate-pulse",
     },
     completed: {
       wrap:
-        "bg-gradient-to-r from-blue-500/15 via-blue-400/10 to-indigo-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30 ring-1 ring-inset ring-blue-500/20",
+        "bg-gradient-to-r from-blue-500/15 via-blue-400/10 to-indigo-500/20 text-blue-700 border-blue-500/30 ring-1 ring-inset ring-blue-500/20",
       dot: "bg-blue-500",
     },
     failed: {
       wrap:
-        "bg-gradient-to-r from-rose-500/15 via-rose-400/10 to-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/30 ring-1 ring-inset ring-rose-500/20",
+        "bg-gradient-to-r from-rose-500/15 via-rose-400/10 to-rose-500/20 text-rose-700 border-rose-500/30 ring-1 ring-inset ring-rose-500/20",
       dot: "bg-rose-500",
     },
     queued: {
       wrap:
-        "bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30 ring-1 ring-inset ring-amber-500/20",
+        "bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/20 text-amber-700 border-amber-500/30 ring-1 ring-inset ring-amber-500/20",
       dot: "bg-amber-500",
     },
   };
@@ -335,102 +335,102 @@ export default function JobManagementPage() {
         <section>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
             {/* Total Jobs */}
-            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-gray-100/70 dark:bg-gray-800/40 border border-gray-300 dark:border-gray-600 ring-1 ring-inset ring-gray-400/20 dark:ring-gray-500/30">
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-400/15 via-transparent to-gray-500/25 dark:from-gray-600/30 dark:to-gray-500/20" />
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-gray-100/70 border border-gray-300 ring-1 ring-inset ring-gray-400/20">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-400/15 via-transparent to-gray-500/25" />
               <div className="flex items-start justify-between gap-4 relative">
                 <div>
-                  <p className="text-[11px] sm:text-xs font-medium text-gray-600 dark:text-gray-300 tracking-wide uppercase">Total Jobs</p>
-                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">{total}</p>
+                  <p className="text-[11px] sm:text-xs font-medium text-gray-600 tracking-wide uppercase">Total Jobs</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">{total}</p>
                 </div>
                 <div className="group relative">
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-300/60 to-gray-400/50 dark:from-gray-600/60 dark:to-gray-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/30 dark:bg-gray-700/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-gray-400/40 dark:ring-gray-500/40 shadow-inner shadow-gray-400/30">
-                    <BarChart3 className="text-gray-700 dark:text-gray-200 group-hover:scale-110 transition-transform" size={20} />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-300/60 to-gray-400/50 blur opacity-60 group-hover:opacity-80 transition" />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-gray-400/40 shadow-inner shadow-gray-400/30">
+                    <BarChart3 className="text-gray-700 group-hover:scale-110 transition-transform" size={20} />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Running */}
-            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-emerald-50/70 dark:bg-emerald-100/10 border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30">
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-emerald-50/70 border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30">
               <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/15" />
               <div className="flex items-start justify-between gap-4 relative">
                 <div>
-                  <p className="text-[11px] sm:text-xs font-medium text-emerald-700 dark:text-emerald-300 tracking-wide uppercase">Running</p>
-                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">{running}</p>
+                  <p className="text-[11px] sm:text-xs font-medium text-emerald-700 tracking-wide uppercase">Running</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-emerald-700">{running}</p>
                 </div>
                 <div className="group relative">
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-emerald-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
-                    <PlayCircle className="text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" size={22} />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
+                    <PlayCircle className="text-emerald-600 group-hover:scale-110 transition-transform" size={22} />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Completed */}
-            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-blue-50/70 dark:bg-blue-100/10 border border-blue-300/70 ring-1 ring-inset ring-blue-400/30">
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-blue-50/70 border border-blue-300/70 ring-1 ring-inset ring-blue-400/30">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/15" />
               <div className="flex items-start justify-between gap-4 relative">
                 <div>
-                  <p className="text-[11px] sm:text-xs font-medium text-blue-700 dark:text-blue-300 tracking-wide uppercase">Completed</p>
-                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-blue-700 dark:text-blue-300">{completed}</p>
+                  <p className="text-[11px] sm:text-xs font-medium text-blue-700 tracking-wide uppercase">Completed</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-blue-700">{completed}</p>
                 </div>
                 <div className="group relative">
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-indigo-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-blue-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-blue-500/30 shadow-inner shadow-blue-500/20">
-                    <CheckCircle className="text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" size={22} />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-blue-500/30 shadow-inner shadow-blue-500/20">
+                    <CheckCircle className="text-blue-600 group-hover:scale-110 transition-transform" size={22} />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Failed */}
-            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-red-50/70 dark:bg-rose-100/10 border border-red-300/70 ring-1 ring-inset ring-red-400/30">
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-red-50/70 border border-red-300/70 ring-1 ring-inset ring-red-400/30">
               <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-rose-500/15" />
               <div className="flex items-start justify-between gap-4 relative">
                 <div>
-                  <p className="text-[11px] sm:text-xs font-medium text-red-700 dark:text-red-300 tracking-wide uppercase">Failed</p>
-                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-red-700 dark:text-red-300">{failed}</p>
+                  <p className="text-[11px] sm:text-xs font-medium text-red-700 tracking-wide uppercase">Failed</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-red-700">{failed}</p>
                 </div>
                 <div className="group relative">
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-red-400/50 to-rose-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-rose-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-red-500/30 shadow-inner shadow-red-500/20">
-                    <XCircle className="text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform" size={22} />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-red-500/30 shadow-inner shadow-red-500/20">
+                    <XCircle className="text-red-600 group-hover:scale-110 transition-transform" size={22} />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Queued */}
-            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-yellow-50/70 dark:bg-amber-100/10 border border-amber-300/70 ring-1 ring-inset ring-amber-400/30">
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-yellow-50/70 border border-amber-300/70 ring-1 ring-inset ring-amber-400/30">
               <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/15" />
               <div className="flex items-start justify-between gap-4 relative">
                 <div>
-                  <p className="text-[11px] sm:text-xs font-medium text-amber-700 dark:text-amber-300 tracking-wide uppercase">Queued</p>
-                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-amber-700 dark:text-amber-300">{queued}</p>
+                  <p className="text-[11px] sm:text-xs font-medium text-amber-700 tracking-wide uppercase">Queued</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-amber-700">{queued}</p>
                 </div>
                 <div className="group relative">
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400/50 to-yellow-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-amber-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-amber-500/30 shadow-inner shadow-amber-500/20">
-                    <Clock className="text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform" size={22} />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-amber-500/30 shadow-inner shadow-amber-500/20">
+                    <Clock className="text-amber-600 group-hover:scale-110 transition-transform" size={22} />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Avg Duration */}
-            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-indigo-50/70 dark:bg-indigo-100/10 border border-indigo-300/70 ring-1 ring-inset ring-indigo-400/30">
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-indigo-50/70 border border-indigo-300/70 ring-1 ring-inset ring-indigo-400/30">
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-600/15" />
               <div className="flex items-start justify-between gap-4 relative">
                 <div>
-                  <p className="text-[11px] sm:text-xs font-medium text-indigo-700 dark:text-indigo-300 tracking-wide uppercase">Avg. Duration</p>
-                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-indigo-600 dark:text-indigo-300">1h 23m</p>
+                  <p className="text-[11px] sm:text-xs font-medium text-indigo-700 tracking-wide uppercase">Avg. Duration</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-indigo-600">1h 23m</p>
                 </div>
                 <div className="group relative">
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-400/50 to-purple-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-indigo-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-indigo-500/30 shadow-inner shadow-indigo-500/20">
-                    <Timer className="text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" size={22} />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-indigo-500/30 shadow-inner shadow-indigo-500/20">
+                    <Timer className="text-indigo-600 group-hover:scale-110 transition-transform" size={22} />
                   </div>
                 </div>
               </div>
@@ -438,57 +438,97 @@ export default function JobManagementPage() {
           </div>
         </section>
 
-        {/* Charts */}
+        {/* Charts / Analytics (Enhanced) */}
         <section>
+          <div className="flex items-center gap-3 mb-4">
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Analytics</h2>
-          {/* items-stretch ensures all cards get full height in the row */}
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
-            <div className="bg-white shadow rounded-xl p-4 border h-64 flex flex-col">
-              <h3 className="text-sm font-semibold mb-2">Job Status Distribution</h3>
-              <div className="flex-1">
-                <Pie data={pieData} options={commonChartOptions} />
+            {/* Status Distribution */}
+            <div className="group relative p-[1px] rounded-2xl bg-gradient-to-br from-indigo-500/40 via-purple-500/30 to-pink-500/40 shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/30 transition-shadow">
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.15),transparent_60%)]" />
+              <div className="relative h-64 flex flex-col rounded-[15px] bg-white/90 backdrop-blur-xl border border-white/60 px-4 py-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-semibold text-gray-800">Job Status Distribution</h3>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 border border-gray-200">Pie</span>
+                </div>
+                <div className="flex-1">
+                  <Pie data={pieData} options={commonChartOptions} />
+                </div>
+                <div className="mt-2 grid grid-cols-4 gap-1 text-[10px] text-gray-600">
+                  <div className="flex flex-col items-center p-1 rounded bg-emerald-500/5"><span className="font-semibold text-emerald-600">{running}</span><span>Run</span></div>
+                  <div className="flex flex-col items-center p-1 rounded bg-blue-500/5"><span className="font-semibold text-blue-600">{completed}</span><span>Done</span></div>
+                  <div className="flex flex-col items-center p-1 rounded bg-rose-500/5"><span className="font-semibold text-rose-600">{failed}</span><span>Fail</span></div>
+                  <div className="flex flex-col items-center p-1 rounded bg-amber-500/5"><span className="font-semibold text-amber-600">{queued}</span><span>Queue</span></div>
+                </div>
               </div>
             </div>
 
-            <div className="bg-white shadow rounded-xl p-4 border h-64 flex flex-col">
-              <h3 className="text-sm font-semibold mb-2">Owner-wise Job Count</h3>
-              <div className="flex-1">
-                <Bar
-                  data={{
-                    labels: [...new Set(jobList.map((j) => j.owner))],
-                    datasets: [
-                      {
-                        label: "Jobs",
-                        data: [...new Set(jobList.map((j) => j.owner))].map(
-                          (o) => jobList.filter((j) => j.owner === o).length
-                        ),
-                        backgroundColor: "#6366f1",
-                      },
-                    ],
-                  }}
-                  options={barOptions}
-                />
+            {/* Owner-wise */}
+            <div className="group relative p-[1px] rounded-2xl bg-gradient-to-br from-violet-500/40 via-indigo-500/30 to-sky-500/40 shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/30 transition-shadow">
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_30%_70%,rgba(255,255,255,0.15),transparent_60%)]" />
+              <div className="relative h-64 flex flex-col rounded-[15px] bg-white/90 backdrop-blur-xl border border-white/60 px-4 py-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-semibold text-gray-800">Owner-wise Job Count</h3>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 border border-indigo-200">Bar</span>
+                </div>
+                <div className="flex-1">
+                  <Bar
+                    data={{
+                      labels: [...new Set(jobList.map((j) => j.owner))],
+                      datasets: [
+                        {
+                          label: "Jobs",
+                          data: [...new Set(jobList.map((j) => j.owner))].map(
+                            (o) => jobList.filter((j) => j.owner === o).length
+                          ),
+                          backgroundColor: "#6366f1",
+                          borderRadius: 6,
+                        },
+                      ],
+                    }}
+                    options={barOptions}
+                  />
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1 text-[10px] text-indigo-600">
+                  {[...new Set(jobList.map(j=>j.owner))].map(o => (
+                    <span key={o} className="px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">{o}</span>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="bg-white shadow rounded-xl p-4 border h-64 flex flex-col">
-              <h3 className="text-sm font-semibold mb-2">GPU Utilization</h3>
-              <div className="flex-1">
-                <Bar
-                  data={{
-                    labels: [...new Set(jobList.map((j) => j.gpu))],
-                    datasets: [
-                      {
-                        label: "Usage",
-                        data: [...new Set(jobList.map((j) => j.gpu))].map(
-                          (g) => jobList.filter((j) => j.gpu === g).length
-                        ),
-                        backgroundColor: "#22c55e",
-                      },
-                    ],
-                  }}
-                  options={barOptions}
-                />
+            {/* GPU Utilization */}
+            <div className="group relative p-[1px] rounded-2xl bg-gradient-to-br from-emerald-500/40 via-teal-500/30 to-cyan-500/40 shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/30 transition-shadow">
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_50%_40%,rgba(255,255,255,0.12),transparent_60%)]" />
+              <div className="relative h-64 flex flex-col rounded-[15px] bg-white/90 backdrop-blur-xl border border-white/60 px-4 py-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-semibold text-gray-800">GPU Utilization</h3>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 border border-emerald-200">Bar</span>
+                </div>
+                <div className="flex-1">
+                  <Bar
+                    data={{
+                      labels: [...new Set(jobList.map((j) => j.gpu))],
+                      datasets: [
+                        {
+                          label: "Usage",
+                          data: [...new Set(jobList.map((j) => j.gpu))].map(
+                            (g) => jobList.filter((j) => j.gpu === g).length
+                          ),
+                          backgroundColor: "#22c55e",
+                          borderRadius: 6,
+                        },
+                      ],
+                    }}
+                    options={barOptions}
+                  />
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1 text-[10px] text-emerald-600">
+                  {[...new Set(jobList.map(j=>j.gpu))].map(g => (
+                    <span key={g} className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">{g}</span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -664,16 +704,43 @@ export default function JobManagementPage() {
           </div>
         </section>
 
-        {/* Recent Activity */}
+        {/* Recent Activity (Enhanced Timeline) */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">Recent Activity</h2>
-          <div className="bg-white rounded-xl shadow border p-4">
-            <ul className="text-sm text-gray-700 space-y-2">
-              <li>✅ Job <span className="font-semibold">NLP Inference</span> completed by Bob (08:45)</li>
-              <li>⚠️ Job <span className="font-semibold">GAN Training</span> failed for Charlie (00:10)</li>
-              <li>🚀 Job <span className="font-semibold">ImageNet Training</span> started by Alice (09:30)</li>
-              <li>⏳ Job <span className="font-semibold">BERT Fine-tuning</span> queued by Alice</li>
-            </ul>
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-xl font-bold tracking-tight text-gray-800">Recent Activity</h2>
+            <span className="text-[11px] uppercase font-medium px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200">Live Feed</span>
+          </div>
+          <div className="relative group rounded-2xl p-[1px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/10">
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_75%_25%,rgba(255,255,255,0.15),transparent_60%)]" />
+            <div className="relative bg-white/90 backdrop-blur-xl border border-white/60 rounded-[15px] p-5">
+              <ul className="space-y-4">
+                {[
+                  { icon: '✅', label: 'completed', job: 'NLP Inference', by: 'Bob', time: '08:45', color: 'from-emerald-500 to-green-500' },
+                  { icon: '⚠️', label: 'failed', job: 'GAN Training', by: 'Charlie', time: '00:10', color: 'from-rose-500 to-red-500' },
+                  { icon: '🚀', label: 'started', job: 'ImageNet Training', by: 'Alice', time: '09:30', color: 'from-indigo-500 to-purple-500' },
+                  { icon: '⏳', label: 'queued', job: 'BERT Fine-tuning', by: 'Alice', time: '—', color: 'from-amber-500 to-yellow-500' },
+                ].map((e, i, arr) => (
+                  <li key={i} className="relative pl-8">
+                    {i !== arr.length - 1 && (
+                      <span className="absolute left-3 top-5 w-px h-full bg-gradient-to-b from-gray-300/70 via-gray-300/40 to-transparent" />
+                    )}
+                    <span className="absolute left-0 top-1.5 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white bg-gradient-to-r shadow ring-2 ring-white animate-[pulse_5s_ease-in-out_infinite]" style={{ backgroundImage: 'linear-gradient(to right,var(--tw-gradient-stops))' }}>
+                      <span className={`bg-gradient-to-r ${e.color} bg-clip-text text-transparent`}>{e.icon}</span>
+                    </span>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                      <div className="text-sm text-gray-700">
+                        <span className="font-semibold text-gray-900">{e.job}</span>
+                        <span className="mx-2 text-gray-400">•</span>
+                        <span className="capitalize text-gray-600">{e.label}</span>
+                        <span className="mx-2 text-gray-400">•</span>
+                        <span className="text-gray-500">by {e.by}</span>
+                      </div>
+                      <span className="inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-md bg-gray-100 text-gray-500 border border-gray-200 w-fit">{e.time}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 

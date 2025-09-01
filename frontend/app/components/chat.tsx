@@ -84,7 +84,7 @@ export default function Chat() {
       </div>
 
       {/* Messages */}
-<div className="flex-grow overflow-y-auto p-6 space-y-6 bg-gradient-to-br from-white/70 via-indigo-50/40 to-purple-50/40 backdrop-blur-md dark:from-slate-900/90 dark:via-slate-900/80 dark:to-slate-900/90">
+<div className="flex-grow overflow-y-auto p-6 space-y-6 bg-gradient-to-br from-white/70 via-indigo-50/40 to-purple-50/40 backdrop-blur-md">
         {messages.map((msg) => (
           <div
             key={msg.id}

@@ -35,17 +35,17 @@ const renderStatusBadge = (status: GPU["status"]) => {
   const map: Record<GPU["status"], { wrap: string; dot: string }> = {
     available: {
       wrap:
-        "bg-gradient-to-r from-emerald-500/15 via-emerald-400/10 to-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 ring-1 ring-inset ring-emerald-500/20",
+        "bg-gradient-to-r from-emerald-500/15 via-emerald-400/10 to-emerald-500/20 text-emerald-700 border-emerald-500/30 ring-1 ring-inset ring-emerald-500/20",
       dot: "bg-emerald-500 animate-pulse",
     },
     allocated: {
       wrap:
-        "bg-gradient-to-r from-blue-500/15 via-blue-400/10 to-indigo-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30 ring-1 ring-inset ring-blue-500/20",
+        "bg-gradient-to-r from-blue-500/15 via-blue-400/10 to-indigo-500/20 text-blue-700 border-blue-500/30 ring-1 ring-inset ring-blue-500/20",
       dot: "bg-blue-500",
     },
     offline: {
       wrap:
-        "bg-gradient-to-r from-rose-500/15 via-rose-400/10 to-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/30 ring-1 ring-inset ring-rose-500/20",
+        "bg-gradient-to-r from-rose-500/15 via-rose-400/10 to-rose-500/20 text-rose-700 border-rose-500/30 ring-1 ring-inset ring-rose-500/20",
       dot: "bg-rose-500",
     },
   };
@@ -145,86 +145,86 @@ export default function GPUResourcesPage() {
       {/* Stats Overview (Enhanced to match Dashboard) */}
       <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
         {/* Total GPUs */}
-        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-slate-50/70 dark:bg-slate-100/10 border border-slate-300/70 ring-1 ring-inset ring-slate-400/30">
+  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-slate-50/70 border border-slate-300/70 ring-1 ring-inset ring-slate-400/30">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-500/5 via-transparent to-slate-900/10" />
           <div className="flex items-start sm:items-center justify-between gap-4 relative">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">Total GPUs</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-200">{totalGPUs}</p>
-              <p className="text-[10px] sm:text-xs mt-1 font-medium text-slate-500 dark:text-slate-400">{totalMemoryGB} GB aggregate</p>
+              <p className="text-xs sm:text-sm font-medium text-slate-700">Total GPUs</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-slate-800">{totalGPUs}</p>
+              <p className="text-[10px] sm:text-xs mt-1 font-medium text-slate-500">{totalMemoryGB} GB aggregate</p>
             </div>
             <div className="group relative">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-slate-400/50 to-slate-700/50 blur opacity-50 group-hover:opacity-70 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 dark:bg-slate-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-slate-500/30 shadow-inner shadow-slate-500/20">
-                <Server className="text-slate-600 dark:text-slate-300 group-hover:scale-110 transition-transform" size={24} />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-slate-500/30 shadow-inner shadow-slate-500/20">
+                <Server className="text-slate-600 group-hover:scale-110 transition-transform" size={24} />
               </div>
             </div>
           </div>
         </div>
         {/* Available */}
-        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-emerald-50/70 dark:bg-emerald-100/10 border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30">
+  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-emerald-50/70 border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/15" />
           <div className="flex items-start sm:items-center justify-between gap-4 relative">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-emerald-700 dark:text-emerald-300">Available</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">{gpuSummary.available}</p>
+              <p className="text-xs sm:text-sm font-medium text-emerald-700">Available</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-emerald-700">{gpuSummary.available}</p>
             </div>
             <div className="group relative">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 dark:bg-emerald-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
-                <CheckCircle className="text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" size={24} />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
+                <CheckCircle className="text-emerald-600 group-hover:scale-110 transition-transform" size={24} />
               </div>
             </div>
           </div>
         </div>
 
         {/* Allocated */}
-        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-blue-50/70 dark:bg-blue-100/10 border border-blue-300/70 ring-1 ring-inset ring-blue-400/30">
+  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-blue-50/70 border border-blue-300/70 ring-1 ring-inset ring-blue-400/30">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/15" />
           <div className="flex items-start sm:items-center justify-between gap-4 relative">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300">Allocated</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-blue-700 dark:text-blue-300">{gpuSummary.allocated}</p>
+              <p className="text-xs sm:text-sm font-medium text-blue-700">Allocated</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-blue-700">{gpuSummary.allocated}</p>
             </div>
             <div className="group relative">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-indigo-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 dark:bg-blue-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-blue-500/30 shadow-inner shadow-blue-500/20">
-                <Lock className="text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" size={24} />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-blue-500/30 shadow-inner shadow-blue-500/20">
+                <Lock className="text-blue-600 group-hover:scale-110 transition-transform" size={24} />
               </div>
             </div>
           </div>
         </div>
 
         {/* Offline */}
-        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-red-50/70 dark:bg-rose-100/10 border border-red-300/70 ring-1 ring-inset ring-red-400/30">
+  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-red-50/70 border border-red-300/70 ring-1 ring-inset ring-red-400/30">
           <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-rose-500/15" />
           <div className="flex items-start sm:items-center justify-between gap-4 relative">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-red-700 dark:text-red-300">Offline</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-red-700 dark:text-red-300">{gpuSummary.offline}</p>
+              <p className="text-xs sm:text-sm font-medium text-red-700">Offline</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-red-700">{gpuSummary.offline}</p>
             </div>
             <div className="group relative">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-red-400/50 to-rose-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 dark:bg-rose-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-red-500/30 shadow-inner shadow-red-500/20">
-                <PowerOff className="text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform" size={24} />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-red-500/30 shadow-inner shadow-red-500/20">
+                <PowerOff className="text-red-600 group-hover:scale-110 transition-transform" size={24} />
               </div>
             </div>
           </div>
         </div>
 
         {/* Allocation Rate */}
-        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-violet-50/70 dark:bg-violet-100/10 border border-violet-300/70 ring-1 ring-inset ring-violet-400/30">
+  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-violet-50/70 border border-violet-300/70 ring-1 ring-inset ring-violet-400/30">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/15" />
           <div className="flex items-start sm:items-center justify-between gap-4 relative">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-violet-700 dark:text-violet-300">Allocation Rate</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-violet-700 dark:text-violet-300">{allocationRate}%</p>
-              <p className="text-[10px] sm:text-xs mt-1 font-medium text-violet-500 dark:text-violet-400">{gpuSummary.allocated} / {totalGPUs} allocated</p>
+              <p className="text-xs sm:text-sm font-medium text-violet-700">Allocation Rate</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-violet-700">{allocationRate}%</p>
+              <p className="text-[10px] sm:text-xs mt-1 font-medium text-violet-500">{gpuSummary.allocated} / {totalGPUs} allocated</p>
             </div>
             <div className="group relative">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-violet-400/50 to-fuchsia-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 dark:bg-violet-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-violet-500/30 shadow-inner shadow-violet-500/20">
-                <BarChart3 className="text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform" size={24} />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-violet-500/30 shadow-inner shadow-violet-500/20">
+                <BarChart3 className="text-violet-600 group-hover:scale-110 transition-transform" size={24} />
               </div>
             </div>
           </div>
