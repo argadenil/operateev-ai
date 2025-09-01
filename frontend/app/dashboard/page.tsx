@@ -68,6 +68,35 @@ const getStatusColor = (status: string) => {
   }
 };
 
+// Fancy status badge renderer (centralized styling)
+const renderStatusBadge = (status: string) => {
+  const base =
+    "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide shadow-sm backdrop-blur-sm border transition-colors duration-300";
+  const styles: Record<string, string> = {
+    Running:
+      "bg-gradient-to-r from-emerald-500/15 via-emerald-400/10 to-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 ring-1 ring-inset ring-emerald-500/20", // green
+    Idle:
+      "bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30 ring-1 ring-inset ring-amber-500/20", // amber
+  };
+  const fallback =
+    "bg-gradient-to-r from-rose-500/15 via-rose-400/10 to-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/30 ring-1 ring-inset ring-rose-500/20";
+
+  const cls = styles[status] || fallback;
+  const dotColor =
+    status === "Running"
+      ? "bg-emerald-500 animate-pulse"
+      : status === "Idle"
+        ? "bg-amber-500"
+        : "bg-rose-500";
+
+  return (
+    <span className={`${base} ${cls}`} aria-label={`Status: ${status}`}>
+      <span className={`w-2 h-2 rounded-full shadow-inner ${dotColor}`} />
+      {status}
+    </span>
+  );
+};
+
 // Chart data - moved outside component to prevent recreation
 const createLineChartData = () => ({
   labels: ["1m", "2m", "3m", "4m", "5m", "6m"],
@@ -178,13 +207,7 @@ const Dashboard = React.memo(() => {
       header: "Status",
       cell: ({ getValue }) => {
         const status = getValue() as string;
-        const colorClass = getStatusColor(status);
-
-        return (
-          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border-0 shadow-sm ${colorClass}`}>
-            {status}
-          </span>
-        );
+  return renderStatusBadge(status);
       },
     },
     {
@@ -222,32 +245,58 @@ const Dashboard = React.memo(() => {
 
   return (
     <div className="space-y-6 animate-slide-up">
-      {/* Customer Info */}
-      <div className="bg-gradient-to-r from-white via-indigo-50/30 to-purple-50/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100/50 shadow-lg backdrop-blur-sm">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-          Customer Dashboard: <span className="text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text">TEST Corp</span>
-        </h2>
+      {/* Customer Info (Enhanced) */}
+      <div className="relative group rounded-2xl p-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-xl shadow-indigo-500/20">
+        <div className="relative rounded-2xl overflow-hidden bg-white/80 dark:bg-gray-900/70 backdrop-blur-xl border border-white/60 dark:border-gray-700/60 px-5 sm:px-7 py-5 sm:py-6">
+          <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[radial-gradient(circle_at_15%_20%,rgba(99,102,241,0.25),transparent_60%),radial-gradient(circle_at_85%_80%,rgba(168,85,247,0.25),transparent_65%)]" />
+          <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+              <div className="relative w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30">
+                <Cpu size={26} className="drop-shadow" />
+                <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-60 transition duration-500 blur-lg bg-gradient-to-br from-indigo-500/40 via-fuchsia-500/30 to-purple-600/40" />
+              </div>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-50 flex items-center gap-2">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">Customer Dashboard</span>
+                  <span className="hidden sm:inline-block text-xs font-medium ml-1 px-2 py-0.5 rounded-full bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">Live</span>
+                </h2>
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 font-medium">
+                  Account: <span className="text-gray-900 dark:text-gray-100">TEST Corp</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="hidden sm:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-white/60 dark:bg-gray-800/70 px-3 py-1.5 rounded-lg border border-gray-200/60 dark:border-gray-700/60 shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Resources synced</span>
+              </div>
+              <button className="relative inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg border border-indigo-200 dark:border-indigo-500/40 bg-gradient-to-r from-indigo-50 via-white to-purple-50 dark:from-indigo-600/30 dark:via-indigo-700/10 dark:to-purple-700/20 text-indigo-700 dark:text-indigo-200 shadow hover:shadow-md transition active:scale-[0.97]">
+                <span className="bg-indigo-500 w-1.5 h-1.5 rounded-full shadow-inner" /> Refresh
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/10" />
+        <div className="bg-gray-100/70 dark:bg-gray-800/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-300 dark:border-gray-600 ring-1 ring-inset ring-gray-400/20 dark:ring-gray-500/30 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-400/20 via-transparent to-gray-500/30 dark:from-gray-600/30 dark:to-gray-500/20" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
               <p className="text-xs sm:text-sm font-medium text-gray-600">Total GPUs</p>
               <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">{statsData.total}</p>
             </div>
             <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-400/50 to-purple-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-indigo-500/30 shadow-inner shadow-indigo-500/20">
-                <Cpu className="text-indigo-600 group-hover:scale-110 transition-transform" size={22} />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-300/60 to-gray-400/50 dark:from-gray-600/60 dark:to-gray-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/20 dark:bg-gray-700/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-gray-400/40 dark:ring-gray-500/40 shadow-inner shadow-gray-400/30">
+                <Cpu className="text-gray-700 dark:text-gray-200 group-hover:scale-110 transition-transform" size={22} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 relative overflow-hidden">
+        <div className="bg-emerald-50/70 dark:bg-emerald-50/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/10" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
@@ -263,7 +312,7 @@ const Dashboard = React.memo(() => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 relative overflow-hidden">
+        <div className="bg-amber-50/70 dark:bg-amber-50/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-amber-300/70 ring-1 ring-inset ring-amber-400/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/10" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
@@ -279,7 +328,7 @@ const Dashboard = React.memo(() => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 relative overflow-hidden">
+        <div className="bg-indigo-50/70 dark:bg-indigo-50/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-indigo-300/70 ring-1 ring-inset ring-indigo-400/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-600/10" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
@@ -328,14 +377,7 @@ const Dashboard = React.memo(() => {
                       <div className="text-xs text-gray-600">{row.original.memory} • {row.original.cluster}</div>
                     </div>
                     <div className="text-right">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.original.status === "Running"
-                          ? "bg-green-100 text-green-700"
-                          : row.original.status === "Idle"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-red-100 text-red-700"
-                        }`}>
-                        {row.original.status}
-                      </span>
+                      {renderStatusBadge(row.original.status)}
                     </div>
                   </div>
 
@@ -523,16 +565,7 @@ const Dashboard = React.memo(() => {
                 <div className="text-sm sm:text-base"><span className="font-semibold">Processes Running:</span> {selectedModel.processes}</div>
                 <div className="col-span-1 sm:col-span-2 text-sm sm:text-base">
                   <span className="font-semibold">Status:</span>{" "}
-                  <span
-                    className={`ml-2 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold border ${selectedModel.status === "Running"
-                      ? "bg-green-100 text-green-700 border-green-700"
-                      : selectedModel.status === "Idle"
-                        ? "bg-yellow-100 text-yellow-700 border-yellow-700"
-                        : "bg-red-100 text-red-700 border-red-700"
-                      }`}
-                  >
-                    {selectedModel.status}
-                  </span>
+                  <span className="ml-2 inline-block align-middle">{renderStatusBadge(selectedModel.status)}</span>
                 </div>
               </div>
 

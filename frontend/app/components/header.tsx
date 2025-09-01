@@ -1,13 +1,19 @@
 import { useState, useRef, useEffect } from "react";
 import { Bell, Search, Zap } from "lucide-react"; // Icons for notifications, search, quick actions
 
+interface HeaderProps {
+  className?: string;
+  pageTitle?: string;
+  showSearch?: boolean;
+  showUserMenu?: boolean;
+}
+
 export default function Header({
   className = "",
   pageTitle = "",
-}: {
-  className?: string;
-  pageTitle?: string;
-}) {
+  showSearch = true,
+  showUserMenu = true,
+}: HeaderProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -82,7 +88,7 @@ export default function Header({
       </div>
 
       {/* Center - Search (Hidden on mobile) */}
-      {!isMobile && (
+  {showSearch && !isMobile && (
         <div className="flex-1 mx-8 relative max-w-md">
           <div className="relative">
             <label htmlFor="search-input" className="sr-only">
@@ -105,7 +111,7 @@ export default function Header({
       {/* Right - Actions */}
       <div className="flex items-center space-x-2 sm:space-x-4">
         {/* Search icon for mobile */}
-        {isMobile && (
+  {showSearch && isMobile && (
           <button 
             className="p-2 rounded-full hover:bg-white/10 transition"
             aria-label="Open search"
@@ -115,7 +121,8 @@ export default function Header({
         )}
 
         {/* Profile */}
-        <div className="relative" ref={dropdownRef}>
+  {showUserMenu && (
+  <div className="relative" ref={dropdownRef}>
           <div
             className={`rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold cursor-pointer hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl ring-2 ring-white/10 hover:ring-white/20 ${
               isMobile ? 'w-9 h-9' : 'w-11 h-11'
@@ -173,6 +180,7 @@ export default function Header({
             </div>
           )}
         </div>
+  )}
       </div>
     </header>
   );

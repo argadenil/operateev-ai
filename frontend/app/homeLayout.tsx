@@ -73,6 +73,13 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         "/settings": "Settings",
     };
 
+    // Routes that should NOT use the application shell (no sidebar/chat/system status)
+    const lightweightRoutes = ["/login", "/register"];
+    if (lightweightRoutes.includes(pathname)) {
+        // Let the page itself control header/footer; bypass app shell to avoid duplication
+        return <>{children}</>;
+    }
+
     return (
         <div className="flex h-screen relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-indigo-50">
             {/* Mobile Menu Button */}
