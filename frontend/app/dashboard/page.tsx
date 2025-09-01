@@ -12,7 +12,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, BarChart3, RefreshCw, Activity, Settings2 } from "lucide-react";
+import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, BarChart3, RefreshCw, Activity, Settings2, Server } from "lucide-react";
 
 // Chart.js - Register once
 import {
@@ -235,15 +235,19 @@ const Dashboard = React.memo(() => {
 
   return (
     <div className="space-y-6 animate-slide-up">
-      {/* Customer Info (Innovative Enhanced) */}
-      <div className="relative group rounded-2xl p-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-xl shadow-indigo-500/20 overflow-hidden">
-        {/* Animated border sheen */}
-        <div className="pointer-events-none absolute inset-0 rounded-2xl before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:bg-[conic-gradient(from_180deg_at_50%_50%,rgba(255,255,255,0.05)_0deg,rgba(255,255,255,0.35)_140deg,rgba(255,255,255,0.05)_300deg)] before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-700" />
-  <div className="relative rounded-2xl overflow-hidden bg-white/85 backdrop-blur-xl border border-white/60 px-5 sm:px-7 py-5 sm:py-6">
-          {/* Decorative gradients */}
-          <div className="pointer-events-none absolute -top-20 -right-32 w-80 h-80 bg-gradient-to-br from-fuchsia-500/10 via-purple-500/10 to-indigo-500/10 rounded-full blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-28 -left-20 w-72 h-72 bg-gradient-to-tr from-indigo-500/10 via-sky-500/5 to-pink-500/10 rounded-full blur-3xl" />
-
+      <div className="relative rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-sky-500 to-cyan-400 rounded-t-2xl" />
+        <div className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden">
+          <div className="absolute -top-8 -left-8 w-40 h-40 bg-indigo-100/30 rounded-full blur-2xl" />
+          <div className="absolute -bottom-10 -right-10 w-52 h-52 bg-sky-100/20 rounded-full blur-2xl" />
+        </div>
+        {/* dashboard card */}
+        <div className="relative px-5 sm:px-7 py-6 overflow-hidden">
+          {/* Edge dark -> faint middle gradient background overlay */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.38)0%,rgba(139,92,246,0.20)14%,rgba(236,72,153,0.12)28%,rgba(255,255,255,0)50%,rgba(236,72,153,0.12)72%,rgba(139,92,246,0.20)86%,rgba(99,102,241,0.38)100%)]"
+          />
           <div className="relative flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
               <div className="flex items-start sm:items-center gap-4">
@@ -256,7 +260,7 @@ const Dashboard = React.memo(() => {
                   <p className="mt-1 text-sm text-gray-600 font-medium flex items-center gap-2">
                     {/* Company name badge (enhanced) */}
                     <span
-                      className="relative inline-flex items-center gap-2 pl-3 pr-4 py-1.5 rounded-lg text-base sm:text-2xl font-extrabold tracking-tight bg-white text-gray-900 ring-2 ring-gray-300 shadow-sm focus:outline-none cursor-default select-none"
+                      className="relative inline-flex items-center gap-2 pl-3 pr-4 py-1.5 rounded-lg text-base sm:text-2xl font-semibold tracking-tight bg-white ring-1 ring-slate-200 shadow-sm focus:outline-none cursor-default select-none text-slate-800"
                       aria-label="Company: TEST Corp"
                       title="TEST Corp"
                     >
@@ -295,7 +299,7 @@ const Dashboard = React.memo(() => {
             {/* Mini KPI strip */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/70 backdrop-blur px-3 py-3 overflow-hidden">
-                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.15),transparent_60%)]" />
+                <div className="absolute inset-0 opacity-0 transition-opacity duration-500 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.15),transparent_60%)]" />
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-medium text-gray-600 tracking-wide">UTIL%</span>
                   <Activity size={14} className="text-indigo-500" />
@@ -354,8 +358,8 @@ const Dashboard = React.memo(() => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        <div className="bg-gray-100/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-300 ring-1 ring-inset ring-gray-400/20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-400/20 via-transparent to-gray-500/30" />
+        <div className="bg-blue-50/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-blue-200 ring-1 ring-inset ring-blue-300/30 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-sky-500/15" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
               <p className="text-xs sm:text-sm font-medium text-gray-600">Total GPUs</p>
@@ -364,7 +368,7 @@ const Dashboard = React.memo(() => {
             <div className="group relative">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-300/60 to-gray-400/50 blur opacity-60 group-hover:opacity-80 transition" />
               <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-gray-400/40 shadow-inner shadow-gray-400/30">
-                <Cpu className="text-gray-700 group-hover:scale-110 transition-transform" size={22} />
+                <Server className="text-gray-700 group-hover:scale-110 transition-transform" size={22} />
               </div>
             </div>
           </div>
@@ -386,7 +390,7 @@ const Dashboard = React.memo(() => {
           </div>
         </div>
 
-  <div className="bg-amber-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-amber-300/70 ring-1 ring-inset ring-amber-400/30 relative overflow-hidden">
+        <div className="bg-amber-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-amber-300/70 ring-1 ring-inset ring-amber-400/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/10" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
@@ -402,17 +406,17 @@ const Dashboard = React.memo(() => {
           </div>
         </div>
 
-  <div className="bg-indigo-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-indigo-300/70 ring-1 ring-inset ring-indigo-400/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-600/10" />
+        <div className="bg-orange-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-orange-300/70 ring-1 ring-inset ring-orange-400/30 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-orange-600/10" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
             <div className="mb-2 sm:mb-0">
               <p className="text-xs sm:text-sm font-medium text-gray-600">Avg. Power</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-600 tracking-tight">{statsData.avgPower}W</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-600 tracking-tight">{statsData.avgPower}W</p>
             </div>
             <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-400/50 to-purple-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-indigo-500/30 shadow-inner shadow-indigo-500/20">
-                <Zap className="text-indigo-600 group-hover:scale-110 transition-transform" size={22} />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-400/50 to-orange-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-orange-500/30 shadow-inner shadow-orange-500/20">
+                <Zap className="text-orange-600 group-hover:scale-110 transition-transform" size={22} />
               </div>
             </div>
           </div>

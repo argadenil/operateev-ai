@@ -236,19 +236,19 @@ export default function GPUResourcesPage() {
     <div className="flex flex-col space-y-6 min-h-[70vh]">
       {/* Stats Overview (Enhanced to match Dashboard) */}
   <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
-        {/* Total GPUs */}
-  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-slate-50/70 border border-slate-300/70 ring-1 ring-inset ring-slate-400/30">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-500/5 via-transparent to-slate-900/10" />
+        {/* Total GPUs (updated color from slate/gray to amber) */}
+  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-amber-50/70 border border-amber-300/70 ring-1 ring-inset ring-amber-400/30">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-400/10 via-transparent to-orange-500/20" />
           <div className="flex items-start sm:items-center justify-between gap-4 relative">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-slate-700">Total GPUs</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-slate-800">{totalGPUs}</p>
-              <p className="text-[10px] sm:text-xs mt-1 font-medium text-slate-500">{totalMemoryGB} GB aggregate</p>
+              <p className="text-xs sm:text-sm font-medium text-amber-700">Total GPUs</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-amber-800">{totalGPUs}</p>
+              <p className="text-[10px] sm:text-xs mt-1 font-medium text-amber-600">{totalMemoryGB} GB aggregate</p>
             </div>
             <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-slate-400/50 to-slate-700/50 blur opacity-50 group-hover:opacity-70 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-slate-500/30 shadow-inner shadow-slate-500/20">
-                <Server className="text-slate-600 group-hover:scale-110 transition-transform" size={24} />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-300/60 to-orange-400/60 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-amber-500/30 shadow-inner shadow-amber-500/20">
+                <Server className="text-amber-600 group-hover:scale-110 transition-transform" size={24} />
               </div>
             </div>
           </div>

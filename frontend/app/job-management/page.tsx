@@ -334,18 +334,18 @@ export default function JobManagementPage() {
         {/* KPI Cards (Enhanced like Dashboard Stats) */}
         <section>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
-            {/* Total Jobs */}
-            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-gray-100/70 border border-gray-300 ring-1 ring-inset ring-gray-400/20">
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-400/15 via-transparent to-gray-500/25" />
+            {/* Total Jobs (updated from gray to violet palette) */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-violet-50/70 border border-violet-300/70 ring-1 ring-inset ring-violet-400/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/15" />
               <div className="flex items-start justify-between gap-4 relative">
                 <div>
-                  <p className="text-[11px] sm:text-xs font-medium text-gray-600 tracking-wide uppercase">Total Jobs</p>
-                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">{total}</p>
+                  <p className="text-[11px] sm:text-xs font-medium text-violet-700 tracking-wide uppercase">Total Jobs</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-violet-700">{total}</p>
                 </div>
                 <div className="group relative">
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-300/60 to-gray-400/50 blur opacity-60 group-hover:opacity-80 transition" />
-                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-gray-400/40 shadow-inner shadow-gray-400/30">
-                    <BarChart3 className="text-gray-700 group-hover:scale-110 transition-transform" size={20} />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-violet-400/50 to-fuchsia-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-violet-500/30 shadow-inner shadow-violet-500/20">
+                    <BarChart3 className="text-violet-600 group-hover:scale-110 transition-transform" size={20} />
                   </div>
                 </div>
               </div>
