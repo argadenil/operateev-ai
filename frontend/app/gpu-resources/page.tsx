@@ -367,7 +367,12 @@ export default function GPUResourcesPage() {
             <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Status</label>
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === 'all' || val === 'available' || val === 'allocated' || val === 'offline') {
+                  setStatusFilter(val);
+                }
+              }}
               className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             >
               <option value="all">All</option>
