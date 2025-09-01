@@ -56,17 +56,7 @@ const mockGPUData: GPUResource[] = [
   { id: 6, gpu: "RTX 6000 Ada", memory: "48 GB", cluster: "Cluster-B", status: "Idle", uptime: "8h", temperature: 50, power: 100, processes: 2 },
 ];
 
-// Status color mapping - moved outside component
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "Running":
-      return "bg-green-100 text-green-700";
-    case "Idle":
-      return "bg-yellow-100 text-yellow-700";
-    default:
-      return "bg-red-100 text-red-700";
-  }
-};
+// (Old getStatusColor removed; using unified renderStatusBadge)
 
 // Fancy status badge renderer (centralized styling)
 const renderStatusBadge = (status: string) => {
@@ -368,7 +358,7 @@ const Dashboard = React.memo(() => {
             <h3 className="font-semibold text-sm sm:text-base">GPU Resources ({statsData.total})</h3>
           </div>
           <div className="divide-y divide-gray-100">
-            {table.getRowModel().rows.map((row, i) => (
+            {table.getRowModel().rows.map((row) => (
               <div key={row.id} className="p-4 hover:bg-gray-50 transition-colors">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">

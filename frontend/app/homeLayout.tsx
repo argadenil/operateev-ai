@@ -14,7 +14,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
     const pathname = usePathname(); // current route
     const router = useRouter();
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition(); // drop unused isPending
     const [activeHref, setActiveHref] = useState<string | null>(null);
 
     // Debounced resize handler for better performance

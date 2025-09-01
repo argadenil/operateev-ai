@@ -226,7 +226,7 @@ export default function JobManagementPage() {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [selectedJob, setSelectedJob] = React.useState<Job | null>(null);
-  const [statusFilter, setStatusFilter] = React.useState<"all" | Job["status"]>("all");
+  const [statusFilter] = React.useState<"all" | Job["status"]>("all"); // setter removed (unused)
 
   const filteredData =
     statusFilter === "all" ? jobList : jobList.filter((job) => job.status === statusFilter);
