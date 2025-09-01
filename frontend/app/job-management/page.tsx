@@ -13,7 +13,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
+import { X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, BarChart3, PlayCircle, CheckCircle, XCircle, Clock, Timer } from "lucide-react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -185,6 +185,41 @@ const jobList: Job[] = [
   },
 ];
 
+// Unified dashboard-style status badge
+const renderStatusBadge = (status: Job["status"]) => {
+  const base =
+    "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide shadow-sm backdrop-blur-sm border transition-colors duration-300 capitalize";
+  const map: Record<Job["status"], { wrap: string; dot: string }> = {
+    running: {
+      wrap:
+        "bg-gradient-to-r from-emerald-500/15 via-emerald-400/10 to-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 ring-1 ring-inset ring-emerald-500/20",
+      dot: "bg-emerald-500 animate-pulse",
+    },
+    completed: {
+      wrap:
+        "bg-gradient-to-r from-blue-500/15 via-blue-400/10 to-indigo-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30 ring-1 ring-inset ring-blue-500/20",
+      dot: "bg-blue-500",
+    },
+    failed: {
+      wrap:
+        "bg-gradient-to-r from-rose-500/15 via-rose-400/10 to-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/30 ring-1 ring-inset ring-rose-500/20",
+      dot: "bg-rose-500",
+    },
+    queued: {
+      wrap:
+        "bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30 ring-1 ring-inset ring-amber-500/20",
+      dot: "bg-amber-500",
+    },
+  };
+  const { wrap, dot } = map[status];
+  return (
+    <span className={`${base} ${wrap}`} aria-label={`Status: ${status}`}>
+      <span className={`w-2 h-2 rounded-full shadow-inner ${dot}`} />
+      {status}
+    </span>
+  );
+};
+
 
 export default function JobManagementPage() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -204,20 +239,8 @@ export default function JobManagementPage() {
       accessorKey: "status",
       header: "Status",
       cell: ({ getValue }) => {
-        const status = getValue() as string;
-        const color =
-          status === "running"
-            ? "bg-green-100 text-green-700 border-green-700"
-            : status === "completed"
-              ? "bg-blue-100 text-blue-700 border-blue-700"
-              : status === "failed"
-                ? "bg-red-100 text-red-700 border-red-700"
-                : "bg-yellow-100 text-yellow-700 border-yellow-700";
-        return (
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>
-            {status}
-          </span>
-        );
+  const status = getValue() as Job["status"];
+  return renderStatusBadge(status);
       },
     },
     { accessorKey: "startTime", header: "Start Time" },
@@ -308,32 +331,109 @@ export default function JobManagementPage() {
       <div className="mx-auto flex flex-col gap-6">
         {/* Page Header */}
 
-        {/* KPI Cards */}
+        {/* KPI Cards (Enhanced like Dashboard Stats) */}
         <section>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-            <div className="bg-white rounded-xl p-4 shadow border">
-              <p className="text-gray-500 text-sm">Total Jobs</p>
-              <h2 className="text-2xl font-bold">{total}</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
+            {/* Total Jobs */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-gray-100/70 dark:bg-gray-800/40 border border-gray-300 dark:border-gray-600 ring-1 ring-inset ring-gray-400/20 dark:ring-gray-500/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-400/15 via-transparent to-gray-500/25 dark:from-gray-600/30 dark:to-gray-500/20" />
+              <div className="flex items-start justify-between gap-4 relative">
+                <div>
+                  <p className="text-[11px] sm:text-xs font-medium text-gray-600 dark:text-gray-300 tracking-wide uppercase">Total Jobs</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">{total}</p>
+                </div>
+                <div className="group relative">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-300/60 to-gray-400/50 dark:from-gray-600/60 dark:to-gray-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/30 dark:bg-gray-700/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-gray-400/40 dark:ring-gray-500/40 shadow-inner shadow-gray-400/30">
+                    <BarChart3 className="text-gray-700 dark:text-gray-200 group-hover:scale-110 transition-transform" size={20} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-green-50 rounded-xl p-4 shadow border border-green-400">
-              <p className="text-green-700 text-sm">Running</p>
-              <h2 className="text-2xl font-bold text-green-700">{running}</h2>
+
+            {/* Running */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-emerald-50/70 dark:bg-emerald-100/10 border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/15" />
+              <div className="flex items-start justify-between gap-4 relative">
+                <div>
+                  <p className="text-[11px] sm:text-xs font-medium text-emerald-700 dark:text-emerald-300 tracking-wide uppercase">Running</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">{running}</p>
+                </div>
+                <div className="group relative">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-emerald-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
+                    <PlayCircle className="text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" size={22} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-blue-50 rounded-xl p-4 shadow border border-blue-400">
-              <p className="text-blue-700 text-sm">Completed</p>
-              <h2 className="text-2xl font-bold text-blue-700">{completed}</h2>
+
+            {/* Completed */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-blue-50/70 dark:bg-blue-100/10 border border-blue-300/70 ring-1 ring-inset ring-blue-400/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/15" />
+              <div className="flex items-start justify-between gap-4 relative">
+                <div>
+                  <p className="text-[11px] sm:text-xs font-medium text-blue-700 dark:text-blue-300 tracking-wide uppercase">Completed</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-blue-700 dark:text-blue-300">{completed}</p>
+                </div>
+                <div className="group relative">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-indigo-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-blue-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-blue-500/30 shadow-inner shadow-blue-500/20">
+                    <CheckCircle className="text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" size={22} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-red-50 rounded-xl p-4 shadow border border-red-400">
-              <p className="text-red-700 text-sm">Failed</p>
-              <h2 className="text-2xl font-bold text-red-700">{failed}</h2>
+
+            {/* Failed */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-red-50/70 dark:bg-rose-100/10 border border-red-300/70 ring-1 ring-inset ring-red-400/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-rose-500/15" />
+              <div className="flex items-start justify-between gap-4 relative">
+                <div>
+                  <p className="text-[11px] sm:text-xs font-medium text-red-700 dark:text-red-300 tracking-wide uppercase">Failed</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-red-700 dark:text-red-300">{failed}</p>
+                </div>
+                <div className="group relative">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-red-400/50 to-rose-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-rose-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-red-500/30 shadow-inner shadow-red-500/20">
+                    <XCircle className="text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform" size={22} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-yellow-50 rounded-xl p-4 shadow border border-yellow-400">
-              <p className="text-yellow-700 text-sm">Queued</p>
-              <h2 className="text-2xl font-bold text-yellow-700">{queued}</h2>
+
+            {/* Queued */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-yellow-50/70 dark:bg-amber-100/10 border border-amber-300/70 ring-1 ring-inset ring-amber-400/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/15" />
+              <div className="flex items-start justify-between gap-4 relative">
+                <div>
+                  <p className="text-[11px] sm:text-xs font-medium text-amber-700 dark:text-amber-300 tracking-wide uppercase">Queued</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-amber-700 dark:text-amber-300">{queued}</p>
+                </div>
+                <div className="group relative">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400/50 to-yellow-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-amber-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-amber-500/30 shadow-inner shadow-amber-500/20">
+                    <Clock className="text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform" size={22} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-indigo-50 rounded-xl p-4 shadow border border-indigo-400">
-              <p className="text-indigo-700 text-sm">Avg. Duration</p>
-              <h2 className="text-2xl font-bold text-indigo-700">1h 23m</h2>
+
+            {/* Avg Duration */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-indigo-50/70 dark:bg-indigo-100/10 border border-indigo-300/70 ring-1 ring-inset ring-indigo-400/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-600/15" />
+              <div className="flex items-start justify-between gap-4 relative">
+                <div>
+                  <p className="text-[11px] sm:text-xs font-medium text-indigo-700 dark:text-indigo-300 tracking-wide uppercase">Avg. Duration</p>
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-indigo-600 dark:text-indigo-300">1h 23m</p>
+                </div>
+                <div className="group relative">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-400/50 to-purple-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 dark:bg-indigo-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-indigo-500/30 shadow-inner shadow-indigo-500/20">
+                    <Timer className="text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" size={22} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -477,6 +577,7 @@ export default function JobManagementPage() {
                       </div>
                       <div className="flex items-center justify-between text-xs text-gray-600">
                         <span className="font-medium">{row.original.status}</span>
+                        {/* Could wrap with badge if desired in mobile summary line */}
                         <span>{row.original.duration}</span>
                       </div>
                       <button
@@ -598,6 +699,7 @@ export default function JobManagementPage() {
                 <li><span className="font-semibold">Owner:</span> {selectedJob.owner}</li>
                 <li><span className="font-semibold">GPU:</span> {selectedJob.gpu}</li>
                 <li><span className="font-semibold">Status:</span> {selectedJob.status}</li>
+                {/* Badge version: <li><span className=\"font-semibold\">Status:</span> <span className=\"ml-2\">{renderStatusBadge(selectedJob.status)}</span></li> */}
                 <li><span className="font-semibold">Start Time:</span> {selectedJob.startTime}</li>
                 <li><span className="font-semibold">Duration:</span> {selectedJob.duration}</li>
               </ul>

@@ -12,7 +12,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { X, Copy, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
+import { X, Copy, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, CheckCircle, Lock, PowerOff } from "lucide-react";
 
 type GPU = {
   id: number;
@@ -27,6 +27,36 @@ const gpuList: GPU[] = [
   { id: 2, model: "NVIDIA V100", memory: "32 GB", cluster: "Cluster-B", status: "allocated" },
   { id: 3, model: "RTX 4090", memory: "24 GB", cluster: "Cluster-C", status: "offline" },
 ];
+
+// Reusable badge styled similarly to dashboard statuses
+const renderStatusBadge = (status: GPU["status"]) => {
+  const base =
+    "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide shadow-sm backdrop-blur-sm border transition-colors duration-300 capitalize";
+  const map: Record<GPU["status"], { wrap: string; dot: string }> = {
+    available: {
+      wrap:
+        "bg-gradient-to-r from-emerald-500/15 via-emerald-400/10 to-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 ring-1 ring-inset ring-emerald-500/20",
+      dot: "bg-emerald-500 animate-pulse",
+    },
+    allocated: {
+      wrap:
+        "bg-gradient-to-r from-blue-500/15 via-blue-400/10 to-indigo-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30 ring-1 ring-inset ring-blue-500/20",
+      dot: "bg-blue-500",
+    },
+    offline: {
+      wrap:
+        "bg-gradient-to-r from-rose-500/15 via-rose-400/10 to-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/30 ring-1 ring-inset ring-rose-500/20",
+      dot: "bg-rose-500",
+    },
+  };
+  const { wrap, dot } = map[status];
+  return (
+    <span className={`${base} ${wrap}`} aria-label={`Status: ${status}`}>
+      <span className={`w-2 h-2 rounded-full shadow-inner ${dot}`} />
+      {status}
+    </span>
+  );
+};
 
 export default function GPUResourcesPage() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -43,19 +73,8 @@ export default function GPUResourcesPage() {
       accessorKey: "status",
       header: "Status",
       cell: ({ getValue }) => {
-        const status = getValue() as string;
-        const color =
-          status === "available"
-            ? "bg-green-100 text-green-700"
-            : status === "allocated"
-            ? "bg-blue-100 text-blue-700"
-            : "bg-red-100 text-red-700";
-
-        return (
-          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${color}`}>
-            {status}
-          </span>
-        );
+  const status = getValue() as GPU["status"];
+  return renderStatusBadge(status);
       },
     },
     {
@@ -115,19 +134,57 @@ export default function GPUResourcesPage() {
 
   return (
     <div className="flex flex-col space-y-6 min-h-[70vh]">
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <div className="bg-green-100 text-green-700 p-4 rounded-lg text-center font-semibold">
-          <span className="block text-sm sm:text-base">Available</span>
-          <span className="text-lg sm:text-xl">{gpuSummary.available}</span>
+      {/* Stats Overview (Enhanced to match Dashboard) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+        {/* Available */}
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-emerald-50/70 dark:bg-emerald-100/10 border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/15" />
+          <div className="flex items-start sm:items-center justify-between gap-4 relative">
+            <div>
+              <p className="text-xs sm:text-sm font-medium text-emerald-700 dark:text-emerald-300">Available</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">{gpuSummary.available}</p>
+            </div>
+            <div className="group relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 dark:bg-emerald-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
+                <CheckCircle className="text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" size={24} />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="bg-blue-100 text-blue-700 p-4 rounded-lg text-center font-semibold">
-          <span className="block text-sm sm:text-base">Allocated</span>
-          <span className="text-lg sm:text-xl">{gpuSummary.allocated}</span>
+
+        {/* Allocated */}
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-blue-50/70 dark:bg-blue-100/10 border border-blue-300/70 ring-1 ring-inset ring-blue-400/30">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/15" />
+          <div className="flex items-start sm:items-center justify-between gap-4 relative">
+            <div>
+              <p className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300">Allocated</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-blue-700 dark:text-blue-300">{gpuSummary.allocated}</p>
+            </div>
+            <div className="group relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-indigo-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 dark:bg-blue-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-blue-500/30 shadow-inner shadow-blue-500/20">
+                <Lock className="text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" size={24} />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="bg-red-100 text-red-700 p-4 rounded-lg text-center font-semibold">
-          <span className="block text-sm sm:text-base">Offline</span>
-          <span className="text-lg sm:text-xl">{gpuSummary.offline}</span>
+
+        {/* Offline */}
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-red-50/70 dark:bg-rose-100/10 border border-red-300/70 ring-1 ring-inset ring-red-400/30">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-rose-500/15" />
+          <div className="flex items-start sm:items-center justify-between gap-4 relative">
+            <div>
+              <p className="text-xs sm:text-sm font-medium text-red-700 dark:text-red-300">Offline</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-red-700 dark:text-red-300">{gpuSummary.offline}</p>
+            </div>
+            <div className="group relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-red-400/50 to-rose-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 dark:bg-rose-200/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-red-500/30 shadow-inner shadow-red-500/20">
+                <PowerOff className="text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform" size={24} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -217,11 +274,7 @@ export default function GPUResourcesPage() {
                       <div className="text-xs text-gray-600">{row.original.memory} • {row.original.cluster}</div>
                     </div>
                     <div className="text-right">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.original.status === "available"
-                        ? "bg-green-100 text-green-700"
-                        : row.original.status === "allocated"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-red-100 text-red-700"}`}>{row.original.status}</span>
+                      {renderStatusBadge(row.original.status)}
                     </div>
                   </div>
                   <button
@@ -325,6 +378,8 @@ export default function GPUResourcesPage() {
               <li><span className="font-semibold">Memory:</span> {selectedGPU.memory}</li>
               <li><span className="font-semibold">Cluster:</span> {selectedGPU.cluster}</li>
               <li><span className="font-semibold">Status:</span> {selectedGPU.status}</li>
+              {/* Could also render the badge inside the modal if preferred: */}
+              {/* <li><span className="font-semibold">Status:</span> <span className="ml-2">{renderStatusBadge(selectedGPU.status)}</span></li> */}
             </ul>
           </div>
         </div>
