@@ -69,8 +69,10 @@ export default function LoginPage() {
         localStorage.setItem("auth_token", data.token);
       } catch { }
 
-      success("Welcome back!", { title: "Login successful" });
-      router.push("/dashboard");
+      localStorage.setItem("customer_id", data.customer_id);
+      localStorage.setItem("username", data.username);
+      success(`Welcome ${data.username}`, { title: "Login successful" });
+      router.push("/dashboard/" + data.customer_id);
     } catch (e: any) {
       const msg = e?.message || "Network error";
       setError(msg);
