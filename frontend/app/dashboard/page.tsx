@@ -298,7 +298,7 @@ const Dashboard = React.memo(() => {
       if (!t) {
         router.replace("/login");
       }
-    } catch {}
+    } catch { }
   }, [router]);
 
   if (loading || customerId === undefined) return <Loader />;
@@ -376,60 +376,94 @@ const Dashboard = React.memo(() => {
 
             {/* Mini KPI strip */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/90 backdrop-blur px-3 py-3 overflow-hidden">
-                <div className="absolute inset-0 opacity-0 transition-opacity duration-500 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.15),transparent_60%)]" />
+              {/* UTIL% */}
+              <div className="relative group/kpi rounded-xl border border-indigo-400 ring-1 ring-indigo-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-indigo-300/50 hover:shadow-lg hover:shadow-indigo-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
+                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.15),transparent_70%)]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-gray-600 tracking-wide">UTIL%</span>
+                  <span className="text-xs font-semibold text-gray-700 tracking-wide">UTIL%</span>
                   <Activity size={14} className="text-indigo-500" />
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-semibold text-gray-900">72%</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 font-semibold">+5%</span>
+                  <span className="text-lg font-bold text-gray-900">72%</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-600 font-semibold">+5%</span>
                 </div>
-                <div className="mt-2 h-1.5 w-full rounded bg-gray-200/70 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-[pulse_3s_ease-in-out_infinite] rounded" style={{ width: '72%' }} />
+                <div className="mt-2 h-1.5 w-full rounded bg-gray-100 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-[pulse_3s_ease-in-out_infinite]"
+                    style={{ width: "72%" }}
+                  />
                 </div>
               </div>
-              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/90 backdrop-blur px-3 py-3">
+
+              {/* AVG TEMP */}
+              <div className="relative group/kpi rounded-xl border border-amber-400 ring-1 ring-amber-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-amber-300/50 hover:shadow-lg hover:shadow-amber-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
+                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_20%_20%,rgba(251,191,36,0.15),transparent_70%)]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-gray-600 tracking-wide">AVG TEMP</span>
-                  <span className="text-xs font-semibold text-amber-600">℃</span>
+                  <span className="text-xs font-semibold text-gray-700 tracking-wide">AVG TEMP</span>
+                  <span className="text-xs font-bold text-amber-600">℃</span>
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-semibold text-gray-900">62</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 font-semibold">+2</span>
+                  <span className="text-lg font-bold text-gray-900">62</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-600 font-semibold">+2</span>
                 </div>
                 <div className="mt-2 h-1 w-full flex gap-0.5">
-                  {Array.from({ length: 12 }).map((_, i) => (<span key={i} className={`flex-1 rounded-sm ${i < 8 ? 'bg-amber-400/70' : 'bg-amber-200/50'} h-full`} />))}
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`flex-1 rounded-sm ${i < 8 ? "bg-amber-400" : "bg-amber-200"} h-full`}
+                    />
+                  ))}
                 </div>
               </div>
-              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/90 backdrop-blur px-3 py-3">
+
+              {/* POWER W */}
+              <div className="relative group/kpi rounded-xl border border-indigo-400 ring-1 ring-indigo-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-indigo-300/50 hover:shadow-lg hover:shadow-indigo-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
+                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_70%_80%,rgba(99,102,241,0.15),transparent_70%)]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-gray-600 tracking-wide">POWER W</span>
+                  <span className="text-xs font-semibold text-gray-700 tracking-wide">POWER W</span>
                   <Zap size={14} className="text-indigo-500" />
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-semibold text-gray-900">{statsData.avgPower}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-600 font-semibold">stable</span>
+                  <span className="text-lg font-bold text-gray-900">{statsData.avgPower}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-600 font-semibold">
+                    stable
+                  </span>
                 </div>
                 <div className="mt-2 flex items-end gap-0.5 h-8">
-                  {[5, 7, 6, 8, 5, 9, 6, 7].map((v, i) => (<span key={i} className="flex-1 bg-gradient-to-t from-indigo-500/30 to-indigo-500/70 rounded-t" style={{ height: `${v * 6}px` }} />))}
+                  {[5, 7, 6, 8, 5, 9, 6, 7].map((v, i) => (
+                    <span
+                      key={i}
+                      className="flex-1 bg-gradient-to-t from-indigo-300 to-indigo-600 rounded-t"
+                      style={{ height: `${v * 6}px` }}
+                    />
+                  ))}
                 </div>
               </div>
-              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/90 backdrop-blur px-3 py-3">
+
+              {/* STATUS */}
+              <div className="relative group/kpi rounded-xl border border-emerald-400 ring-1 ring-emerald-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-emerald-300/50 hover:shadow-lg hover:shadow-emerald-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
+                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.15),transparent_70%)]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-gray-600 tracking-wide">STATUS</span>
-                  <span className="text-xs font-semibold text-emerald-600">Live</span>
+                  <span className="text-xs font-semibold text-gray-700 tracking-wide">STATUS</span>
+                  <span className="text-xs font-bold text-emerald-600">Live</span>
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-semibold text-gray-900">{statsData.running}/{statsData.total}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 font-semibold">Running</span>
+                  <span className="text-lg font-bold text-gray-900">
+                    {statsData.running}/{statsData.total}
+                  </span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-600 font-semibold">
+                    Running
+                  </span>
                 </div>
                 <div className="mt-2 h-1.5 w-full rounded bg-emerald-100 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-500" style={{ width: `${(statsData.running / statsData.total) * 100}%` }} />
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 animate-[pulse_3s_ease-in-out_infinite]"
+                    style={{ width: `${(statsData.running / statsData.total) * 100}%` }}
+                  />
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
