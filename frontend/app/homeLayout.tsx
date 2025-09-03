@@ -239,34 +239,35 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                     : 'top-[30%] right-6 -translate-y-1/2'
                     }`} style={{ position: 'fixed' }}>
                     <div className="relative group">
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 blur-lg opacity-65 group-hover:opacity-80 transition" />
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 blur-lg opacity-65 group-hover:opacity-80 transition" />
 
-<video
-  src="/images/Robot.mp4"
-  className={`relative rounded-full cursor-pointer bg-gradient-to-tr from-teal-800 via-teal-900 to-black
+                        <video
+                            src="/images/Robot.mp4"
+                            className={`relative rounded-full cursor-pointer bg-gradient-to-tr from-teal-800 via-teal-900 to-black
     backdrop-blur-md ring-2 ring-orange-400/80
     filter contrast-145 brightness-110 saturate-140
     shadow-[0_0_15px_rgba(251,146,60,0.65),0_0_30px_rgba(251,146,60,0.25)]
     hover:shadow-[0_0_20px_rgba(251,146,60,0.75),0_0_40px_rgba(251,146,60,0.35)]
     active:scale-95 transition-all duration-300
     ${isMobile ? 'w-12 h-12 p-1' : 'w-20 h-20 p-1'}`}
-  width={isMobile ? 48 : 64}
-  height={isMobile ? 48 : 64}
-  muted
-  loop
-  playsInline
-  autoPlay
-  aria-hidden
-  onClick={() => {
-    setTimeout(() => setSlideOverOpen(true), 100);
-  }}
-  style={{
-    position: 'relative',
-    zIndex: 1,
-    pointerEvents: 'auto'
-  }}
-/>
-
+                            width={isMobile ? 48 : 64}
+                            height={isMobile ? 48 : 64}
+                            muted
+                            loop
+                            playsInline
+                            autoPlay
+                            aria-hidden
+                            onClick={() => {
+                                setTimeout(() => setSlideOverOpen(true), 100);
+                            }}
+                            style={{
+                                position: 'relative',
+                                zIndex: 1,
+                                pointerEvents: 'auto'
+                            }}
+                        />
+                        <div className={`absolute -top-2 -right-2 bg-green-500 rounded-full border-2 border-white animate-pulse ${isMobile ? 'w-3 h-3' : 'w-5 h-5'
+                            }`}></div>
 
                     </div>
                 </div>
