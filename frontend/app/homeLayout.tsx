@@ -227,7 +227,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                     <div className="relative group">
                         <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full blur-lg opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <video
-                            src="images/agent.webm"
+                            src="/images/agent.webm"
                             className={`relative rounded-full cursor-pointer shadow-2xl border-2 border-white/20 bg-transparent backdrop-blur-sm hover:scale-110 active:scale-95 transition-all duration-300 hover:shadow-3xl ${
                                 isMobile ? 'w-12 h-12' : 'w-16 h-16'
                             }`}
