@@ -130,9 +130,9 @@ func GetDashboard(c echo.Context) error {
 	}
 
 	for _, r := range resources {
-		if r.Status == "running" {
+		if r.Status == "Running" {
 			summary.Running++
-		} else if r.Status == "idle" {
+		} else if r.Status == "Idle" {
 			summary.Idle++
 		}
 	}
