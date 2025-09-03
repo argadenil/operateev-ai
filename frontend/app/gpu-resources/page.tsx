@@ -88,10 +88,10 @@ export default function GPUResourcesPage() {
     setGpuData(prev => prev.map(g => {
       if (g.status === "offline") return { ...g, utilization: 0, temperature: 0, power: 0, memoryUsedGB: 0 };
       const total = parseTotalMemory(g);
-      const nextUtil = Math.max(0, Math.min(100, Math.round(g.utilization + (Math.random()*20 - 10))));
-      const nextTemp = Math.max(30, Math.min(85, Math.round(g.temperature + (Math.random()*6 - 3))));
-      const nextPower = Math.max(50, Math.min(350, Math.round(g.power + (Math.random()*40 - 20))));
-      const nextMemUsed = Math.max(0, Math.min(total, Math.round(g.memoryUsedGB + (Math.random()*6 - 3))));
+      const nextUtil = Math.max(0, Math.min(100, Math.round(g.utilization + (Math.random() * 20 - 10))));
+      const nextTemp = Math.max(30, Math.min(85, Math.round(g.temperature + (Math.random() * 6 - 3))));
+      const nextPower = Math.max(50, Math.min(350, Math.round(g.power + (Math.random() * 40 - 20))));
+      const nextMemUsed = Math.max(0, Math.min(total, Math.round(g.memoryUsedGB + (Math.random() * 6 - 3))));
       return { ...g, utilization: nextUtil, temperature: nextTemp, power: nextPower, memoryUsedGB: nextMemUsed };
     }));
   };
@@ -245,110 +245,114 @@ export default function GPUResourcesPage() {
   return (
     <div className="flex flex-col space-y-6 min-h-[70vh]">
       {/* Stats Overview (Enhanced to match Dashboard) */}
-  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
         {/* Total GPUs (updated color from slate/gray to amber) */}
-  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-amber-50/70 border border-amber-300/70 ring-1 ring-inset ring-amber-400/30">
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-400/10 via-transparent to-orange-500/20" />
-          <div className="flex items-start sm:items-center justify-between gap-4 relative">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-amber-700">Total GPUs</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-amber-800">{totalGPUs}</p>
-              <p className="text-[10px] sm:text-xs mt-1 font-medium text-amber-600">{totalMemoryGB} GB aggregate</p>
-            </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-300/60 to-orange-400/60 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-amber-500/30 shadow-inner shadow-amber-500/20">
-                <Server className="text-amber-600 group-hover:scale-110 transition-transform" size={24} />
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Available */}
-  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-emerald-50/70 border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/15" />
-          <div className="flex items-start sm:items-center justify-between gap-4 relative">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-emerald-700">Available</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-emerald-700">{gpuSummary.available}</p>
-            </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
-                <CheckCircle className="text-emerald-600 group-hover:scale-110 transition-transform" size={24} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Allocated */}
-  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-blue-50/70 border border-blue-300/70 ring-1 ring-inset ring-blue-400/30">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/15" />
-          <div className="flex items-start sm:items-center justify-between gap-4 relative">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-blue-700">Allocated</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-blue-700">{gpuSummary.allocated}</p>
-            </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-indigo-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-blue-500/30 shadow-inner shadow-blue-500/20">
-                <Lock className="text-blue-600 group-hover:scale-110 transition-transform" size={24} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Offline */}
-  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-red-50/70 border border-red-300/70 ring-1 ring-inset ring-red-400/30">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-rose-500/15" />
-          <div className="flex items-start sm:items-center justify-between gap-4 relative">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-red-700">Offline</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-red-700">{gpuSummary.offline}</p>
-            </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-red-400/50 to-rose-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-red-500/30 shadow-inner shadow-red-500/20">
-                <PowerOff className="text-red-600 group-hover:scale-110 transition-transform" size={24} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-  {/* Allocation Rate */}
-  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-violet-50/70 border border-violet-300/70 ring-1 ring-inset ring-violet-400/30">
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/15" />
-          <div className="flex items-start sm:items-center justify-between gap-4 relative">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-violet-700">Allocation Rate</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-violet-700">{allocationRate}%</p>
-              <p className="text-[10px] sm:text-xs mt-1 font-medium text-violet-500">{gpuSummary.allocated} / {totalGPUs} allocated</p>
-            </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-violet-400/50 to-fuchsia-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-violet-500/30 shadow-inner shadow-violet-500/20">
-                <BarChart3 className="text-violet-600 group-hover:scale-110 transition-transform" size={24} />
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Avg Utilization */}
-        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-emerald-50/70 border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-600/10" />
-          <div className="flex items-start sm:items-center justify-between gap-4 relative">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-emerald-700">Avg Utilization</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-emerald-700">{avgUtil}%</p>
-            </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-emerald-600/50 blur opacity-50 group-hover:opacity-70 transition" />
-              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
-                <Activity className="text-emerald-600 group-hover:scale-110 transition-transform" size={24} />
-              </div>
-            </div>
-          </div>
+        {/* Total GPUs */}
+<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-amber-50/70 border border-gray-900/20 hover:border-amber-500/40 ring-1 ring-inset ring-amber-400/30 transition-all">
+  <div className="absolute inset-0 bg-gradient-to-br from-amber-400/10 via-transparent to-orange-500/20" />
+  <div className="flex items-start sm:items-center justify-between gap-4 relative">
+    <div>
+      <p className="text-xs sm:text-sm font-medium text-amber-700">Total GPUs</p>
+      <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-amber-800">{totalGPUs}</p>
+      <p className="text-[10px] sm:text-xs mt-1 font-medium text-amber-600">{totalMemoryGB} GB aggregate</p>
+    </div>
+    <div className="group relative">
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-300/60 to-orange-400/60 blur opacity-60 group-hover:opacity-80 transition" />
+      <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-amber-500/30 shadow-inner shadow-amber-500/20">
+        <Server className="text-amber-600 group-hover:scale-110 transition-transform" size={24} />
+      </div>
+    </div>
   </div>
+</div>
 
-  {/* Removed Avg Temperature and Total Power cards to allow more space for remaining cards */}
+{/* Available */}
+<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-emerald-50/70 border border-gray-900/20 hover:border-emerald-500/40 ring-1 ring-inset ring-emerald-400/30 transition-all">
+  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/15" />
+  <div className="flex items-start sm:items-center justify-between gap-4 relative">
+    <div>
+      <p className="text-xs sm:text-sm font-medium text-emerald-700">Available</p>
+      <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-emerald-700">{gpuSummary.available}</p>
+    </div>
+    <div className="group relative">
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+      <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
+        <CheckCircle className="text-emerald-600 group-hover:scale-110 transition-transform" size={24} />
+      </div>
+    </div>
+  </div>
+</div>
+
+{/* Allocated */}
+<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-blue-50/70 border border-gray-900/20 hover:border-blue-500/40 ring-1 ring-inset ring-blue-400/30 transition-all">
+  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/15" />
+  <div className="flex items-start sm:items-center justify-between gap-4 relative">
+    <div>
+      <p className="text-xs sm:text-sm font-medium text-blue-700">Allocated</p>
+      <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-blue-700">{gpuSummary.allocated}</p>
+    </div>
+    <div className="group relative">
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-indigo-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+      <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-blue-500/30 shadow-inner shadow-blue-500/20">
+        <Lock className="text-blue-600 group-hover:scale-110 transition-transform" size={24} />
+      </div>
+    </div>
+  </div>
+</div>
+
+{/* Offline */}
+<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-red-50/70 border border-gray-900/20 hover:border-red-500/40 ring-1 ring-inset ring-red-400/30 transition-all">
+  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-rose-500/15" />
+  <div className="flex items-start sm:items-center justify-between gap-4 relative">
+    <div>
+      <p className="text-xs sm:text-sm font-medium text-red-700">Offline</p>
+      <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-red-700">{gpuSummary.offline}</p>
+    </div>
+    <div className="group relative">
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-red-400/50 to-rose-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+      <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-red-500/30 shadow-inner shadow-red-500/20">
+        <PowerOff className="text-red-600 group-hover:scale-110 transition-transform" size={24} />
+      </div>
+    </div>
+  </div>
+</div>
+
+{/* Allocation Rate */}
+<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-violet-50/70 border border-gray-900/20 hover:border-violet-500/40 ring-1 ring-inset ring-violet-400/30 transition-all">
+  <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/15" />
+  <div className="flex items-start sm:items-center justify-between gap-4 relative">
+    <div>
+      <p className="text-xs sm:text-sm font-medium text-violet-700">Allocation Rate</p>
+      <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-violet-700">{allocationRate}%</p>
+      <p className="text-[10px] sm:text-xs mt-1 font-medium text-violet-500">{gpuSummary.allocated} / {totalGPUs} allocated</p>
+    </div>
+    <div className="group relative">
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-violet-400/50 to-fuchsia-500/50 blur opacity-60 group-hover:opacity-80 transition" />
+      <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-violet-500/30 shadow-inner shadow-violet-500/20">
+        <BarChart3 className="text-violet-600 group-hover:scale-110 transition-transform" size={24} />
+      </div>
+    </div>
+  </div>
+</div>
+
+{/* Avg Utilization */}
+<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg bg-emerald-50/70 border border-gray-900/20 hover:border-emerald-500/40 ring-1 ring-inset ring-emerald-400/30 transition-all">
+  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-600/10" />
+  <div className="flex items-start sm:items-center justify-between gap-4 relative">
+    <div>
+      <p className="text-xs sm:text-sm font-medium text-emerald-700">Avg Utilization</p>
+      <p className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-emerald-700">{avgUtil}%</p>
+    </div>
+    <div className="group relative">
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-emerald-600/50 blur opacity-60 group-hover:opacity-80 transition" />
+      <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/30 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
+        <Activity className="text-emerald-600 group-hover:scale-110 transition-transform" size={24} />
+      </div>
+    </div>
+  </div>
+</div>
+
+
+        {/* Removed Avg Temperature and Total Power cards to allow more space for remaining cards */}
       </div>
 
       {/* Filters & Actions */}
@@ -363,7 +367,7 @@ export default function GPUResourcesPage() {
               className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
           </div>
-            <div className="flex flex-col w-full sm:w-40">
+          <div className="flex flex-col w-full sm:w-40">
             <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Status</label>
             <select
               value={statusFilter}
@@ -460,7 +464,7 @@ export default function GPUResourcesPage() {
             <h3 className="font-semibold text-sm">GPU Resources ({filteredData.length})</h3>
           </div>
           <div className="divide-y divide-gray-100">
-              {table.getRowModel().rows.map((row) => (
+            {table.getRowModel().rows.map((row) => (
               <div key={row.id} className="p-4 hover:bg-gray-50 transition-colors">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">

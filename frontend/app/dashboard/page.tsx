@@ -436,69 +436,74 @@ const Dashboard = React.memo(() => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        <div className="bg-blue-50/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-blue-200 ring-1 ring-inset ring-blue-300/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-sky-500/15" />
+        {/* Total GPUs */}
+        <div className="relative overflow-hidden rounded-2xl p-6 shadow-xl border border-gray-900/20 hover:border-blue-500/40 ring-1 ring-inset ring-blue-400/30 bg-gradient-to-br from-blue-50/90 to-sky-100/80 backdrop-blur-sm group hover:shadow-blue-300/40 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-tr from-blue-400/20 via-transparent to-sky-500/20 opacity-60 group-hover:opacity-90 transition" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
-            <div className="mb-2 sm:mb-0">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Total GPUs</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">{statsData.total}</p>
+            <div>
+              <p className="text-sm font-medium text-blue-700/80">Total GPUs</p>
+              <p className="text-3xl font-bold text-blue-900 tracking-tight">{statsData.total}</p>
             </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-300/60 to-gray-400/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-gray-400/40 shadow-inner shadow-gray-400/30">
-                <Server className="text-gray-700 group-hover:scale-110 transition-transform" size={22} />
+            <div className="relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-sky-500/50 blur-lg opacity-70 group-hover:opacity-90 transition" />
+              <div className="relative w-12 h-12 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ring-blue-400/40 shadow-md shadow-blue-500/30">
+                <Server className="text-blue-700 group-hover:scale-110 transition-transform" size={26} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-emerald-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-emerald-300/70 ring-1 ring-inset ring-emerald-400/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/10" />
+        {/* Running */}
+        <div className="relative overflow-hidden rounded-2xl p-6 shadow-xl border border-gray-900/20 hover:border-emerald-500/40 ring-1 ring-inset ring-emerald-400/30 bg-gradient-to-br from-emerald-50/90 to-green-100/80 backdrop-blur-sm group hover:shadow-emerald-300/40 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-tr from-emerald-400/20 via-transparent to-green-500/20 opacity-60 group-hover:opacity-90 transition" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
-            <div className="mb-2 sm:mb-0">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Running</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-600 tracking-tight">{statsData.running}</p>
+            <div>
+              <p className="text-sm font-medium text-emerald-700/80">Running</p>
+              <p className="text-3xl font-bold text-emerald-700 tracking-tight">{statsData.running}</p>
             </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
-                <PlayCircle className="text-emerald-600 group-hover:scale-110 transition-transform" size={22} />
+            <div className="relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur-lg opacity-70 group-hover:opacity-90 transition" />
+              <div className="relative w-12 h-12 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ring-emerald-500/40 shadow-md shadow-emerald-500/30">
+                <PlayCircle className="text-emerald-600 group-hover:scale-110 transition-transform" size={26} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-amber-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-amber-300/70 ring-1 ring-inset ring-amber-400/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/10" />
+        {/* Idle */}
+        <div className="relative overflow-hidden rounded-2xl p-6 shadow-xl border border-gray-900/20 hover:border-amber-500/40 ring-1 ring-inset ring-amber-400/30 bg-gradient-to-br from-amber-50/90 to-yellow-100/80 backdrop-blur-sm group hover:shadow-amber-300/40 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-tr from-amber-400/20 via-transparent to-yellow-500/20 opacity-60 group-hover:opacity-90 transition" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
-            <div className="mb-2 sm:mb-0">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Idle</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-amber-600 tracking-tight">{statsData.idle}</p>
+            <div>
+              <p className="text-sm font-medium text-amber-700/80">Idle</p>
+              <p className="text-3xl font-bold text-amber-700 tracking-tight">{statsData.idle}</p>
             </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400/50 to-yellow-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-amber-500/30 shadow-inner shadow-amber-500/20">
-                <PauseCircle className="text-amber-600 group-hover:scale-110 transition-transform" size={22} />
+            <div className="relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400/50 to-yellow-500/50 blur-lg opacity-70 group-hover:opacity-90 transition" />
+              <div className="relative w-12 h-12 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ring-amber-500/40 shadow-md shadow-amber-500/30">
+                <PauseCircle className="text-amber-600 group-hover:scale-110 transition-transform" size={26} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-orange-50/70 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-orange-300/70 ring-1 ring-inset ring-orange-400/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-orange-600/10" />
+        {/* Avg. Power */}
+        <div className="relative overflow-hidden rounded-2xl p-6 shadow-xl border border-gray-900/20 hover:border-orange-500/40 ring-1 ring-inset ring-orange-400/30 bg-gradient-to-br from-orange-50/90 to-orange-100/80 backdrop-blur-sm group hover:shadow-orange-300/40 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-tr from-orange-400/20 via-transparent to-orange-600/20 opacity-60 group-hover:opacity-90 transition" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
-            <div className="mb-2 sm:mb-0">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Avg. Power</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-600 tracking-tight">{statsData.avgPower}W</p>
+            <div>
+              <p className="text-sm font-medium text-orange-700/80">Avg. Power</p>
+              <p className="text-3xl font-bold text-orange-700 tracking-tight">{statsData.avgPower}W</p>
             </div>
-            <div className="group relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-400/50 to-orange-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-orange-500/30 shadow-inner shadow-orange-500/20">
-                <Zap className="text-orange-600 group-hover:scale-110 transition-transform" size={22} />
+            <div className="relative">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-400/50 to-orange-500/50 blur-lg opacity-70 group-hover:opacity-90 transition" />
+              <div className="relative w-12 h-12 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ring-orange-500/40 shadow-md shadow-orange-500/30">
+                <Zap className="text-orange-600 group-hover:scale-110 transition-transform" size={26} />
               </div>
             </div>
           </div>
         </div>
+
       </div>
 
       {/* Search */}
