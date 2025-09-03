@@ -345,7 +345,7 @@ const Dashboard = React.memo(() => {
 
             {/* Mini KPI strip */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/70 backdrop-blur px-3 py-3 overflow-hidden">
+              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/90 backdrop-blur px-3 py-3 overflow-hidden">
                 <div className="absolute inset-0 opacity-0 transition-opacity duration-500 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.15),transparent_60%)]" />
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-medium text-gray-600 tracking-wide">UTIL%</span>
@@ -359,7 +359,7 @@ const Dashboard = React.memo(() => {
                   <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-[pulse_3s_ease-in-out_infinite] rounded" style={{ width: '72%' }} />
                 </div>
               </div>
-              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/70 backdrop-blur px-3 py-3">
+              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/90 backdrop-blur px-3 py-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-medium text-gray-600 tracking-wide">AVG TEMP</span>
                   <span className="text-xs font-semibold text-amber-600">℃</span>
@@ -372,7 +372,7 @@ const Dashboard = React.memo(() => {
                   {Array.from({ length: 12 }).map((_, i) => (<span key={i} className={`flex-1 rounded-sm ${i < 8 ? 'bg-amber-400/70' : 'bg-amber-200/50'} h-full`} />))}
                 </div>
               </div>
-              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/70 backdrop-blur px-3 py-3">
+              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/90 backdrop-blur px-3 py-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-medium text-gray-600 tracking-wide">POWER W</span>
                   <Zap size={14} className="text-indigo-500" />
@@ -385,7 +385,7 @@ const Dashboard = React.memo(() => {
                   {[5, 7, 6, 8, 5, 9, 6, 7].map((v, i) => (<span key={i} className="flex-1 bg-gradient-to-t from-indigo-500/30 to-indigo-500/70 rounded-t" style={{ height: `${v * 6}px` }} />))}
                 </div>
               </div>
-              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/70 backdrop-blur px-3 py-3">
+              <div className="relative group/kpi rounded-xl border border-gray-200 bg-white/90 backdrop-blur px-3 py-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-medium text-gray-600 tracking-wide">STATUS</span>
                   <span className="text-xs font-semibold text-emerald-600">Live</span>
