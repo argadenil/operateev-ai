@@ -627,7 +627,11 @@ const Dashboard = React.memo(() => {
               {table.getRowModel().rows.map((row, i) => (
                 <tr
                   key={row.id}
-                  className={`border-b border-gray-100 hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-200 ${i % 2 === 0 ? "bg-gray-50/30" : "bg-white"}`}
+                  className={`border-b border-gray-100 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200 ${
+                    i % 2 === 0 
+                      ? "bg-gray-100" 
+                      : "bg-white"
+                  }`}
                 >
                   {row.getVisibleCells().map((cell) => {
                     const isCenter = ["status", "actions"].includes(cell.column.id);
