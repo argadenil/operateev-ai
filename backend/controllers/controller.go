@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"operateev/db"
 	"operateev/models"
-	"strconv"
 	"strings"
 	"time"
 
@@ -88,72 +87,65 @@ func Logout(c echo.Context) error {
 }
 
 func GetDashboard(c echo.Context) error {
-	// Preferred: path parameter /dashboard/:customer_id
-	customerID := strings.TrimSpace(c.Param("customer_id"))
+	// 1. Get customer_id from URL
+	customerID := c.Param("customer_id")
+	print(customerID)
 
-	// Fallback: context set by auth middleware (uses key user_id)
+	// If no customer_id in URL
 	if customerID == "" {
-		if uidVal := c.Get("user_id"); uidVal != nil {
-			switch v := uidVal.(type) {
-			case int:
-				customerID = strconv.Itoa(v)
-			case int64:
-				customerID = strconv.FormatInt(v, 10)
-			case float64: // JSON numbers sometimes float64
-				customerID = strconv.Itoa(int(v))
-			case string:
-				customerID = v
-			}
-		}
-	}
-	if customerID == "" {
-		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "unauthorized"})
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "customer_id is required"})
 	}
 
-	// Timeout to avoid hanging DB calls
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	rows, err := db.Conn.QueryContext(
-		ctx,
-		`SELECT id, gpu, memory_gb, cluster, status, uptime_sec, temperature_c, power_w, processes 
-		 FROM "usersSchema"."dashboard_resources" 
-		 WHERE customer_id = $1`,
-		customerID,
-	)
+	// 2. Query database
+	rows, err := db.Conn.Query(`
+		SELECT id, gpu, memory_gb, cluster, status, uptime_sec, temperature_c, power_w, processes 
+		FROM "usersSchema"."dashboard_resources"
+		WHERE customer_id = $1
+	`, customerID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to load resources: " + err.Error()})
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "cannot load data"})
 	}
 	defer rows.Close()
 
-	var (
-		resources  []models.DashboardResource
-		totalPower int
-	)
+	// 3. Collect resources
+	var resources []models.DashboardResource
+	var totalPower int
+
 	for rows.Next() {
 		var r models.DashboardResource
-		if err := rows.Scan(&r.ID, &r.GPU, &r.MemoryGB, &r.Cluster, &r.Status, &r.UptimeSec, &r.Temperature, &r.PowerW, &r.Processes); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "scan failed: " + err.Error()})
+		if err := rows.Scan(&r.ID, &r.GPU, &r.MemoryGB, &r.Cluster, &r.Status,
+			&r.UptimeSec, &r.Temperature, &r.PowerW, &r.Processes); err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "scan failed"})
 		}
 		resources = append(resources, r)
 		totalPower += r.PowerW
 	}
-	if err := rows.Err(); err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "iteration failed: " + err.Error()})
+
+	// 4. Build summary
+	summary := models.DashboardSummary{
+		Total:    len(resources),
+		Running:  0,
+		Idle:     0,
+		AvgPower: 0,
 	}
 
-	summary := models.DashboardSummary{Total: len(resources)}
 	for _, r := range resources {
-		switch strings.ToLower(r.Status) {
-		case "running":
+		if r.Status == "running" {
 			summary.Running++
-		case "idle":
+		} else if r.Status == "idle" {
 			summary.Idle++
 		}
 	}
 	if summary.Total > 0 {
 		summary.AvgPower = totalPower / summary.Total
 	}
+	if resources == nil {
+		resources = []models.DashboardResource{}
+	}
 
-	return c.JSON(http.StatusOK, models.DashboardResponse{Resources: resources, Summary: summary})
+	// 5. Always return resources (even empty) + summary
+	return c.JSON(http.StatusOK, models.DashboardResponse{
+		Resources: resources, // will be [] if no rows
+		Summary:   summary,   // will be all zeros
+	})
 }
