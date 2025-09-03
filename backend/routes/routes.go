@@ -10,5 +10,6 @@ import (
 func Register(e *echo.Echo) {
 	e.POST("/login", controllers.Login)
 	e.POST("/logout", controllers.Logout)
+	e.GET("/dashboard", controllers.GetDashboard)
 	e.GET("/dashboard/:customer_id", controllers.GetDashboard)
 }
