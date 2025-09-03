@@ -3,15 +3,16 @@ package routes
 
 import (
 	"operateev/controllers"
+	"operateev/middleware"
 
 	"github.com/labstack/echo/v4"
 )
 
 // Register attaches all API routes to the provided Echo instance.
 func Register(e *echo.Echo) {
-	e.GET("/health", controllers.Health)
-	e.GET("/", controllers.Health) // root -> health for now
-	e.GET("/users", controllers.GetUsers)
-	e.GET("/user/:id", controllers.GetUserByID)
-	e.POST("/users", controllers.CreateUser)
+	e.POST("/login", controllers.Login)
+	e.POST("/logout", controllers.Logout)
+
+	d := e.Group("/dashboard/:customer_id", middleware.AuthRequired)
+	d.GET("", controllers.GetDashboard)
 }
