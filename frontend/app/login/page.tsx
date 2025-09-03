@@ -1,33 +1,82 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import Loader from "../components/loader";
+
+// Small helper to resolve API base. Prefer NEXT_PUBLIC_API_BASE, else default to localhost backend port.
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:1324";
 
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ username: "admin", password: "admin" });
+  const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    try {
+      const t = localStorage.getItem("auth_token");
+      if (t) {
+        router.replace("/dashboard");
+        return; // don't unset checkingAuth to avoid flicker
+      }
+    } catch { }
+    setCheckingAuth(false);
+  }, [router]);
 
   async function handleSubmit(ev: React.FormEvent) {
     ev.preventDefault();
     setError("");
-    setLoading(true);
 
-    // Simple check for demo
-    const isAdmin = form.username === "admin" && form.password === "admin";
-    setTimeout(() => {
-      setLoading(false);
-      if (isAdmin) {
-        router.push("/dashboard");
-      } else {
-        setError("Invalid username or password");
+    if (!form.username.trim() || !form.password) {
+      setError("Username and password are required");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const resp = await fetch(`${API_BASE}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: form.username.trim(), password: form.password }),
+      });
+
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        setError(data.error || "Login failed");
+        return;
       }
-    }, 600);
+
+      if (!data.token) {
+        setError("Invalid response from server");
+        return;
+      }
+
+      // Store token (simple localStorage). Could be upgraded to secure httpOnly cookie via an API route proxy later.
+      try {
+        localStorage.setItem("auth_token", data.token);
+      } catch { }
+
+      router.push("/dashboard");
+    } catch (e: any) {
+      setError(e?.message || "Network error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (checkingAuth) {
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
   }
 
   return (
@@ -62,6 +111,7 @@ export default function LoginPage() {
                   onChange={(e) => setForm({ ...form, username: e.target.value })}
                   className="w-full rounded-md bg-[var(--dark-surface)]/70 border border-[var(--dark-border)]/60 text-sm px-3 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)] shadow-sm"
                   placeholder="Enter your username"
+                  disabled={loading}
                 />
               </div>
 
@@ -75,6 +125,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
                     className="text-xs text-[var(--primary-500)] hover:text-[var(--primary-400)] focus:outline-none flex items-center gap-1"
+                    disabled={loading}
                   >
                     {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                     {showPassword ? "Hide" : "Show"}
@@ -88,6 +139,7 @@ export default function LoginPage() {
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   className="w-full rounded-md bg-[var(--dark-surface)]/70 border border-[var(--dark-border)]/60 text-sm px-3 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)] shadow-sm"
                   placeholder="••••••••"
+                  disabled={loading}
                 />
               </div>
 
