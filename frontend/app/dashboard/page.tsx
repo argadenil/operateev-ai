@@ -35,6 +35,9 @@ if (typeof window !== 'undefined') {
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
 }
 
+import { fetchDashboard, secondsToH, capitalizeStatus, DashboardAPIResource } from "../../lib/dashboard"; // added
+import { useToast } from "../components/toaster"; // added
+
 type GPUResource = {
   id: number;
   gpu: string;
@@ -47,15 +50,6 @@ type GPUResource = {
   processes: number;
 };
 
-// Move data outside component to prevent recreation
-const mockGPUData: GPUResource[] = [
-  { id: 1, gpu: "NVIDIA A100", memory: "80 GB", cluster: "Cluster-A", status: "Running", uptime: "72h", temperature: 65, power: 250, processes: 12 },
-  { id: 2, gpu: "RTX 4090", memory: "24 GB", cluster: "Cluster-C", status: "Stopped", uptime: "0h", temperature: 40, power: 50, processes: 0 },
-  { id: 3, gpu: "T4", memory: "16 GB", cluster: "Cluster-A", status: "Running", uptime: "36h", temperature: 70, power: 200, processes: 5 },
-  { id: 4, gpu: "A40", memory: "48 GB", cluster: "Cluster-D", status: "Idle", uptime: "10h", temperature: 55, power: 120, processes: 1 },
-  { id: 5, gpu: "A100", memory: "80 GB", cluster: "Cluster-B", status: "Running", uptime: "96h", temperature: 72, power: 280, processes: 20 },
-  { id: 6, gpu: "RTX 6000 Ada", memory: "48 GB", cluster: "Cluster-B", status: "Idle", uptime: "8h", temperature: 50, power: 100, processes: 2 },
-];
 
 // (Old getStatusColor removed; using unified renderStatusBadge)
 
@@ -157,35 +151,76 @@ const chartOptions = {
 
 const Dashboard = React.memo(() => {
   const router = useRouter();
+  const { error: pushError } = useToast(); // added
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [selectedModel, setSelectedModel] = React.useState<GPUResource | null>(null);
+  const [resources, setResources] = React.useState<GPUResource[]>([]); // added
+  const [summary, setSummary] = React.useState({ total: 0, running: 0, idle: 0, avgPower: 0 }); // added
+  const [fetching, setFetching] = React.useState(false);
+
+  const customerId = localStorage.getItem("customer_id") || '';
+
+  // Fetch data
+  useEffect(() => {
+    let abort = new AbortController();
+    async function load() {
+      setFetching(true);
+      try {
+        const data = await fetchDashboard(customerId, abort.signal);
+        if (data.error) {
+          pushError(data.error, { title: 'Dashboard' });
+        }
+        const transformed: GPUResource[] = (data.resources || []).map((r: DashboardAPIResource) => ({
+          id: r.id,
+            gpu: r.gpu,
+          memory: `${r.memory_gb} GB`,
+          cluster: r.cluster,
+          status: capitalizeStatus(r.status),
+          uptime: secondsToH(r.uptime_sec),
+          temperature: r.temperature_c,
+          power: r.power_w,
+          processes: r.processes,
+        }));
+        setResources(transformed);
+        setSummary({
+          total: data.summary?.total || 0,
+          running: data.summary?.running || 0,
+          idle: data.summary?.idle || 0,
+          avgPower: data.summary?.avg_power || 0,
+        });
+      } catch (e: any) {
+        if (!abort.signal.aborted) {
+          pushError(e?.message || 'Network error', { title: 'Dashboard fetch' });
+        }
+      } finally {
+        if (!abort.signal.aborted) setFetching(false);
+        if (!abort.signal.aborted) setLoading(false);
+      }
+    }
+    load();
+    return () => abort.abort();
+  }, [customerId]);
 
   // Memoize chart data
   const lineChartData = useMemo(() => createLineChartData(), []);
   const pieChartData = useMemo(() => createPieChartData(), []);
 
-  // Memoize expensive calculations
-  const statsData = useMemo(() => {
-    const runningCount = mockGPUData.filter(gpu => gpu.status === 'Running').length;
-    const idleCount = mockGPUData.filter(gpu => gpu.status === 'Idle').length;
-    const avgPower = Math.round(mockGPUData.reduce((acc, gpu) => acc + gpu.power, 0) / mockGPUData.length);
-
-    return {
-      total: mockGPUData.length,
-      running: runningCount,
-      idle: idleCount,
-      avgPower
-    };
-  }, []);
+  // Replace statsData calc to use summary/resources
+  const statsData = useMemo(() => ({
+    total: summary.total,
+    running: summary.running,
+    idle: summary.idle,
+    avgPower: summary.avgPower,
+  }), [summary]);
 
   // Memoize modal close handler
   const handleCloseModal = useCallback(() => {
     setSelectedModel(null);
   }, []);
 
-  // Memoize columns to prevent recreation
+  // Adjust columns and table data to use resources
   const columns = useMemo<ColumnDef<GPUResource>[]>(() => [
     { accessorKey: "gpu", header: "GPU" },
     { accessorKey: "memory", header: "Memory" },
@@ -217,7 +252,7 @@ const Dashboard = React.memo(() => {
   ], []);
 
   const table = useReactTable({
-    data: mockGPUData,
+    data: resources,
     columns,
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
@@ -228,13 +263,17 @@ const Dashboard = React.memo(() => {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  // Replace mock delay
+  useEffect(() => {
+    if (resources.length > 0 || !fetching) setLoading(false);
+  }, [resources, fetching]);
+
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    // Basic auth check; could be replaced by a server component check later.
     try {
       const t = localStorage.getItem("auth_token");
       if (!t) {
