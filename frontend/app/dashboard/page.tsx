@@ -159,22 +159,41 @@ const Dashboard = React.memo(() => {
   const [resources, setResources] = React.useState<GPUResource[]>([]); // added
   const [summary, setSummary] = React.useState({ total: 0, running: 0, idle: 0, avgPower: 0 }); // added
   const [fetching, setFetching] = React.useState(false);
+  // customerId: undefined = pending (not yet parsed), null = explicitly missing (base /dashboard), string = present
+  const [customerId, setCustomerId] = React.useState<string | null | undefined>(undefined);
+  const missingIdNotified = React.useRef(false);
 
-  const customerId = localStorage.getItem("customer_id") || '';
-
-  // Fetch data
+  // Derive customer id strictly from URL (/dashboard/:id). Base /dashboard should not auto-use stored id.
   useEffect(() => {
-    let abort = new AbortController();
+    if (typeof window === 'undefined') return; // wait for client
+    const match = window.location.pathname.match(/^\/dashboard\/([^\/]+)$/);
+    setCustomerId(match ? match[1] : null);
+  }, []);
+  useEffect(() => {
+    // Wait until we've parsed (customerId !== undefined)
+    if (customerId === undefined) return;
+    // Missing after parsing
+    if (customerId === null) {
+      if (!missingIdNotified.current) {
+        pushError('customer_id is required', { title: 'Dashboard' });
+        missingIdNotified.current = true;
+      }
+      setResources([]);
+      setSummary({ total: 0, running: 0, idle: 0, avgPower: 0 });
+      setLoading(false);
+      return;
+    }
+    const abort = new AbortController();
     async function load() {
       setFetching(true);
       try {
-        const data = await fetchDashboard(customerId, abort.signal);
+        const data = await fetchDashboard(customerId as string, abort.signal);
         if (data.error) {
           pushError(data.error, { title: 'Dashboard' });
         }
         const transformed: GPUResource[] = (data.resources || []).map((r: DashboardAPIResource) => ({
           id: r.id,
-            gpu: r.gpu,
+          gpu: r.gpu,
           memory: `${r.memory_gb} GB`,
           cluster: r.cluster,
           status: capitalizeStatus(r.status),
@@ -282,7 +301,19 @@ const Dashboard = React.memo(() => {
     } catch {}
   }, [router]);
 
-  if (loading) return <Loader />;
+  if (loading || customerId === undefined) return <Loader />;
+
+  // If no customer id was provided in the path, show a friendly empty state.
+  if (customerId === null) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-6">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-semibold text-gray-800">Customer ID Required</h2>
+          <p className="text-gray-600 text-sm max-w-md">Please access the dashboard via /dashboard/&lt;customer_id&gt;. Example: /dashboard/111111</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-slide-up">
