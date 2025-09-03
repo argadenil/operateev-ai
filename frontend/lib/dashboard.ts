@@ -33,6 +33,10 @@ export interface DashboardAPIResponse {
 }
 
 export async function fetchDashboard(customerId: string, signal?: AbortSignal): Promise<DashboardAPIResponse> {
+  // Guard: require a non-empty customerId; mimic backend 400 response shape
+  if (!customerId) {
+    return { resources: [], summary: { total: 0, running: 0, idle: 0, avg_power: 0 }, error: 'customer_id is required' };
+  }
   const url = `${API_BASE}/dashboard/${encodeURIComponent(customerId)}`;
   const resp = await authFetch(url, { method: 'GET', signal });
   const data = await resp.json().catch(() => ({}));
