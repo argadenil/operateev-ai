@@ -4,11 +4,12 @@ package models
 // User represents a row in the users dashboard table.
 // Tags align with JSON serialization for HTTP responses.
 type User struct {
-	ID       int    `json:"id"`
-	FullName string `json:"full_name"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password,omitempty"`
+	ID         int    `json:"id"`
+	FullName   string `json:"full_name"`
+	Username   string `json:"username"`
+	Email      string `json:"email"`
+	Password   string `json:"password,omitempty"`
+	CustomerID string `json:"customer_id"`
 }
 
 type LoginRequest struct {
@@ -17,8 +18,9 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Token    string `json:"token"`
-	Username string `json:"username"`
+	Token      string `json:"token"`
+	Username   string `json:"username"`
+	CustomerID string `json:"customer_id"`
 }
 
 // DashboardResource represents a GPU resource row for a specific user.
