@@ -1,5 +1,7 @@
 // Simple auth utilities for frontend.
-// In production consider httpOnly cookies and refresh tokens.
+// NOTE: For production you should move to httpOnly cookies + refresh tokens.
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:1324";
 
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -18,4 +20,29 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     headers.set('Authorization', `Bearer ${token}`);
   }
   return fetch(input, { ...init, headers });
+}
+
+// Logout helper: best-effort POST to backend, always clears token locally.
+export async function logout(): Promise<{ ok: boolean; error?: string }> {
+  const token = getToken();
+  if (!token) {
+    clearToken();
+    return { ok: true };
+  }
+  try {
+    const resp = await fetch(`${API_BASE}/logout`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    clearToken();
+    if (!resp.ok) {
+      let msg = 'Logout failed';
+      try { const data = await resp.json(); msg = data.error || msg; } catch {}
+      return { ok: false, error: msg };
+    }
+    return { ok: true };
+  } catch (e: any) {
+    clearToken();
+    return { ok: false, error: e?.message || 'Network error' };
+  }
 }
