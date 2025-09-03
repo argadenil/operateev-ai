@@ -6,12 +6,13 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Loader from "../components/loader";
+import { useToast } from "../components/toaster";
 
-// Small helper to resolve API base. Prefer NEXT_PUBLIC_API_BASE, else default to localhost backend port.
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:1324";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { success, error: pushError } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ username: "", password: "" });
@@ -34,7 +35,9 @@ export default function LoginPage() {
     setError("");
 
     if (!form.username.trim() || !form.password) {
-      setError("Username and password are required");
+      const msg = "Username and password are required";
+      setError(msg);
+      pushError(msg, { title: "Missing fields" });
       return;
     }
 
@@ -49,23 +52,29 @@ export default function LoginPage() {
       const data = await resp.json().catch(() => ({}));
 
       if (!resp.ok) {
-        setError(data.error || "Login failed");
+        const msg = data.error || "Login failed";
+        setError(msg);
+        pushError(msg, { title: "Login failed" });
         return;
       }
 
       if (!data.token) {
-        setError("Invalid response from server");
+        const msg = "Invalid response from server";
+        setError(msg);
+        pushError(msg, { title: "Login error" });
         return;
       }
 
-      // Store token (simple localStorage). Could be upgraded to secure httpOnly cookie via an API route proxy later.
       try {
         localStorage.setItem("auth_token", data.token);
       } catch { }
 
+      success("Welcome back!", { title: "Login successful" });
       router.push("/dashboard");
     } catch (e: any) {
-      setError(e?.message || "Network error");
+      const msg = e?.message || "Network error";
+      setError(msg);
+      pushError(msg, { title: "Login error" });
     } finally {
       setLoading(false);
     }
@@ -150,7 +159,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="relative inline-flex w-full justify-center items-center gap-2 rounded-md bg-[var(--primary-600)] hover:bg-[var(--primary-500)] disabled:opacity-60 px-4 py-2.5 text-sm font-medium text-white shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-600)] focus:ring-offset-[var(--dark-bg)] transition"
+                className="relative hover:cursor-pointer inline-flex w-full justify-center items-center gap-2 rounded-md bg-[var(--primary-600)] hover:bg-[var(--primary-500)] disabled:opacity-60 px-4 py-2.5 text-sm font-medium text-white shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-600)] focus:ring-offset-[var(--dark-bg)] transition"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {loading ? "Signing in..." : "Sign In"}
