@@ -293,7 +293,7 @@ const Dashboard = React.memo(() => {
           <div className="absolute -bottom-10 -right-10 w-52 h-52 bg-sky-100/20 rounded-full blur-2xl" />
         </div>
         {/* dashboard card */}
-        <div className="relative px-5 sm:px-7 py-6 overflow-hidden rounded-lg bg-gradient-to-tr from-slate-200 via-slate-400/90 to-slate-700
+        <div className="relative px-5 sm:px-7 py-6 overflow-hidden rounded-lg bg-gradient-to-b from-slate-400 via-slate-400/90 to-slate-700
 ">
           <div className="relative flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
