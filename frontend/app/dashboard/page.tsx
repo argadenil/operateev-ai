@@ -286,20 +286,15 @@ const Dashboard = React.memo(() => {
 
   return (
     <div className="space-y-6 animate-slide-up">
-      <div className="relative rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-sky-500 to-cyan-400 rounded-t-2xl" />
+      <div className="relative rounded-2xl border border-slate-200 shadow-sm">
+        <div className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl" />
         <div className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden">
           <div className="absolute -top-8 -left-8 w-40 h-40 bg-indigo-100/30 rounded-full blur-2xl" />
           <div className="absolute -bottom-10 -right-10 w-52 h-52 bg-sky-100/20 rounded-full blur-2xl" />
         </div>
         {/* dashboard card */}
-        <div className="relative px-5 sm:px-7 py-6 overflow-hidden rounded-lg">
-          {/* Edge dark -> faint middle gradient background overlay */}
-          <div
-            aria-hidden
-            /* Enhanced multi-stop gradient with subtle cyan infusion + mask vignette for depth */
-            className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,.85),rgba(0,0,0,.55),rgba(0,0,0,.85))] bg-[linear-gradient(90deg,rgba(99,102,241,.55)_0%,rgba(139,92,246,.35)_10%,rgba(236,72,153,.22)_25%,rgba(255,255,255,0)_48%,rgba(6,182,212,.20)_60%,rgba(236,72,153,.24)_72%,rgba(139,92,246,.38)_88%,rgba(99,102,241,.55)_100%)]"
-          />
+        <div className="relative px-5 sm:px-7 py-6 overflow-hidden rounded-lg bg-gradient-to-tr from-slate-200 via-slate-400/90 to-slate-700
+">
           <div className="relative flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
               <div className="flex items-start sm:items-center gap-4">
