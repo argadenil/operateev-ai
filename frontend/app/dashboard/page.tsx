@@ -377,6 +377,7 @@ const Dashboard = React.memo(() => {
             {/* Mini KPI strip */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {/* UTIL% */}
+              {/* Total Users */}
               <div className="relative group/kpi rounded-xl border border-indigo-400 ring-1 ring-indigo-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-indigo-300/50 hover:shadow-lg hover:shadow-indigo-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
                 <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.15),transparent_70%)]" />
                 <div className="flex items-center justify-between">
@@ -385,83 +386,80 @@ const Dashboard = React.memo(() => {
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-lg font-bold text-gray-900">72%</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-600 font-semibold">+5%</span>
                 </div>
                 <div className="mt-2 h-1.5 w-full rounded bg-gray-100 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-[pulse_3s_ease-in-out_infinite]"
+                    className="h-full bg-gradient-to-r from-indigo-400 via-indigo-500 to-indigo-600 animate-[pulse_3s_ease-in-out_infinite]"
                     style={{ width: "72%" }}
                   />
                 </div>
               </div>
 
-              {/* AVG TEMP */}
-              <div className="relative group/kpi rounded-xl border border-amber-400 ring-1 ring-amber-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-amber-300/50 hover:shadow-lg hover:shadow-amber-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
-                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_20%_20%,rgba(251,191,36,0.15),transparent_70%)]" />
+              {/* Revenue */}
+              <div className="relative group/kpi rounded-xl border border-pink-400 ring-1 ring-pink-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-pink-300/50 hover:shadow-lg hover:shadow-pink-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
+                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_20%_20%,rgba(236,72,153,0.15),transparent_70%)]" />
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700 tracking-wide">AVG TEMP</span>
-                  <span className="text-xs font-bold text-amber-600">℃</span>
+                  <span className="text-xs font-bold text-pink-600">℃</span>
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-lg font-bold text-gray-900">62</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-600 font-semibold">+2</span>
                 </div>
                 <div className="mt-2 h-1 w-full flex gap-0.5">
                   {Array.from({ length: 12 }).map((_, i) => (
                     <span
                       key={i}
-                      className={`flex-1 rounded-sm ${i < 8 ? "bg-amber-400" : "bg-amber-200"} h-full`}
+                      className={`flex-1 rounded-sm ${i < 8 ? "bg-pink-500" : "bg-pink-200"} h-full`}
                     />
                   ))}
                 </div>
               </div>
 
-              {/* POWER W */}
-              <div className="relative group/kpi rounded-xl border border-indigo-400 ring-1 ring-indigo-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-indigo-300/50 hover:shadow-lg hover:shadow-indigo-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
-                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_70%_80%,rgba(99,102,241,0.15),transparent_70%)]" />
+              {/* Active Sessions */}
+              <div className="relative group/kpi rounded-xl border border-teal-400 ring-1 ring-teal-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-teal-300/50 hover:shadow-lg hover:shadow-teal-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
+                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_70%_80%,rgba(20,184,166,0.15),transparent_70%)]" />
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700 tracking-wide">POWER W</span>
-                  <Zap size={14} className="text-indigo-500" />
+                  <Zap size={14} className="text-teal-500" />
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-gray-900">{statsData.avgPower}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-600 font-semibold">
-                    stable
+                  <span className="text-lg font-bold text-gray-900">1,240</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-600 font-semibold">
+                    Stable
                   </span>
                 </div>
                 <div className="mt-2 flex items-end gap-0.5 h-8">
                   {[5, 7, 6, 8, 5, 9, 6, 7].map((v, i) => (
                     <span
                       key={i}
-                      className="flex-1 bg-gradient-to-t from-indigo-300 to-indigo-600 rounded-t"
+                      className="flex-1 bg-gradient-to-t from-teal-300 to-teal-600 rounded-t"
                       style={{ height: `${v * 6}px` }}
                     />
                   ))}
                 </div>
               </div>
 
-              {/* STATUS */}
-              <div className="relative group/kpi rounded-xl border border-emerald-400 ring-1 ring-emerald-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-emerald-300/50 hover:shadow-lg hover:shadow-emerald-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
-                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.15),transparent_70%)]" />
+              {/* Growth */}
+              <div className="relative group/kpi rounded-xl border border-amber-400 ring-1 ring-amber-300/50 bg-white/95 backdrop-blur-md px-3 py-3 shadow-md shadow-amber-300/50 hover:shadow-lg hover:shadow-amber-400/60 group-hover/kpi:-translate-y-1 group-hover/kpi:scale-[1.02] transition-all duration-300">
+                <div className="absolute inset-0 opacity-0 group-hover/kpi:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.15),transparent_70%)]" />
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700 tracking-wide">STATUS</span>
-                  <span className="text-xs font-bold text-emerald-600">Live</span>
+                  <span className="text-xs font-bold text-amber-600">LIVE</span>
                 </div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-gray-900">
-                    {statsData.running}/{statsData.total}
-                  </span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-600 font-semibold">
+                  <span className="text-lg font-bold text-gray-900">{statsData.running}/{statsData.total}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-600 font-semibold">
                     Running
                   </span>
                 </div>
-                <div className="mt-2 h-1.5 w-full rounded bg-emerald-100 overflow-hidden">
+                <div className="mt-2 h-1.5 w-full rounded bg-amber-100 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 animate-[pulse_3s_ease-in-out_infinite]"
-                    style={{ width: `${(statsData.running / statsData.total) * 100}%` }}
+                    className="h-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 animate-[pulse_3s_ease-in-out_infinite]"
+                    style={{ width: "60%" }}
                   />
                 </div>
               </div>
+
             </div>
 
           </div>
