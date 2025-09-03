@@ -31,9 +31,9 @@ func Login(c echo.Context) error {
 	var passwordHash string
 	err := db.Conn.QueryRowContext(
 		context.Background(),
-		`SELECT id, username, full_name, email, password_hash FROM "usersSchema"."users" WHERE username=$1`,
+		`SELECT id, username, customer_id, full_name, email, password_hash FROM "usersSchema"."users" WHERE username=$1`,
 		strings.TrimSpace(req.Username),
-	).Scan(&user.ID, &user.Username, &user.FullName, &user.Email, &passwordHash)
+	).Scan(&user.ID, &user.Username, &user.CustomerID, &user.FullName, &user.Email, &passwordHash)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "The username or password you entered is incorrect."})
 	}
@@ -70,7 +70,7 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "token generation failed"})
 	}
 
-	return c.JSON(http.StatusOK, models.LoginResponse{Token: tokenString, Username: user.FullName})
+	return c.JSON(http.StatusOK, models.LoginResponse{Token: tokenString, Username: user.FullName, CustomerID: user.CustomerID})
 }
 
 func Logout(c echo.Context) error {
