@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   useReactTable,
   getCoreRowModel,
@@ -155,6 +156,7 @@ const chartOptions = {
 };
 
 const Dashboard = React.memo(() => {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [loading, setLoading] = React.useState(true);
@@ -230,6 +232,16 @@ const Dashboard = React.memo(() => {
     const timer = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    // Basic auth check; could be replaced by a server component check later.
+    try {
+      const t = localStorage.getItem("auth_token");
+      if (!t) {
+        router.replace("/login");
+      }
+    } catch {}
+  }, [router]);
 
   if (loading) return <Loader />;
 
