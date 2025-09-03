@@ -1,5 +1,8 @@
+"use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Search } from "lucide-react"; // Icon
+import { useRouter } from "next/navigation";
+import { logout } from "../../lib/auth";
 
 interface HeaderProps {
   className?: string;
@@ -13,6 +16,7 @@ export default function Header({
   showSearch = true,
   showUserMenu = true,
 }: HeaderProps) {
+  const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -45,10 +49,21 @@ export default function Header({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    await logout(); // Regardless of server response, token cleared.
+    // Small delay to allow UI feedback (optional)
+    router.replace('/login');
+    setLoggingOut(false);
+  }
+
   const menuItems = [
-    { label: "Profile", onClick: () => console.log("Go to profile") },
-    { label: "Settings", onClick: () => console.log("Go to settings") },
-    { label: "Logout", onClick: () => console.log("Logging out") },
+    { label: "Profile", onClick: () => router.push('/settings') },
+    { label: "Settings", onClick: () => router.push('/settings') },
+    { label: "Logout", onClick: handleLogout },
   ];
 
   // Focus management when menu opens
