@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Search } from "lucide-react"; // Icon
 import { useRouter } from "next/navigation";
 import { logout } from "../../lib/auth";
+import { useToast } from "./toaster";
 
 interface HeaderProps {
   className?: string;
@@ -17,6 +18,7 @@ export default function Header({
   showUserMenu = true,
 }: HeaderProps) {
   const router = useRouter();
+  const { success, error: pushError } = useToast();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -54,8 +56,12 @@ export default function Header({
   async function handleLogout() {
     if (loggingOut) return;
     setLoggingOut(true);
-    await logout(); // Regardless of server response, token cleared.
-    // Small delay to allow UI feedback (optional)
+    const res = await logout(); // Regardless of server response, token cleared.
+    if (res.ok) {
+      success("You have been logged out", { title: "Logged out" });
+    } else if (res.error) {
+      pushError(res.error, { title: "Logout issue" });
+    }
     router.replace('/login');
     setLoggingOut(false);
   }
@@ -241,7 +247,7 @@ export default function Header({
                   ref={(el) => { menuItemRefs.current[index] = el; }}
                   role="menuitem"
                   tabIndex={activeIndex === index ? 0 : -1}
-                  className={`w-full text-left hover:bg-indigo-50 focus:bg-indigo-50 focus:text-indigo-800 focus-visible:outline-none transition-colors duration-150 text-gray-700 hover:text-indigo-700 font-medium ${
+                  className={`w-full text-left hover:bg-indigo-50 hover:cursor-pointer focus:bg-indigo-50 focus:text-indigo-800 focus-visible:outline-none transition-colors duration-150 text-gray-700 hover:text-indigo-700 font-medium ${
                     isMobile ? 'px-3 py-2 text-sm' : 'px-4 py-3'
                   }`}
                   onKeyDown={(e) => {
