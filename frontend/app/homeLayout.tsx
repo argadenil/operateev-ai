@@ -191,7 +191,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 isMobile ? 'main-content-mobile' : ''
             }`}>
                 <MemoHeader />
-                <main className={`flex-grow overflow-auto bg-gradient-to-br from-white/90 via-indigo-50/30 to-purple-50/30 main-content-transition ${
+                <main className={`bg-gray-200 flex-grow overflow-auto bg-gradient-to-br from-white/90 via-indigo-50/30 to-purple-50/30 main-content-transition ${
                     isMobile 
                         ? 'px-4 py-4' 
                         : sidebarOpen 
