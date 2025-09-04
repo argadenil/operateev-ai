@@ -472,7 +472,7 @@ const Dashboard = React.memo(() => {
         <StatCard title="Total GPUs" value={statsData.total} icon={Server} palette="blue" />
         <StatCard title="Running" value={statsData.running} icon={PlayCircle} palette="emerald" />
         <StatCard title="Idle" value={statsData.idle} icon={PauseCircle} palette="amber" />
-        <StatCard title="Avg. Power" value={<>{statsData.avgPower}<span className='text-lg font-medium'>W</span></>} icon={Zap} palette="orange" />
+        <StatCard title="Avg. Power" value={<>{statsData.avgPower}<span className='text-xl sm:text-2xl'>W</span></>} icon={Zap} palette="orange" />
       </div>
 
       {/* Search */}
