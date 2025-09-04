@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
 import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, BarChart3, RefreshCw, Activity, Settings2, Server } from "lucide-react";
+import StatCard from "../components/stat-card";
 
 // Chart.js - Register once
 import {
@@ -468,74 +469,10 @@ const Dashboard = React.memo(() => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        {/* Total GPUs */}
-        <div className="relative overflow-hidden rounded-2xl p-6 shadow-xl border border-gray-900/20 hover:border-blue-500/40 ring-1 ring-inset ring-blue-400/30 bg-gradient-to-br from-blue-50/90 to-sky-100/80 backdrop-blur-sm group hover:shadow-blue-300/40 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-tr from-blue-400/20 via-transparent to-sky-500/20 opacity-60 group-hover:opacity-90 transition" />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
-            <div>
-              <p className="text-sm font-medium text-blue-700/80">Total GPUs</p>
-              <p className="text-3xl font-bold text-blue-900 tracking-tight">{statsData.total}</p>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-sky-500/50 blur-lg opacity-70 group-hover:opacity-90 transition" />
-              <div className="relative w-12 h-12 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ring-blue-400/40 shadow-md shadow-blue-500/30">
-                <Server className="text-blue-700 group-hover:scale-110 transition-transform" size={26} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Running */}
-        <div className="relative overflow-hidden rounded-2xl p-6 shadow-xl border border-gray-900/20 hover:border-emerald-500/40 ring-1 ring-inset ring-emerald-400/30 bg-gradient-to-br from-emerald-50/90 to-green-100/80 backdrop-blur-sm group hover:shadow-emerald-300/40 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-tr from-emerald-400/20 via-transparent to-green-500/20 opacity-60 group-hover:opacity-90 transition" />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
-            <div>
-              <p className="text-sm font-medium text-emerald-700/80">Running</p>
-              <p className="text-3xl font-bold text-emerald-700 tracking-tight">{statsData.running}</p>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur-lg opacity-70 group-hover:opacity-90 transition" />
-              <div className="relative w-12 h-12 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ring-emerald-500/40 shadow-md shadow-emerald-500/30">
-                <PlayCircle className="text-emerald-600 group-hover:scale-110 transition-transform" size={26} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Idle */}
-        <div className="relative overflow-hidden rounded-2xl p-6 shadow-xl border border-gray-900/20 hover:border-amber-500/40 ring-1 ring-inset ring-amber-400/30 bg-gradient-to-br from-amber-50/90 to-yellow-100/80 backdrop-blur-sm group hover:shadow-amber-300/40 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-tr from-amber-400/20 via-transparent to-yellow-500/20 opacity-60 group-hover:opacity-90 transition" />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
-            <div>
-              <p className="text-sm font-medium text-amber-700/80">Idle</p>
-              <p className="text-3xl font-bold text-amber-700 tracking-tight">{statsData.idle}</p>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400/50 to-yellow-500/50 blur-lg opacity-70 group-hover:opacity-90 transition" />
-              <div className="relative w-12 h-12 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ring-amber-500/40 shadow-md shadow-amber-500/30">
-                <PauseCircle className="text-amber-600 group-hover:scale-110 transition-transform" size={26} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Avg. Power */}
-        <div className="relative overflow-hidden rounded-2xl p-6 shadow-xl border border-gray-900/20 hover:border-orange-500/40 ring-1 ring-inset ring-orange-400/30 bg-gradient-to-br from-orange-50/90 to-orange-100/80 backdrop-blur-sm group hover:shadow-orange-300/40 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-tr from-orange-400/20 via-transparent to-orange-600/20 opacity-60 group-hover:opacity-90 transition" />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
-            <div>
-              <p className="text-sm font-medium text-orange-700/80">Avg. Power</p>
-              <p className="text-3xl font-bold text-orange-700 tracking-tight">{statsData.avgPower}W</p>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-400/50 to-orange-500/50 blur-lg opacity-70 group-hover:opacity-90 transition" />
-              <div className="relative w-12 h-12 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ring-orange-500/40 shadow-md shadow-orange-500/30">
-                <Zap className="text-orange-600 group-hover:scale-110 transition-transform" size={26} />
-              </div>
-            </div>
-          </div>
-        </div>
-
+        <StatCard title="Total GPUs" value={statsData.total} icon={Server} palette="blue" />
+        <StatCard title="Running" value={statsData.running} icon={PlayCircle} palette="emerald" />
+        <StatCard title="Idle" value={statsData.idle} icon={PauseCircle} palette="amber" />
+        <StatCard title="Avg. Power" value={<>{statsData.avgPower}<span className='text-lg font-medium'>W</span></>} icon={Zap} palette="orange" />
       </div>
 
       {/* Search */}

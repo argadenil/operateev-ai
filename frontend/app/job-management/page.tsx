@@ -1,4 +1,3 @@
-// ...existing code...
 "use client";
 
 import React, { useEffect } from "react";
@@ -25,6 +24,7 @@ import {
   Legend,
 } from "chart.js";
 import { Pie, Bar } from "react-chartjs-2";
+import StatCard from "../components/stat-card";
 
 ChartJS.register(CategoryScale, LinearScale, ArcElement, BarElement, Title, Tooltip, Legend);
 
@@ -334,109 +334,12 @@ export default function JobManagementPage() {
         {/* KPI Cards (Enhanced like Dashboard Stats) */}
         <section>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
-            {/* Total Jobs (updated from gray to violet palette) */}
-            {/* Total Jobs */}
-<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-violet-50/70 border border-violet-400/80 ring-1 ring-inset ring-violet-500/40 shadow-violet-500/10">
-  <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/15" />
-  <div className="flex items-start justify-between gap-4 relative">
-    <div>
-      <p className="text-[11px] sm:text-xs font-medium text-violet-700 tracking-wide uppercase">Total Jobs</p>
-      <p className="text-xl sm:text-2xl font-bold tracking-tight text-violet-700">{total}</p>
-    </div>
-    <div className="group relative">
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-violet-400/50 to-fuchsia-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-      <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-violet-500/30 shadow-inner shadow-violet-500/20">
-        <BarChart3 className="text-violet-600 group-hover:scale-110 transition-transform" size={20} />
-      </div>
-    </div>
-  </div>
-</div>
-
-{/* Running */}
-<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-emerald-50/70 border border-emerald-400/80 ring-1 ring-inset ring-emerald-500/40 shadow-emerald-500/10">
-  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/15" />
-  <div className="flex items-start justify-between gap-4 relative">
-    <div>
-      <p className="text-[11px] sm:text-xs font-medium text-emerald-700 tracking-wide uppercase">Running</p>
-      <p className="text-xl sm:text-2xl font-bold tracking-tight text-emerald-700">{running}</p>
-    </div>
-    <div className="group relative">
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-400/50 to-green-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-      <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-emerald-500/30 shadow-inner shadow-emerald-500/20">
-        <PlayCircle className="text-emerald-600 group-hover:scale-110 transition-transform" size={22} />
-      </div>
-    </div>
-  </div>
-</div>
-
-{/* Completed */}
-<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-blue-50/70 border border-blue-400/80 ring-1 ring-inset ring-blue-500/40 shadow-blue-500/10">
-  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/15" />
-  <div className="flex items-start justify-between gap-4 relative">
-    <div>
-      <p className="text-[11px] sm:text-xs font-medium text-blue-700 tracking-wide uppercase">Completed</p>
-      <p className="text-xl sm:text-2xl font-bold tracking-tight text-blue-700">{completed}</p>
-    </div>
-    <div className="group relative">
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-indigo-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-      <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-blue-500/30 shadow-inner shadow-blue-500/20">
-        <CheckCircle className="text-blue-600 group-hover:scale-110 transition-transform" size={22} />
-      </div>
-    </div>
-  </div>
-</div>
-
-{/* Failed */}
-<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-red-50/70 border border-red-400/80 ring-1 ring-inset ring-red-500/40 shadow-red-500/10">
-  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-rose-500/15" />
-  <div className="flex items-start justify-between gap-4 relative">
-    <div>
-      <p className="text-[11px] sm:text-xs font-medium text-red-700 tracking-wide uppercase">Failed</p>
-      <p className="text-xl sm:text-2xl font-bold tracking-tight text-red-700">{failed}</p>
-    </div>
-    <div className="group relative">
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-red-400/50 to-rose-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-      <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-red-500/30 shadow-inner shadow-red-500/20">
-        <XCircle className="text-red-600 group-hover:scale-110 transition-transform" size={22} />
-      </div>
-    </div>
-  </div>
-</div>
-
-{/* Queued */}
-<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-yellow-50/70 border border-amber-400/80 ring-1 ring-inset ring-amber-500/40 shadow-amber-500/10">
-  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/15" />
-  <div className="flex items-start justify-between gap-4 relative">
-    <div>
-      <p className="text-[11px] sm:text-xs font-medium text-amber-700 tracking-wide uppercase">Queued</p>
-      <p className="text-xl sm:text-2xl font-bold tracking-tight text-amber-700">{queued}</p>
-    </div>
-    <div className="group relative">
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400/50 to-yellow-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-      <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-amber-500/30 shadow-inner shadow-amber-500/20">
-        <Clock className="text-amber-600 group-hover:scale-110 transition-transform" size={22} />
-      </div>
-    </div>
-  </div>
-</div>
-
-{/* Avg Duration */}
-<div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg bg-indigo-50/70 border border-indigo-400/80 ring-1 ring-inset ring-indigo-500/40 shadow-indigo-500/10">
-  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-600/15" />
-  <div className="flex items-start justify-between gap-4 relative">
-    <div>
-      <p className="text-[11px] sm:text-xs font-medium text-indigo-700 tracking-wide uppercase">Avg. Duration</p>
-      <p className="text-xl sm:text-2xl font-bold tracking-tight text-indigo-600">1h 23m</p>
-    </div>
-    <div className="group relative">
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-400/50 to-purple-500/50 blur opacity-60 group-hover:opacity-80 transition" />
-      <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center ring-1 ring-inset ring-indigo-500/30 shadow-inner shadow-indigo-500/20">
-        <Timer className="text-indigo-600 group-hover:scale-110 transition-transform" size={22} />
-      </div>
-    </div>
-  </div>
-</div>
-
+            <StatCard title="Total Jobs" value={total} icon={BarChart3} palette="violet" size="sm" uppercaseTitle />
+            <StatCard title="Running" value={running} icon={PlayCircle} palette="emerald" size="sm" uppercaseTitle />
+            <StatCard title="Completed" value={completed} icon={CheckCircle} palette="blue" size="sm" uppercaseTitle />
+            <StatCard title="Failed" value={failed} icon={XCircle} palette="red" size="sm" uppercaseTitle />
+            <StatCard title="Queued" value={queued} icon={Clock} palette="yellow" size="sm" uppercaseTitle />
+            <StatCard title="Avg. Duration" value="1h 23m" icon={Timer} palette="indigo" size="sm" uppercaseTitle />
           </div>
         </section>
 
