@@ -16,7 +16,7 @@ const MemoChat = React.memo(Chat);
 interface NavItemType { name: string; icon: string; href: string; }
 
 // Individual nav item (memoized)
-const NavItem = React.memo(function NavItem({ item, isActive, sidebarOpen, isMobile, onNavigate }: { item: NavItemType; isActive: boolean; sidebarOpen: boolean; isMobile: boolean; onNavigate: () => void; }) {
+const NavItem = React.memo(function NavItem({ item, isActive, sidebarOpen, onNavigate }: { item: NavItemType; isActive: boolean; sidebarOpen: boolean; onNavigate: () => void; }) {
     return (
         <Link
             href={item.href}
@@ -25,12 +25,12 @@ const NavItem = React.memo(function NavItem({ item, isActive, sidebarOpen, isMob
             className={`group will-change-transform relative flex items-center p-4 mx-3 rounded-2xl cursor-pointer transition-all duration-200 transform touch-manipulation ${isActive
                 ? "bg-indigo-500 text-white shadow-xl shadow-indigo-500/25"
                 : "hover:bg-white/10 hover:backdrop-blur-sm text-gray-300 hover:text-white"}`}
-            title={!sidebarOpen && !isMobile ? item.name : undefined}
+            title={!sidebarOpen ? item.name : undefined}
             aria-current={isActive ? 'page' : undefined}
             style={{ transform: 'translateZ(0)' }}
         >
             <span className="text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>{item.icon}</span>
-            <span className={`ml-4 font-medium text-base group-hover:text-white transition-all duration-200 whitespace-nowrap overflow-hidden ${(sidebarOpen || isMobile) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
+            <span className={`ml-4 font-medium text-base group-hover:text-white transition-all duration-200 whitespace-nowrap overflow-hidden ${sidebarOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
                 style={{ transform: 'translateZ(0)' }}>
                 {item.name}
             </span>
@@ -42,36 +42,14 @@ NavItem.displayName = 'NavItem';
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [slideOverOpen, setSlideOverOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
 
     const pathname = usePathname(); // current route
     const router = useRouter();
 
-    // Debounced resize handler for better performance
-    const handleResize = useCallback(() => {
-        const mobile = window.innerWidth < 768;
-        setIsMobile(mobile);
-        if (window.innerWidth >= 768) {
-            setSidebarOpen(false); // Close sidebar on desktop
-        }
+    // Optimized sidebar toggle function
+    const toggleSidebar = useCallback(() => {
+        setSidebarOpen(prev => !prev);
     }, []);
-
-    // Check if device is mobile with debounced resize handler
-    useEffect(() => {
-        handleResize();
-
-        let timeoutId: NodeJS.Timeout;
-        const debouncedResize = () => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(handleResize, 100);
-        };
-
-        window.addEventListener('resize', debouncedResize, { passive: true });
-        return () => {
-            window.removeEventListener('resize', debouncedResize);
-            clearTimeout(timeoutId);
-        };
-    }, [handleResize]);
 
     // Load customer id after mount to avoid SSR / hydration mismatch and allow direct deep-links
     const [customerId, setCustomerId] = useState<string | null>(null);
@@ -95,15 +73,10 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         navigationItems.forEach(i => router.prefetch(i.href));
     }, [navigationItems, router]);
 
-    // Optimized sidebar toggle function
-    const toggleSidebar = useCallback(() => {
-        setSidebarOpen(prev => !prev);
-    }, []);
-
-    // Navigation handler (close sidebar on mobile only). Route change handled by Link.
+    // Navigation handler (close sidebar on route change for mobile). Route change handled by Link.
     const handleNavigateClose = useCallback(() => {
-        if (isMobile) setSidebarOpen(false);
-    }, [isMobile]);
+        setSidebarOpen(false);
+    }, []);
 
     // Map of routes to names for dynamic page title
     const routeMap: Record<string, string> = {
@@ -128,26 +101,22 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <div className="flex h-screen relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-indigo-50">
-            {/* Mobile Menu Button */}
-            {isMobile && (
-                <button
-                    onClick={toggleSidebar}
-                    className="fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg md:hidden touch-manipulation"
-                    aria-label={sidebarOpen ? "Close navigation menu" : "Open navigation menu"}
-                    aria-expanded={sidebarOpen}
-                    style={{ transform: 'translateZ(0)' }} // Force hardware acceleration
-                >
-                    <Menu size={20} className="text-gray-700" aria-hidden="true" />
-                </button>
-            )}
+            {/* Mobile Menu Button - Show only on mobile screens using CSS */}
+            <button
+                onClick={toggleSidebar}
+                className="fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg md:hidden touch-manipulation block"
+                aria-label={sidebarOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={sidebarOpen}
+                style={{ transform: 'translateZ(0)' }}
+            >
+                <Menu size={20} className="text-gray-700" aria-hidden="true" />
+            </button>
 
             {/* Sidebar */}
             <aside
-                className={`bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white sidebar-transition ${isMobile
-                    ? (sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed")
-                    : (sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed")
-                    } flex flex-col relative z-30 shadow-2xl border-slate-700/50 ${isMobile ? 'fixed' : 'relative'
-                    }`}
+                className={`bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white sidebar-transition ${
+                    sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"
+                    } flex flex-col relative z-30 shadow-2xl border-slate-700/50 md:relative fixed`}
                 style={{
                     transform: 'translateZ(0)', // Force hardware acceleration
                     containIntrinsicSize: '16rem auto' // Optimize layout
@@ -156,7 +125,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 {/* Sidebar background pattern */}
                 <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
 
-                <nav className={`flex flex-col ${isMobile ? 'mt-16' : 'mt-40'} space-y-2 relative z-10`}>
+                <nav className="flex flex-col mt-16 md:mt-40 space-y-2 relative z-10">
                     {navigationItems.map((item) => {
                         const isActive = item.name === 'Dashboard'
                             ? pathname.startsWith('/dashboard') // match /dashboard or /dashboard/:id
@@ -167,7 +136,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                                 item={item}
                                 isActive={isActive}
                                 sidebarOpen={sidebarOpen}
-                                isMobile={isMobile}
                                 onNavigate={handleNavigateClose}
                             />
                         );
@@ -175,10 +143,10 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 </nav>
 
                 <div className="mt-auto mb-4 px-4 text-white/70 text-sm relative z-10">
-                    <div className={`transition-all duration-200 ${(sidebarOpen || isMobile) ? 'opacity-100' : 'opacity-70'}`}
+                    <div className={`transition-all duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-70'}`}
                         style={{ transform: 'translateZ(0)' }}>
-                        {(sidebarOpen || isMobile) ? (
-                            <div className={`transition-all duration-200 ${(sidebarOpen || isMobile) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}>
+                        {sidebarOpen ? (
+                            <div className={`transition-all duration-200 ${sidebarOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}>
                                 <div className="text-xs font-medium">Version: v1.0.0</div>
                             </div>
                         ) : (
@@ -187,36 +155,29 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                     </div>
                 </div>
 
-                {/* Collapse / Expand - Hidden on mobile */}
-                {!isMobile && (
-                    <button
-                        onClick={toggleSidebar}
-                        className="hover:cursor-pointer absolute top-24 -right-5 w-12 h-12 rounded-full flex items-center justify-center shadow-2xl bg-indigo-500 text-white transition-all duration-200 hover:scale-110 z-40 touch-manipulation"
-                        aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-                        style={{ transform: 'translateZ(0)' }}
-                    >
-                        {sidebarOpen ? (
-                            <ChevronLeft size={24} strokeWidth={2.5} aria-hidden="true" />
-                        ) : (
-                            <ChevronRight size={24} strokeWidth={2.5} aria-hidden="true" />
-                        )}
-                    </button>
-                )}
+                {/* Collapse / Expand - Hide on mobile screens using CSS */}
+                <button
+                    onClick={toggleSidebar}
+                    className="hover:cursor-pointer absolute top-24 -right-5 w-12 h-12 rounded-full flex items-center justify-center shadow-2xl bg-indigo-500 text-white transition-all duration-200 hover:scale-110 z-40 touch-manipulation hidden md:flex"
+                    aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+                    style={{ transform: 'translateZ(0)' }}
+                >
+                    {sidebarOpen ? (
+                        <ChevronLeft size={24} strokeWidth={2.5} aria-hidden="true" />
+                    ) : (
+                        <ChevronRight size={24} strokeWidth={2.5} aria-hidden="true" />
+                    )}
+                </button>
             </aside>
 
             {/* Main Area */}
-            <div className={`flex flex-col flex-grow relative z-20 bg-white/80 backdrop-blur-sm main-content-transition ${isMobile ? 'main-content-mobile' : ''
-                }`}>
+            <div className="flex flex-col flex-grow relative z-20 bg-white/80 backdrop-blur-sm main-content-transition">
                 <MemoHeader />
-                <main className={`bg-gray-200 flex-grow overflow-auto bg-gradient-to-br from-white/90 via-indigo-50/30 to-purple-50/30 main-content-transition ${isMobile
-                    ? 'px-4 py-4'
-                    : sidebarOpen
-                        ? 'px-6 py-6'
-                        : 'px-8 py-6'
+                <main className={`bg-gray-200 flex-grow overflow-auto bg-gradient-to-br from-white/90 via-indigo-50/30 to-purple-50/30 main-content-transition px-4 py-4 md:px-6 md:py-6 ${
+                    sidebarOpen ? 'lg:px-6 lg:py-6' : 'lg:px-8 lg:py-6'
                     }`}>
-                    <div className={`flex items-center justify-between mb-6 transition-all duration-300 ease-in-out`}>
-                        <h1 className={`font-bold text-gray-900 tracking-tight relative transition-all duration-300 ease-in-out ${isMobile ? 'text-xl sm:text-2xl' : 'text-2xl lg:text-2xl'
-                            }`}>
+                    <div className="flex items-center justify-between mb-6 transition-all duration-300 ease-in-out">
+                        <h1 className="font-bold text-gray-900 tracking-tight relative transition-all duration-300 ease-in-out text-xl sm:text-2xl lg:text-2xl">
                             <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent">
                                 {pageTitle}
                             </span>
@@ -234,24 +195,20 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
             {/* Floating Action Button */}
             {!slideOverOpen && (
-                <div className={`fixed z-50 ${isMobile
-                    ? 'bottom-4 right-4'
-                    : 'top-[69%] right-6 -translate-y-1/2'
-                    }`} style={{ position: 'fixed' }}>
+                <div className="fixed z-50 bottom-4 right-4 md:top-[69%] md:right-6 md:-translate-y-1/2" style={{ position: 'fixed' }}>
                     <div className="relative group">
                         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 via-red-500 to-red-600 blur-lg opacity-65 group-hover:opacity-80 transition" />
 
                         <video
                             src="/images/Robot.mp4"
-                            className={`relative rounded-full cursor-pointer bg-gradient-to-tr from-teal-800 via-teal-900 to-black
+                            className="relative rounded-full cursor-pointer bg-gradient-to-tr from-teal-800 via-teal-900 to-black
     backdrop-blur-md ring-2 ring-orange-400/80
     filter contrast-145 brightness-110 saturate-140
     shadow-[0_0_15px_rgba(239,68,68,0.65),0_0_30px_rgba(220,38,38,0.35),0_0_45px_rgba(185,28,28,0.25)]
     hover:shadow-[0_0_20px_rgba(239,68,68,0.8),0_0_40px_rgba(220,38,38,0.45),0_0_60px_rgba(185,28,28,0.35)]
-    active:scale-95 transition-all duration-300
-    ${isMobile ? 'w-12 h-12 p-1' : 'w-18 h-18 p-1'}`}
-                            width={isMobile ? 48 : 64}
-                            height={isMobile ? 48 : 64}
+    active:scale-95 transition-all duration-300 w-12 h-12 p-1 md:w-18 md:h-18 md:p-1"
+                            width={64}
+                            height={64}
                             muted
                             loop
                             playsInline
@@ -267,8 +224,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                             }}
                         />
 
-                        <div className={`absolute -top-2 -right-2 bg-green-500 rounded-full border-2 border-white animate-pulse ${isMobile ? 'w-3 h-3' : 'w-5 h-5'
-                            }`}></div>
+                        <div className="absolute -top-2 -right-2 bg-green-500 rounded-full border-2 border-white animate-pulse w-3 h-3 md:w-5 md:h-5"></div>
 
                     </div>
                 </div>
@@ -276,21 +232,17 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
             {/* Slide-over panel */}
             <div
-                className={`fixed inset-y-0 right-0 bg-white/95 backdrop-blur-xl shadow-2xl border-l border-gray-200/50 z-50 chat-slide-transition ${isMobile
-                    ? 'chat-panel-mobile w-full h-full'
-                    : 'w-96 max-w-[90vw] md:max-w-[400px] h-[96vh]'
-                    } ${slideOverOpen
+                className={`fixed inset-y-0 right-0 bg-white/95 backdrop-blur-xl shadow-2xl border-l border-gray-200/50 z-50 chat-slide-transition w-full h-full md:w-96 md:max-w-[90vw] lg:max-w-[400px] md:h-[96vh] ${slideOverOpen
                         ? "chat-slide-open"
                         : "chat-slide-closed"
                     }`}
             >
                 <div className="flex flex-col h-full">
                     {/* Chat assistant header inside chat window */}
-                    <div className={`flex justify-between items-center border-b border-gray-200/60 bg-gradient-to-r from-indigo-50 to-purple-50 backdrop-blur-sm ${isMobile ? 'p-4' : 'p-6'
-                        }`}>
+                    <div className="flex justify-between items-center border-b border-gray-200/60 bg-gradient-to-r from-indigo-50 to-purple-50 backdrop-blur-sm p-4 md:p-6">
                         <div className="flex items-center space-x-3">
                             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                            <span className={`font-semibold text-gray-800 ${isMobile ? 'text-base' : 'text-lg'}`}>
+                            <span className="font-semibold text-gray-800 text-base md:text-lg">
                                 👋 Welcome Nilesh
                             </span>
                         </div>
@@ -309,13 +261,11 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 </div>
             </div>
 
-            {/* Overlay for mobile sidebar */}
-            {sidebarOpen && isMobile && (
-                <div
-                    onClick={toggleSidebar}
-                    className="fixed inset-0 bg-black/20 overlay-optimized smooth-transition z-20"
-                />
-            )}
+            {/* Overlay for mobile sidebar - Show only when sidebar is open on mobile */}
+            <div
+                onClick={toggleSidebar}
+                className={`fixed inset-0 bg-black/20 overlay-optimized smooth-transition z-20 md:hidden ${sidebarOpen ? 'block' : 'hidden'}`}
+            />
 
             {/* Overlay for chat */}
             {slideOverOpen && (
