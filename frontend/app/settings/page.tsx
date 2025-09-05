@@ -109,7 +109,7 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Enhanced Notifications */}
           <section className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-slate-200/60 p-8 hover:shadow-3xl transition-all duration-300">
             <div className="flex items-center mb-8">
@@ -325,7 +325,7 @@ export default function Settings() {
           </section>
 
           {/* Privacy & Data */}
-          <section className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:col-span-2">
+          <section className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:col-span-3">
             <div className="flex items-center mb-6">
               <span className="material-icons text-indigo-500 text-2xl mr-3">privacy_tip</span>
               <h2 className="text-xl font-semibold text-gray-900">Privacy & Data</h2>
@@ -353,7 +353,7 @@ export default function Settings() {
           </section>
 
           {/* Data Management */}
-          <section className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:col-span-2">
+          <section className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:col-span-3">
             <div className="flex items-center mb-6">
               <span className="material-icons text-indigo-500 text-2xl mr-3">storage</span>
               <h2 className="text-xl font-semibold text-gray-900">Data Management</h2>
