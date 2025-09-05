@@ -82,3 +82,59 @@ type GPUResourcesResponse struct {
 	Summary GPUResourcesSummary `json:"summary"`
 	Error   string              `json:"error,omitempty"`
 }
+
+// Job represents a computational job that can be scheduled and executed on GPU resources.
+type Job struct {
+	ID          int    `json:"id"`
+	CustomerID  string `json:"customer_id"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	GPU         string `json:"gpu"`
+	Owner       string `json:"owner"`
+	Status      string `json:"status"` // queued | running | completed | failed | cancelled
+	StartTime   string `json:"start_time,omitempty"`
+	EndTime     string `json:"end_time,omitempty"`
+	Duration    string `json:"duration,omitempty"`
+	Priority    int    `json:"priority"` // 1-10, higher number = higher priority
+	CPUCores    int    `json:"cpu_cores"`
+	MemoryGB    int    `json:"memory_gb"`
+	GPUMemoryGB int    `json:"gpu_memory_gb"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
+}
+
+// JobSummary provides aggregated statistics for jobs.
+type JobSummary struct {
+	Total     int `json:"total"`
+	Queued    int `json:"queued"`
+	Running   int `json:"running"`
+	Completed int `json:"completed"`
+	Failed    int `json:"failed"`
+	Cancelled int `json:"cancelled"`
+}
+
+// JobResponse bundles jobs with summary statistics.
+type JobResponse struct {
+	Jobs    []Job      `json:"jobs"`
+	Summary JobSummary `json:"summary"`
+	Error   string     `json:"error,omitempty"`
+}
+
+// CreateJobRequest represents the payload for creating a new job.
+type CreateJobRequest struct {
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description"`
+	GPU         string `json:"gpu" validate:"required"`
+	Priority    int    `json:"priority"`
+	CPUCores    int    `json:"cpu_cores"`
+	MemoryGB    int    `json:"memory_gb"`
+	GPUMemoryGB int    `json:"gpu_memory_gb"`
+}
+
+// UpdateJobRequest represents the payload for updating a job.
+type UpdateJobRequest struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
+	Priority    int    `json:"priority"`
+}

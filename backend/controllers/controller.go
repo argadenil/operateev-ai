@@ -3,6 +3,7 @@ package controllers
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"operateev/db"
 	"operateev/models"
@@ -198,4 +199,66 @@ func GetGPUResources(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, models.GPUResourcesResponse{GPUs: gpus, Summary: summary})
+}
+
+// GetJobs retrieves all jobs for a specific customer with summary statistics
+func GetJobs(c echo.Context) error {
+	customerID := c.Param("customer_id")
+	if customerID == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "customer_id required"})
+	}
+
+	rows, err := db.Conn.QueryContext(
+		context.Background(),
+		`SELECT id, customer_id, name, description, gpu, owner, status, start_time, end_time, duration, 
+		 priority, cpu_cores, memory_gb, gpu_memory_gb
+		 FROM "usersSchema"."jobs" WHERE customer_id=$1`,
+		customerID,
+	)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.JobResponse{Error: "failed to fetch jobs"})
+	}
+	defer rows.Close()
+
+	var jobs []models.Job
+	var summary models.JobSummary
+
+	for rows.Next() {
+		var job models.Job
+		var startTime, endTime sql.NullString
+		err := rows.Scan(
+			&job.ID, &job.CustomerID, &job.Name, &job.Description, &job.GPU, &job.Owner,
+			&job.Status, &startTime, &endTime, &job.Duration, &job.Priority,
+			&job.CPUCores, &job.MemoryGB, &job.GPUMemoryGB,
+		)
+		if err != nil {
+			continue
+		}
+
+		if startTime.Valid {
+			job.StartTime = startTime.String
+		}
+		if endTime.Valid {
+			job.EndTime = endTime.String
+		}
+
+		jobs = append(jobs, job)
+		summary.Total++
+
+		// Count by status
+		switch strings.ToLower(job.Status) {
+		case "queued":
+			summary.Queued++
+		case "running":
+			summary.Running++
+		case "completed":
+			summary.Completed++
+		case "failed":
+			summary.Failed++
+		case "cancelled":
+			summary.Cancelled++
+		}
+	}
+
+	return c.JSON(http.StatusOK, models.JobResponse{Jobs: jobs, Summary: summary})
 }
