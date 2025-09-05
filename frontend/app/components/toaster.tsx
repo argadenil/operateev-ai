@@ -105,12 +105,19 @@ export function ToastProvider({
 
   const clear = useCallback(() => setToasts([]), []);
 
-  const success: ToastContextValue["success"] = (m, opts) =>
-    push(m, { ...opts, variant: "success" });
-  const error: ToastContextValue["error"] = (m, opts) =>
-    push(m, { ...opts, variant: "error" });
-  const info: ToastContextValue["info"] = (m, opts) =>
-    push(m, { ...opts, variant: "info" });
+  // Stable helper wrappers so consuming components can safely use them in deps
+  const success: ToastContextValue["success"] = useCallback(
+    (m, opts) => push(m, { ...opts, variant: "success" }),
+    [push]
+  );
+  const error: ToastContextValue["error"] = useCallback(
+    (m, opts) => push(m, { ...opts, variant: "error" }),
+    [push]
+  );
+  const info: ToastContextValue["info"] = useCallback(
+    (m, opts) => push(m, { ...opts, variant: "info" }),
+    [push]
+  );
 
   const value: ToastContextValue = { push, success, error, info, dismiss, clear };
 
