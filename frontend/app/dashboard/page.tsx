@@ -159,7 +159,7 @@ const Dashboard = React.memo(() => {
   const [selectedModel, setSelectedModel] = React.useState<GPUResource | null>(null);
   const [resources, setResources] = React.useState<GPUResource[]>([]); // added
   const [summary, setSummary] = React.useState({ total: 0, running: 0, idle: 0, avgPower: 0 }); // added
-  const [fetching, setFetching] = React.useState(false);
+  // removed fetching state
   // removed lastUpdated timestamp functionality
   // customerId: undefined = pending (not yet parsed), null = explicitly missing (base /dashboard), string = present
   const [customerId, setCustomerId] = React.useState<string | null | undefined>(undefined);
@@ -218,11 +218,9 @@ const Dashboard = React.memo(() => {
       return;
     }
     const abort = new AbortController();
-    setFetching(true);
     loadDashboard(customerId, abort.signal)
       .finally(() => {
         if (!abort.signal.aborted) {
-          setFetching(false);
           setLoading(false);
         }
       });
@@ -291,8 +289,8 @@ const Dashboard = React.memo(() => {
 
   // Replace mock delay
   useEffect(() => {
-    if (resources.length > 0 || !fetching) setLoading(false);
-  }, [resources, fetching]);
+    if (resources.length > 0) setLoading(false);
+  }, [resources]);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1000);
@@ -363,8 +361,7 @@ const Dashboard = React.memo(() => {
                     const btn = "inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg bg-indigo-500 text-white hover:cursor-pointer shadow hover:shadow-lg transition active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-indigo-400/50 disabled:opacity-60";
                     return (
                       <>
-                        <button className={btn} disabled={fetching} onClick={async () => {
-                          if (fetching) return; setFetching(true);
+                        <button className={btn} onClick={async () => {
                           try {
                             const data = await fetchDashboard(customerId as string);
                             const transformed: GPUResource[] = (data.resources || []).map((r: DashboardAPIResource) => ({
@@ -385,11 +382,9 @@ const Dashboard = React.memo(() => {
                               idle: data.summary?.idle || 0,
                               avgPower: data.summary?.avg_power || 0,
                             });
-                            // lastUpdated removed
                           } catch (e: unknown) { const msg = e instanceof Error ? e.message : 'Refresh failed'; pushError(msg, { title: 'Dashboard' }); }
-                          finally { setFetching(false); }
                         }}>
-                          <RefreshCw size={14} className={fetching ? 'animate-spin' : ''} /> {fetching ? 'Refreshing' : 'Refresh'}
+                          <RefreshCw size={14} /> Refresh
                         </button>
                         <button className={btn}>
                           <PlusCircle size={15} /> Add GPU
