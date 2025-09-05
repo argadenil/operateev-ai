@@ -1,7 +1,7 @@
 // Simple auth utilities for frontend.
 // NOTE: For production you should move to httpOnly cookies + refresh tokens.
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:1324";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://operateev-ai-backend.onrender.com";
 
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -41,8 +41,9 @@ export async function logout(): Promise<{ ok: boolean; error?: string }> {
       return { ok: false, error: msg };
     }
     return { ok: true };
-  } catch (e: any) {
+  } catch (e: unknown) {
     clearToken();
-    return { ok: false, error: e?.message || 'Network error' };
+    const msg = e instanceof Error ? e.message : 'Network error';
+    return { ok: false, error: msg };
   }
 }

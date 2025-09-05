@@ -13,7 +13,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, BarChart3, RefreshCw, Activity, Settings2, Server } from "lucide-react";
+import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, BarChart3, RefreshCw, Activity, Settings2, Server, RefreshCcw } from "lucide-react";
 import StatCard from "../components/stat-card";
 
 // Chart.js - Register once
@@ -160,6 +160,7 @@ const Dashboard = React.memo(() => {
   const [resources, setResources] = React.useState<GPUResource[]>([]); // added
   const [summary, setSummary] = React.useState({ total: 0, running: 0, idle: 0, avgPower: 0 }); // added
   const [fetching, setFetching] = React.useState(false);
+  const [lastUpdated, setLastUpdated] = React.useState<Date | null>(null);
   // customerId: undefined = pending (not yet parsed), null = explicitly missing (base /dashboard), string = present
   const [customerId, setCustomerId] = React.useState<string | null | undefined>(undefined);
   const missingIdNotified = React.useRef(false);
@@ -204,15 +205,17 @@ const Dashboard = React.memo(() => {
           processes: r.processes,
         }));
         setResources(transformed);
-        setSummary({
+  setSummary({
           total: data.summary?.total || 0,
           running: data.summary?.running || 0,
           idle: data.summary?.idle || 0,
           avgPower: data.summary?.avg_power || 0,
         });
-      } catch (e: any) {
+  setLastUpdated(new Date());
+      } catch (e: unknown) {
         if (!abort.signal.aborted) {
-          pushError(e?.message || 'Network error', { title: 'Dashboard fetch' });
+          const msg = e instanceof Error ? e.message : 'Network error';
+          pushError(msg, { title: 'Dashboard fetch' });
         }
       } finally {
         if (!abort.signal.aborted) setFetching(false);
@@ -221,7 +224,7 @@ const Dashboard = React.memo(() => {
     }
     load();
     return () => abort.abort();
-  }, [customerId]);
+  }, [customerId, pushError]);
 
   // Memoize chart data
   const lineChartData = useMemo(() => createLineChartData(), []);
@@ -351,27 +354,58 @@ const Dashboard = React.memo(() => {
               </div>
 
               {/* Quick actions */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                {/* Shared button style extracted for consistency */}
-                {(() => {
-                  const btn = "inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg bg-indigo-500 text-white hover:cursor-pointer shadow hover:shadow-lg transition active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-indigo-400/50";
-                  return (
-                    <>
-                      <button className={btn}>
-                        <RefreshCw size={14} /> Refresh
-                      </button>
-                      <button className={btn}>
-                        <PlusCircle size={15} /> Add GPU
-                      </button>
-                      <button className={btn}>
-                        <BarChart3 size={15} /> Reports
-                      </button>
-                      <button className={`hidden lg:inline-flex ${btn}`}>
-                        <Settings2 size={15} /> Settings
-                      </button>
-                    </>
-                  );
-                })()}
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  {(() => {
+                    const btn = "inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg bg-indigo-500 text-white hover:cursor-pointer shadow hover:shadow-lg transition active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-indigo-400/50 disabled:opacity-60";
+                    return (
+                      <>
+                        <button className={btn} disabled={fetching} onClick={async () => {
+                          if (fetching) return; setFetching(true);
+                          try {
+                            const data = await fetchDashboard(customerId as string);
+                            const transformed: GPUResource[] = (data.resources || []).map((r: DashboardAPIResource) => ({
+                              id: r.id,
+                              gpu: r.gpu,
+                              memory: `${r.memory_gb} GB`,
+                              cluster: r.cluster,
+                              status: capitalizeStatus(r.status),
+                              uptime: secondsToH(r.uptime_sec),
+                              temperature: r.temperature_c,
+                              power: r.power_w,
+                              processes: r.processes,
+                            }));
+                            setResources(transformed);
+                            setSummary({
+                              total: data.summary?.total || 0,
+                              running: data.summary?.running || 0,
+                              idle: data.summary?.idle || 0,
+                              avgPower: data.summary?.avg_power || 0,
+                            });
+                            setLastUpdated(new Date());
+                          } catch (e: unknown) { const msg = e instanceof Error ? e.message : 'Refresh failed'; pushError(msg, { title: 'Dashboard' }); }
+                          finally { setFetching(false); }
+                        }}>
+                          <RefreshCw size={14} className={fetching ? 'animate-spin' : ''} /> {fetching ? 'Refreshing' : 'Refresh'}
+                        </button>
+                        <button className={btn}>
+                          <PlusCircle size={15} /> Add GPU
+                        </button>
+                        <button className={btn}>
+                          <BarChart3 size={15} /> Reports
+                        </button>
+                        <button className={`hidden lg:inline-flex ${btn}`}>
+                          <Settings2 size={15} /> Settings
+                        </button>
+                      </>
+                    );
+                  })()}
+                </div>
+                {lastUpdated && (
+                  <div className="text-[10px] sm:text-xs text-slate-700 bg-white/70 backdrop-blur px-2 py-1 rounded-md border border-slate-200 shadow-sm flex items-center gap-1">
+                    <RefreshCcw size={11} className="text-indigo-500" /> Updated {lastUpdated.toLocaleTimeString()}
+                  </div>
+                )}
               </div>
             </div>
 

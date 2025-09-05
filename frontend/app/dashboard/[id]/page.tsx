@@ -4,7 +4,7 @@
 // If you later need ID-specific data fetching, use the `params.id` below.
 import Dashboard from "../page";
 
-export default function DashboardById({ params }: { params: { id: string } }) {
+export default function DashboardById() {
   // Placeholder: you can pass the ID down or trigger a fetch using params.id.
   // console.log('Dashboard ID route param:', params.id);
   return <Dashboard />;
