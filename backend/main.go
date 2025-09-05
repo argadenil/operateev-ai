@@ -25,7 +25,7 @@ func main() {
 	// CORS configuration: allow frontend origin (env FRONTEND_ORIGIN or default http://localhost:3000)
 	allowedOrigin := os.Getenv("FRONTEND_ORIGIN")
 	if allowedOrigin == "" {
-		allowedOrigin = "http://localhost:3005"
+		allowedOrigin = "*"
 	}
 	e.Use(emw.CORSWithConfig(emw.CORSConfig{
 		AllowOrigins:     []string{allowedOrigin},
