@@ -13,4 +13,5 @@ func Register(e *echo.Echo) {
 	e.GET("/dashboard", controllers.GetDashboard)
 	e.GET("/dashboard/:customer_id", controllers.GetDashboard)
 	e.GET("/gpu-resources/:customer_id", controllers.GetGPUResources)
+	e.GET("/get-jobs/:customer_id", controllers.GetJobs)
 }
