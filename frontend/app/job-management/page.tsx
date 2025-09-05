@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import {
   useReactTable,
   getCoreRowModel,
@@ -25,165 +26,11 @@ import {
 } from "chart.js";
 import { Pie, Bar } from "react-chartjs-2";
 import StatCard from "../components/stat-card";
+import { fetchJobs, JobAPIShape, formatDuration, formatDateTime, getStatusColor, getStatusIcon } from "../../lib/job-management";
 
 ChartJS.register(CategoryScale, LinearScale, ArcElement, BarElement, Title, Tooltip, Legend);
 
-type Job = {
-  id: number;
-  name: string;
-  gpu: string;
-  owner: string;
-  status: "running" | "completed" | "failed" | "queued";
-  startTime: string;
-  duration: string;
-};
-
-const jobList: Job[] = [
-  {
-    id: 1,
-    name: "ImageNet Training",
-    gpu: "NVIDIA A100",
-    owner: "Alice",
-    status: "running",
-    startTime: "2025-08-28 09:30",
-    duration: "2h 15m",
-  },
-  {
-    id: 2,
-    name: "NLP Inference",
-    gpu: "RTX 4090",
-    owner: "Bob",
-    status: "completed",
-    startTime: "2025-08-28 08:00",
-    duration: "45m",
-  },
-  {
-    id: 3,
-    name: "GAN Training",
-    gpu: "NVIDIA V100",
-    owner: "Charlie",
-    status: "failed",
-    startTime: "2025-08-27 22:15",
-    duration: "1h 10m",
-  },
-  {
-    id: 4,
-    name: "BERT Fine-tuning",
-    gpu: "Tesla T4",
-    owner: "Alice",
-    status: "queued",
-    startTime: "—",
-    duration: "—",
-  },
-  {
-    id: 5,
-    name: "ResNet50 Training",
-    gpu: "NVIDIA A100",
-    owner: "David",
-    status: "running",
-    startTime: "2025-08-28 10:00",
-    duration: "3h 5m",
-  },
-  {
-    id: 6,
-    name: "YOLOv8 Object Detection",
-    gpu: "RTX 3090",
-    owner: "Eve",
-    status: "completed",
-    startTime: "2025-08-27 14:20",
-    duration: "1h 40m",
-  },
-  {
-    id: 7,
-    name: "StyleGAN2 Generation",
-    gpu: "NVIDIA V100",
-    owner: "Frank",
-    status: "running",
-    startTime: "2025-08-28 11:15",
-    duration: "2h 30m",
-  },
-  {
-    id: 8,
-    name: "Transformer Pretraining",
-    gpu: "Tesla T4",
-    owner: "Grace",
-    status: "queued",
-    startTime: "—",
-    duration: "—",
-  },
-  {
-    id: 9,
-    name: "BERT QA",
-    gpu: "RTX 4090",
-    owner: "Alice",
-    status: "completed",
-    startTime: "2025-08-27 18:45",
-    duration: "55m",
-  },
-  {
-    id: 10,
-    name: "DeepDream Visualization",
-    gpu: "NVIDIA A100",
-    owner: "Bob",
-    status: "failed",
-    startTime: "2025-08-26 21:10",
-    duration: "1h 5m",
-  },
-  {
-    id: 11,
-    name: "RL Policy Training",
-    gpu: "RTX 3080",
-    owner: "Charlie",
-    status: "running",
-    startTime: "2025-08-28 07:50",
-    duration: "2h 50m",
-  },
-  {
-    id: 12,
-    name: "Speech-to-Text Model",
-    gpu: "Tesla T4",
-    owner: "David",
-    status: "queued",
-    startTime: "—",
-    duration: "—",
-  },
-  {
-    id: 13,
-    name: "Autoencoder Training",
-    gpu: "RTX 3090",
-    owner: "Eve",
-    status: "completed",
-    startTime: "2025-08-27 16:30",
-    duration: "1h 20m",
-  },
-  {
-    id: 14,
-    name: "Segmentation Model",
-    gpu: "NVIDIA V100",
-    owner: "Frank",
-    status: "running",
-    startTime: "2025-08-28 09:45",
-    duration: "2h 10m",
-  },
-  {
-    id: 15,
-    name: "GPT-Style Finetune",
-    gpu: "A100",
-    owner: "Grace",
-    status: "queued",
-    startTime: "—",
-    duration: "—",
-  },
-  {
-    id: 16,
-    name: "Image Super-Resolution",
-    gpu: "RTX 4090",
-    owner: "Alice",
-    status: "completed",
-    startTime: "2025-08-27 12:15",
-    duration: "50m",
-  },
-];
+type Job = JobAPIShape;
 
 // Unified dashboard-style status badge
 const renderStatusBadge = (status: Job["status"]) => {
@@ -210,6 +57,11 @@ const renderStatusBadge = (status: Job["status"]) => {
         "bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/20 text-amber-700 border-amber-500/30 ring-1 ring-inset ring-amber-500/20",
       dot: "bg-amber-500",
     },
+    cancelled: {
+      wrap:
+        "bg-gradient-to-r from-gray-500/15 via-gray-400/10 to-gray-500/20 text-gray-700 border-gray-500/30 ring-1 ring-inset ring-gray-500/20",
+      dot: "bg-gray-500",
+    },
   };
   const { wrap, dot } = map[status];
   return (
@@ -222,14 +74,84 @@ const renderStatusBadge = (status: Job["status"]) => {
 
 
 export default function JobManagementPage() {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [selectedJob, setSelectedJob] = React.useState<Job | null>(null);
   const [statusFilter] = React.useState<"all" | Job["status"]>("all"); // setter removed (unused)
+  const [customerId, setCustomerId] = React.useState<string | null | undefined>(undefined);
+  const [jobs, setJobs] = React.useState<Job[]>([]);
+  const [summary, setSummary] = React.useState({
+    total: 0,
+    queued: 0,
+    running: 0,
+    completed: 0,
+    failed: 0,
+    cancelled: 0,
+  });
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Customer ID handling (same pattern as dashboard)
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return; // client-only logic
+    const match = window.location.pathname.match(/^\/job-management\/([^\/]+)$/);
+    if (match) {
+      setCustomerId(match[1]);
+      return;
+    }
+    // No ID in path -> try localStorage
+    try {
+      const storedId = localStorage.getItem('customer_id');
+      if (storedId) {
+        // Redirect to canonical /job-management/{customer_id}
+        router.replace(`/job-management/${storedId}`);
+        // Keep customerId as undefined so we show loader until navigation completes
+        return;
+      }
+    } catch { /* ignore */ }
+    // Nothing found -> mark explicitly missing
+    setCustomerId(null);
+  }, [router]);
+
+  // Load jobs data
+  React.useEffect(() => {
+    if (!customerId) return;
+    
+    const controller = new AbortController();
+    setLoading(true);
+    
+    fetchJobs(customerId, controller.signal)
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setJobs(data.jobs || []);
+          setSummary(data.summary || {
+            total: 0,
+            queued: 0,
+            running: 0,
+            completed: 0,
+            failed: 0,
+            cancelled: 0,
+          });
+          setError(null);
+        }
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          setError('Failed to load jobs');
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [customerId]);
 
   const filteredData =
-    statusFilter === "all" ? jobList : jobList.filter((job) => job.status === statusFilter);
+    statusFilter === "all" ? jobs : jobs.filter((job) => job.status === statusFilter);
 
   const columns: ColumnDef<Job>[] = [
     { accessorKey: "name", header: "Job Name" },
@@ -243,8 +165,16 @@ export default function JobManagementPage() {
   return renderStatusBadge(status);
       },
     },
-    { accessorKey: "startTime", header: "Start Time" },
-    { accessorKey: "duration", header: "Duration" },
+    { 
+      accessorKey: "start_time", 
+      header: "Start Time",
+      cell: ({ getValue }) => formatDateTime(getValue() as string)
+    },
+    { 
+      accessorKey: "duration", 
+      header: "Duration",
+      cell: ({ getValue }) => formatDuration(getValue() as string)
+    },
     {
       id: "actions",
       header: "Actions",
@@ -271,19 +201,33 @@ export default function JobManagementPage() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  // Stats
-  const total = jobList.length;
-  const running = jobList.filter((j) => j.status === "running").length;
-  const completed = jobList.filter((j) => j.status === "completed").length;
-  const failed = jobList.filter((j) => j.status === "failed").length;
-  const queued = jobList.filter((j) => j.status === "queued").length;
+  // Early returns for loading/error states
+  if (loading) return <Loader />;
+  
+  if (customerId === null) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Job Management</h1>
+        <p className="text-gray-600 text-sm max-w-md">Please access job management via /job-management/&lt;customer_id&gt;. Example: /job-management/111111</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Error Loading Jobs</h1>
+        <p className="text-red-600 text-sm">{error}</p>
+      </div>
+    );
+  }
 
   const pieData = {
-    labels: ["Running", "Completed", "Failed", "Queued"],
+    labels: ["Running", "Completed", "Failed", "Queued", "Cancelled"],
     datasets: [
       {
-        data: [running, completed, failed, queued],
-        backgroundColor: ["#22c55e", "#3b82f6", "#ef4444", "#eab308"],
+        data: [summary.running, summary.completed, summary.failed, summary.queued, summary.cancelled],
+        backgroundColor: ["#22c55e", "#3b82f6", "#ef4444", "#eab308", "#6b7280"],
       },
     ],
   };
@@ -319,11 +263,6 @@ export default function JobManagementPage() {
     },
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
-
   if (loading) return <Loader />;
 
   return (
@@ -334,11 +273,11 @@ export default function JobManagementPage() {
         {/* KPI Cards (Enhanced like Dashboard Stats) */}
         <section>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
-            <StatCard title="Total Jobs" value={total} icon={BarChart3} palette="violet" size="sm" uppercaseTitle />
-            <StatCard title="Running" value={running} icon={PlayCircle} palette="emerald" size="sm" uppercaseTitle />
-            <StatCard title="Completed" value={completed} icon={CheckCircle} palette="blue" size="sm" uppercaseTitle />
-            <StatCard title="Failed" value={failed} icon={XCircle} palette="red" size="sm" uppercaseTitle />
-            <StatCard title="Queued" value={queued} icon={Clock} palette="yellow" size="sm" uppercaseTitle />
+            <StatCard title="Total Jobs" value={summary.total} icon={BarChart3} palette="violet" size="sm" uppercaseTitle />
+            <StatCard title="Running" value={summary.running} icon={PlayCircle} palette="emerald" size="sm" uppercaseTitle />
+            <StatCard title="Completed" value={summary.completed} icon={CheckCircle} palette="blue" size="sm" uppercaseTitle />
+            <StatCard title="Failed" value={summary.failed} icon={XCircle} palette="red" size="sm" uppercaseTitle />
+            <StatCard title="Queued" value={summary.queued} icon={Clock} palette="yellow" size="sm" uppercaseTitle />
             <StatCard title="Avg. Duration" value="1h 23m" icon={Timer} palette="indigo" size="sm" uppercaseTitle />
           </div>
         </section>
@@ -361,10 +300,10 @@ export default function JobManagementPage() {
                   <Pie data={pieData} options={commonChartOptions} />
                 </div>
                 <div className="mt-2 grid grid-cols-4 gap-1 text-[10px] text-gray-600">
-                  <div className="flex flex-col items-center p-1 rounded bg-emerald-500/5"><span className="font-semibold text-emerald-600">{running}</span><span>Run</span></div>
-                  <div className="flex flex-col items-center p-1 rounded bg-blue-500/5"><span className="font-semibold text-blue-600">{completed}</span><span>Done</span></div>
-                  <div className="flex flex-col items-center p-1 rounded bg-rose-500/5"><span className="font-semibold text-rose-600">{failed}</span><span>Fail</span></div>
-                  <div className="flex flex-col items-center p-1 rounded bg-amber-500/5"><span className="font-semibold text-amber-600">{queued}</span><span>Queue</span></div>
+                  <div className="flex flex-col items-center p-1 rounded bg-emerald-500/5"><span className="font-semibold text-emerald-600">{summary.running}</span><span>Run</span></div>
+                  <div className="flex flex-col items-center p-1 rounded bg-blue-500/5"><span className="font-semibold text-blue-600">{summary.completed}</span><span>Done</span></div>
+                  <div className="flex flex-col items-center p-1 rounded bg-rose-500/5"><span className="font-semibold text-rose-600">{summary.failed}</span><span>Fail</span></div>
+                  <div className="flex flex-col items-center p-1 rounded bg-amber-500/5"><span className="font-semibold text-amber-600">{summary.queued}</span><span>Queue</span></div>
                 </div>
               </div>
             </div>
@@ -380,12 +319,12 @@ export default function JobManagementPage() {
                 <div className="flex-1">
                   <Bar
                     data={{
-                      labels: [...new Set(jobList.map((j) => j.owner))],
+                      labels: [...new Set(jobs.map((j) => j.owner))],
                       datasets: [
                         {
                           label: "Jobs",
-                          data: [...new Set(jobList.map((j) => j.owner))].map(
-                            (o) => jobList.filter((j) => j.owner === o).length
+                          data: [...new Set(jobs.map((j) => j.owner))].map(
+                            (o) => jobs.filter((j) => j.owner === o).length
                           ),
                           backgroundColor: "#6366f1",
                           borderRadius: 6,
@@ -396,7 +335,7 @@ export default function JobManagementPage() {
                   />
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1 text-[10px] text-indigo-600">
-                  {[...new Set(jobList.map(j=>j.owner))].map(o => (
+                  {[...new Set(jobs.map(j=>j.owner))].map(o => (
                     <span key={o} className="px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">{o}</span>
                   ))}
                 </div>
@@ -414,12 +353,12 @@ export default function JobManagementPage() {
                 <div className="flex-1">
                   <Bar
                     data={{
-                      labels: [...new Set(jobList.map((j) => j.gpu))],
+                      labels: [...new Set(jobs.map((j) => j.gpu))],
                       datasets: [
                         {
                           label: "Usage",
-                          data: [...new Set(jobList.map((j) => j.gpu))].map(
-                            (g) => jobList.filter((j) => j.gpu === g).length
+                          data: [...new Set(jobs.map((j) => j.gpu))].map(
+                            (g) => jobs.filter((j) => j.gpu === g).length
                           ),
                           backgroundColor: "#22c55e",
                           borderRadius: 6,
@@ -430,7 +369,7 @@ export default function JobManagementPage() {
                   />
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1 text-[10px] text-emerald-600">
-                  {[...new Set(jobList.map(j=>j.gpu))].map(g => (
+                  {[...new Set(jobs.map(j=>j.gpu))].map(g => (
                     <span key={g} className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">{g}</span>
                   ))}
                 </div>
@@ -521,9 +460,8 @@ export default function JobManagementPage() {
                         <div className="text-xs text-gray-600">{row.original.gpu} • {row.original.owner}</div>
                       </div>
                       <div className="flex items-center justify-between text-xs text-gray-600">
-                        <span className="font-medium">{row.original.status}</span>
-                        {/* Could wrap with badge if desired in mobile summary line */}
-                        <span>{row.original.duration}</span>
+                        <div>{renderStatusBadge(row.original.status)}</div>
+                        <span>{formatDuration(row.original.duration)}</span>
                       </div>
                       <button
                         onClick={() => setSelectedJob(row.original)}
@@ -670,10 +608,16 @@ export default function JobManagementPage() {
                 <li><span className="font-semibold">Job Name:</span> {selectedJob.name}</li>
                 <li><span className="font-semibold">Owner:</span> {selectedJob.owner}</li>
                 <li><span className="font-semibold">GPU:</span> {selectedJob.gpu}</li>
-                <li><span className="font-semibold">Status:</span> {selectedJob.status}</li>
-                {/* Badge version: <li><span className=\"font-semibold\">Status:</span> <span className=\"ml-2\">{renderStatusBadge(selectedJob.status)}</span></li> */}
-                <li><span className="font-semibold">Start Time:</span> {selectedJob.startTime}</li>
-                <li><span className="font-semibold">Duration:</span> {selectedJob.duration}</li>
+                <li><span className="font-semibold">Status:</span> {renderStatusBadge(selectedJob.status)}</li>
+                <li><span className="font-semibold">Start Time:</span> {formatDateTime(selectedJob.start_time)}</li>
+                <li><span className="font-semibold">Duration:</span> {formatDuration(selectedJob.duration)}</li>
+                <li><span className="font-semibold">Priority:</span> {selectedJob.priority}</li>
+                <li><span className="font-semibold">CPU Cores:</span> {selectedJob.cpu_cores}</li>
+                <li><span className="font-semibold">Memory:</span> {selectedJob.memory_gb} GB</li>
+                <li><span className="font-semibold">GPU Memory:</span> {selectedJob.gpu_memory_gb} GB</li>
+                {selectedJob.description && (
+                  <li className="col-span-1 sm:col-span-2"><span className="font-semibold">Description:</span> {selectedJob.description}</li>
+                )}
               </ul>
               <div className="mt-6 flex gap-4">
                 {selectedJob.status === "running" && (
