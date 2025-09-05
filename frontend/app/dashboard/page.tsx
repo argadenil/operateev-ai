@@ -167,10 +167,25 @@ const Dashboard = React.memo(() => {
 
   // Derive customer id strictly from URL (/dashboard/:id). Base /dashboard should not auto-use stored id.
   useEffect(() => {
-    if (typeof window === 'undefined') return; // wait for client
+    if (typeof window === 'undefined') return; // client-only logic
     const match = window.location.pathname.match(/^\/dashboard\/([^\/]+)$/);
-    setCustomerId(match ? match[1] : null);
-  }, []);
+    if (match) {
+      setCustomerId(match[1]);
+      return;
+    }
+    // No ID in path -> try localStorage
+    try {
+      const storedId = localStorage.getItem('customer_id');
+      if (storedId) {
+        // Redirect to canonical /dashboard/{customer_id}
+        router.replace(`/dashboard/${storedId}`);
+        // Keep customerId as undefined so we show loader until navigation completes
+        return;
+      }
+    } catch { /* ignore */ }
+    // Nothing found -> mark explicitly missing
+    setCustomerId(null);
+  }, [router]);
   const loadDashboard = React.useCallback((cid: string, signal: AbortSignal) => {
     return fetchDashboard(cid, signal)
       .then((data) => {
