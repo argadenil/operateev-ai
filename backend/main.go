@@ -11,8 +11,11 @@ import (
 )
 
 func main() {
+	print("Starting application...")
 	if err := db.InitializeDB(); err != nil {
 		log.Fatal("failed to initialize database: ", err)
+	} else {
+		log.Println("Database initialized successfully")
 	}
 	defer db.Conn.Close()
 
