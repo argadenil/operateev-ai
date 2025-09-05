@@ -68,6 +68,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         { name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" },
         { name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" },
         { name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" },
+        { name: "Profile", icon: "👤", href: customerId ? `/profile/${customerId}` : "/profile" },
         { name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" },
     ], [customerId]);
 
@@ -88,6 +89,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         if (pathname.startsWith("/dashboard")) return "Dashboard";
         if (pathname.startsWith("/gpu-resources")) return "GPU Resources";
         if (pathname.startsWith("/job-management")) return "Job Management";
+        if (pathname.startsWith("/profile")) return "Profile";
         if (pathname.startsWith("/settings")) return "Settings";
         
         // Fallback for exact matches or unknown routes

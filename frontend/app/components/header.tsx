@@ -26,13 +26,16 @@ export default function Header({
   const menuItemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [displayName, setDisplayName] = useState<string>("User");
+  const [customerId, setCustomerId] = useState<string | null>(null);
 
-  // Load username from localStorage (set during login)
+  // Load username and customer_id from localStorage (set during login)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
       const name = localStorage.getItem('username');
       if (name && name.trim()) setDisplayName(name);
+      const cid = localStorage.getItem('customer_id');
+      if (cid) setCustomerId(cid);
     } catch { }
   }, []);
 
@@ -79,8 +82,8 @@ export default function Header({
   }
 
   const menuItems = [
-    { label: "Profile", onClick: () => router.push('/settings') },
-    { label: "Settings", onClick: () => router.push('/settings') },
+    { label: "Profile", onClick: () => router.push(customerId ? `/profile/${customerId}` : '/profile') },
+    { label: "Settings", onClick: () => router.push(customerId ? `/settings/${customerId}` : '/settings') },
     { label: "Logout", onClick: handleLogout },
   ];
 
