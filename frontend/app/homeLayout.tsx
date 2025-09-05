@@ -90,7 +90,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         if (!pathname) return "PAGE";
         if (pathname.startsWith("/dashboard")) return "Dashboard"; // handle /dashboard/:id
         return routeMap[pathname] || "PAGE";
-    }, [pathname]);
+    }, [pathname, routeMap]);
 
     // Routes that should NOT use the application shell (no sidebar/chat/system status)
     const lightweightRoutes = ["/login", "/register"];

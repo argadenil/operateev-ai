@@ -12,7 +12,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { X, Copy, RefreshCcw, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, CheckCircle, Lock, PowerOff, BarChart3, Server, Activity, Thermometer, Zap } from "lucide-react";
+import { X, Copy, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, CheckCircle, BarChart3, Server, Activity } from "lucide-react";
 import StatCard from "../components/stat-card";
 
 type GPU = {
@@ -85,17 +85,7 @@ export default function GPUResourcesPage() {
     return m ? parseInt(m[1], 10) : 0;
   };
 
-  const simulateMetrics = () => {
-    setGpuData(prev => prev.map(g => {
-      if (g.status === "offline") return { ...g, utilization: 0, temperature: 0, power: 0, memoryUsedGB: 0 };
-      const total = parseTotalMemory(g);
-      const nextUtil = Math.max(0, Math.min(100, Math.round(g.utilization + (Math.random() * 20 - 10))));
-      const nextTemp = Math.max(30, Math.min(85, Math.round(g.temperature + (Math.random() * 6 - 3))));
-      const nextPower = Math.max(50, Math.min(350, Math.round(g.power + (Math.random() * 40 - 20))));
-      const nextMemUsed = Math.max(0, Math.min(total, Math.round(g.memoryUsedGB + (Math.random() * 6 - 3))));
-      return { ...g, utilization: nextUtil, temperature: nextTemp, power: nextPower, memoryUsedGB: nextMemUsed };
-    }));
-  };
+  // const simulateMetrics = () => { /* removed unused simulation to satisfy lint */ };
 
   const utilizationColor = (u: number) => {
     if (u >= 85) return "bg-emerald-500";
@@ -224,8 +214,8 @@ export default function GPUResourcesPage() {
     return sum + (m ? parseInt(m[1], 10) : 0);
   }, 0);
   const avgUtil = totalGPUs ? Math.round(gpuData.reduce((a, g) => a + g.utilization, 0) / totalGPUs) : 0;
-  const avgTemp = totalGPUs ? Math.round(gpuData.reduce((a, g) => a + g.temperature, 0) / totalGPUs) : 0;
-  const totalPower = gpuData.reduce((a, g) => a + g.power, 0);
+  // const avgTemp = totalGPUs ? Math.round(gpuData.reduce((a, g) => a + g.temperature, 0) / totalGPUs) : 0;
+  // const totalPower = gpuData.reduce((a, g) => a + g.power, 0);
   const clusters = Array.from(new Set(gpuData.map(g => g.cluster)));
 
   const exportCSV = () => {
@@ -265,14 +255,14 @@ export default function GPUResourcesPage() {
         <StatCard
           title="Allocated"
           value={gpuSummary.allocated}
-          icon={Lock}
+          icon={CheckCircle}
           palette="blue"
           size="sm"
         />
         <StatCard
           title="Offline"
           value={gpuSummary.offline}
-          icon={PowerOff}
+          icon={Activity}
           palette="red"
           size="sm"
         />

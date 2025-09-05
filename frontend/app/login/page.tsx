@@ -8,7 +8,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Loader from "../components/loader";
 import { useToast } from "../components/toaster";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:1324";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://operateev-ai-backend.onrender.com";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -73,8 +73,8 @@ export default function LoginPage() {
       localStorage.setItem("username", data.username);
       success(`Welcome ${data.username}`, { title: "Login successful" });
       router.push("/dashboard/" + data.customer_id);
-    } catch (e: any) {
-      const msg = e?.message || "Network error";
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Network error";
       setError(msg);
       pushError(msg, { title: "Login error" });
     } finally {
