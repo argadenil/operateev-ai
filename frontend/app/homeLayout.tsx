@@ -42,6 +42,7 @@ NavItem.displayName = 'NavItem';
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [slideOverOpen, setSlideOverOpen] = useState(false);
+    const [displayName, setDisplayName] = useState<string>("User");
 
     const pathname = usePathname(); // current route
     const router = useRouter();
@@ -57,6 +58,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         try {
             const cid = localStorage.getItem('customer_id');
             if (cid) setCustomerId(cid);
+            const name = localStorage.getItem('username');
+            if (name && name.trim()) setDisplayName(name);
         } catch { }
     }, []);
 
@@ -243,7 +246,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                         <div className="flex items-center space-x-3">
                             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                             <span className="font-semibold text-gray-800 text-base md:text-lg">
-                                👋 Welcome Nilesh
+                                👋 Welcome {displayName}
                             </span>
                         </div>
                         <button

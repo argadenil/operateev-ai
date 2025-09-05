@@ -25,6 +25,18 @@ export default function Header({
   const profileButtonRef = useRef<HTMLDivElement>(null);
   const menuItemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [displayName, setDisplayName] = useState<string>("User");
+
+  // Load username from localStorage (set during login)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const name = localStorage.getItem('username');
+      if (name && name.trim()) setDisplayName(name);
+    } catch { }
+  }, []);
+
+  const initial = displayName.charAt(0).toUpperCase();
 
   // Check if device is mobile
   useEffect(() => {
@@ -211,7 +223,7 @@ export default function Header({
                 }
               }}
             >
-              <span className={isMobile ? 'text-sm' : 'text-lg'} aria-hidden="true">N</span>
+              <span className={isMobile ? 'text-sm' : 'text-xl'} aria-hidden="true">{initial}</span>
             </div>
 
             {dropdownOpen && (
@@ -235,7 +247,7 @@ export default function Header({
                       N
                     </div>
                     <div>
-                    <div className={`font-semibold text-gray-900 ${isMobile ? 'text-xs' : 'text-sm'}`}>Nilesh</div>
+                    <div className={`font-semibold text-gray-900 ${isMobile ? 'text-xs' : 'text-sm'}`}>{displayName}</div>
                     <div className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-xs'}`}>Administrator</div>
                     </div>
                   </div>
