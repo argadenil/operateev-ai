@@ -149,3 +149,53 @@ func GetDashboard(c echo.Context) error {
 		Summary:   summary,   // will be all zeros
 	})
 }
+func GetGPUResources(c echo.Context) error {
+	customerID := c.Param("customer_id")
+	if customerID == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "customer_id is required"})
+	}
+
+	rows, err := db.Conn.Query(`
+		SELECT id, customer_id, model, memory_gb, COALESCE(memory_used_gb,0), cluster, status, utilization, temperature_c, power_w, uptime_sec
+		FROM "usersSchema"."gpu_resources"
+		WHERE customer_id = $1
+		ORDER BY id ASC
+	`, customerID)
+	if err != nil {
+		return c.JSON(http.StatusOK, models.GPUResourcesResponse{GPUs: []models.GPUResource{}, Summary: models.GPUResourcesSummary{}})
+	}
+	defer rows.Close()
+
+	gpus := []models.GPUResource{}
+	var totalUtil, allocatedCount int
+
+	for rows.Next() {
+		var r models.GPUResource
+		if scanErr := rows.Scan(&r.ID, &r.CustomerID, &r.Model, &r.MemoryGB, &r.MemoryUsed, &r.Cluster, &r.Status, &r.Utilization, &r.Temperature, &r.PowerW, &r.UptimeSec); scanErr != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "scan failed"})
+		}
+		gpus = append(gpus, r)
+		totalUtil += r.Utilization
+		if r.Status == "allocated" {
+			allocatedCount++
+		}
+	}
+
+	summary := models.GPUResourcesSummary{Total: len(gpus)}
+	for _, g := range gpus {
+		switch strings.ToLower(g.Status) {
+		case "available":
+			summary.Available++
+		case "allocated":
+			summary.Allocated++
+		case "offline":
+			summary.Offline++
+		}
+	}
+	if summary.Total > 0 {
+		summary.AvgUtilization = totalUtil / summary.Total
+		summary.AllocationRate = int(float64(summary.Allocated) / float64(summary.Total) * 100.0)
+	}
+
+	return c.JSON(http.StatusOK, models.GPUResourcesResponse{GPUs: gpus, Summary: summary})
+}

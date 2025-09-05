@@ -49,3 +49,36 @@ type DashboardResponse struct {
 	Resources []DashboardResource `json:"resources"`
 	Summary   DashboardSummary    `json:"summary"`
 }
+
+// GPUResource represents a single GPU inventory / runtime metric row.
+// Keeping fields aligned with a potential dedicated gpu_resources table.
+type GPUResource struct {
+	ID          int    `json:"id"`
+	CustomerID  string `json:"customer_id"`
+	Model       string `json:"model"`
+	MemoryGB    int    `json:"memory_gb"`
+	MemoryUsed  int    `json:"memory_used_gb"`
+	Cluster     string `json:"cluster"`
+	Status      string `json:"status"` // available | allocated | offline
+	Utilization int    `json:"utilization"`
+	Temperature int    `json:"temperature_c"`
+	PowerW      int    `json:"power_w"`
+	UptimeSec   int    `json:"uptime_sec"`
+}
+
+// GPUResourcesSummary aggregates counts / averages for a list of GPU resources.
+type GPUResourcesSummary struct {
+	Total          int `json:"total"`
+	Available      int `json:"available"`
+	Allocated      int `json:"allocated"`
+	Offline        int `json:"offline"`
+	AvgUtilization int `json:"avg_utilization"`
+	AllocationRate int `json:"allocation_rate"` // percentage 0-100
+}
+
+// GPUResourcesResponse shape returned by /gpu-resources/:customer_id endpoint.
+type GPUResourcesResponse struct {
+	GPUs    []GPUResource       `json:"gpus"`
+	Summary GPUResourcesSummary `json:"summary"`
+	Error   string              `json:"error,omitempty"`
+}
