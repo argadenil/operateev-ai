@@ -81,19 +81,18 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         setSidebarOpen(false);
     }, []);
 
-    // Map of routes to names for dynamic page title
-    const routeMap: Record<string, string> = {
-        "/dashboard": "Dashboard",
-        "/gpu-resources": "GPU Resources",
-        "/job-management": "Job Management",
-        "/settings": "Settings",
-    };
-
     const pageTitle = useMemo(() => {
         if (!pathname) return "PAGE";
-        if (pathname.startsWith("/dashboard")) return "Dashboard"; // handle /dashboard/:id
-        return routeMap[pathname] || "PAGE";
-    }, [pathname, routeMap]);
+        
+        // Handle dynamic routes with IDs
+        if (pathname.startsWith("/dashboard")) return "Dashboard";
+        if (pathname.startsWith("/gpu-resources")) return "GPU Resources";
+        if (pathname.startsWith("/job-management")) return "Job Management";
+        if (pathname.startsWith("/settings")) return "Settings";
+        
+        // Fallback for exact matches or unknown routes
+        return "PAGE";
+    }, [pathname]);
 
     // Routes that should NOT use the application shell (no sidebar/chat/system status)
     const lightweightRoutes = ["/login", "/register"];
