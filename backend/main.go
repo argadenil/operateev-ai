@@ -35,6 +35,12 @@ func main() {
 	// Register routes
 	routes.Register(e)
 
-	// Start server
-	e.Logger.Fatal(e.Start(":1324"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	// Listen on the correct port
+	log.Printf("Starting server on port %s...", port)
+	e.Logger.Fatal(e.Start(":" + port))
 }
