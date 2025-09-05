@@ -171,25 +171,9 @@ const Dashboard = React.memo(() => {
     const match = window.location.pathname.match(/^\/dashboard\/([^\/]+)$/);
     setCustomerId(match ? match[1] : null);
   }, []);
-  useEffect(() => {
-    // Wait until we've parsed (customerId !== undefined)
-    if (customerId === undefined) return;
-    // Missing after parsing
-    if (customerId === null) {
-      if (!missingIdNotified.current) {
-        pushError('customer_id is required', { title: 'Dashboard' });
-        missingIdNotified.current = true;
-      }
-      setResources([]);
-      setSummary({ total: 0, running: 0, idle: 0, avgPower: 0 });
-      setLoading(false);
-      return;
-    }
-    const abort = new AbortController();
-    async function load() {
-      setFetching(true);
-      try {
-        const data = await fetchDashboard(customerId as string, abort.signal);
+  const loadDashboard = React.useCallback((cid: string, signal: AbortSignal) => {
+    return fetchDashboard(cid, signal)
+      .then((data) => {
         if (data.error) {
           pushError(data.error, { title: 'Dashboard' });
         }
@@ -205,26 +189,45 @@ const Dashboard = React.memo(() => {
           processes: r.processes,
         }));
         setResources(transformed);
-  setSummary({
+        setSummary({
           total: data.summary?.total || 0,
           running: data.summary?.running || 0,
           idle: data.summary?.idle || 0,
           avgPower: data.summary?.avg_power || 0,
         });
-  setLastUpdated(new Date());
-      } catch (e: unknown) {
-        if (!abort.signal.aborted) {
+        setLastUpdated(new Date());
+      })
+      .catch((e: unknown) => {
+        if (!signal.aborted) {
           const msg = e instanceof Error ? e.message : 'Network error';
           pushError(msg, { title: 'Dashboard fetch' });
         }
-      } finally {
-        if (!abort.signal.aborted) setFetching(false);
-        if (!abort.signal.aborted) setLoading(false);
+      });
+  }, [pushError]);
+
+  useEffect(() => {
+    if (customerId === undefined) return; // waiting for parse
+    if (customerId === null) {
+      if (!missingIdNotified.current) {
+        pushError('customer_id is required', { title: 'Dashboard' });
+        missingIdNotified.current = true;
       }
+      setResources([]);
+      setSummary({ total: 0, running: 0, idle: 0, avgPower: 0 });
+      setLoading(false);
+      return;
     }
-    load();
+    const abort = new AbortController();
+    setFetching(true);
+    loadDashboard(customerId, abort.signal)
+      .finally(() => {
+        if (!abort.signal.aborted) {
+          setFetching(false);
+          setLoading(false);
+        }
+      });
     return () => abort.abort();
-  }, [customerId, pushError]);
+  }, [customerId, loadDashboard]);
 
   // Memoize chart data
   const lineChartData = useMemo(() => createLineChartData(), []);
