@@ -14,11 +14,13 @@ import {
 import Loader from "../components/loader";
 import { X, Copy, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, CheckCircle, BarChart3, Server, Activity } from "lucide-react";
 import StatCard from "../components/stat-card";
+import { fetchGPUResources, formatMemory, secondsToPretty, GPUResourceAPIShape, GPUResourcesResponseAPIShape } from "@/lib/gpu-resources";
+import { getToken } from "@/lib/auth";
 
 type GPU = {
   id: number;
   model: string;
-  memory: string; // total memory string
+  memory: string; // formatted memory string for display
   memoryUsedGB: number;
   cluster: string;
   status: "available" | "allocated" | "offline";
@@ -28,18 +30,8 @@ type GPU = {
   uptime: string;
 };
 
-const initialGPUList: GPU[] = [
-  { id: 1, model: "NVIDIA A100", memory: "80 GB", memoryUsedGB: 42, cluster: "Cluster-A", status: "available", utilization: 55, temperature: 62, power: 245, uptime: "120h" },
-  { id: 2, model: "NVIDIA V100", memory: "32 GB", memoryUsedGB: 29, cluster: "Cluster-B", status: "allocated", utilization: 91, temperature: 78, power: 280, uptime: "340h" },
-  { id: 3, model: "RTX 4090", memory: "24 GB", memoryUsedGB: 0, cluster: "Cluster-C", status: "offline", utilization: 0, temperature: 0, power: 0, uptime: "0h" },
-  { id: 4, model: "Tesla T4", memory: "16 GB", memoryUsedGB: 11, cluster: "Cluster-A", status: "allocated", utilization: 68, temperature: 70, power: 140, uptime: "56h" },
-  { id: 5, model: "NVIDIA A100", memory: "80 GB", memoryUsedGB: 75, cluster: "Cluster-D", status: "allocated", utilization: 95, temperature: 74, power: 310, uptime: "512h" },
-  { id: 6, model: "RTX 6000 Ada", memory: "48 GB", memoryUsedGB: 6, cluster: "Cluster-B", status: "available", utilization: 18, temperature: 54, power: 90, uptime: "12h" },
-  { id: 7, model: "A40", memory: "48 GB", memoryUsedGB: 43, cluster: "Cluster-C", status: "allocated", utilization: 76, temperature: 69, power: 230, uptime: "210h" },
-  { id: 8, model: "H100", memory: "94 GB", memoryUsedGB: 12, cluster: "Cluster-E", status: "available", utilization: 22, temperature: 51, power: 180, uptime: "33h" },
-  { id: 9, model: "A10", memory: "24 GB", memoryUsedGB: 19, cluster: "Cluster-B", status: "allocated", utilization: 84, temperature: 72, power: 200, uptime: "400h" },
-  { id: 10, model: "NVIDIA V100", memory: "32 GB", memoryUsedGB: 7, cluster: "Cluster-A", status: "available", utilization: 15, temperature: 49, power: 120, uptime: "8h" },
-];
+// Initial empty state - will be populated from API
+const initialGPUList: GPU[] = [];
 
 // Reusable badge styled similarly to dashboard statuses
 const renderStatusBadge = (status: GPU["status"]) => {
@@ -79,6 +71,92 @@ export default function GPUResourcesPage() {
   const [loading, setLoading] = React.useState(true);
   const [selectedGPU, setSelectedGPU] = React.useState<GPU | null>(null);
   const [gpuData, setGpuData] = React.useState<GPU[]>(initialGPUList);
+  const [customerId, setCustomerId] = React.useState<string | null | undefined>(undefined);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Parse customer id from URL path or localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return; // client only
+    const match = window.location.pathname.match(/^\/gpu-resources\/([^\/]+)$/);
+    if (match) {
+      setCustomerId(match[1]);
+      return;
+    }
+    
+    // No ID in path -> try localStorage
+    try {
+      const storedId = localStorage.getItem('customer_id');
+      if (storedId) {
+        // Redirect to canonical /gpu-resources/{customer_id}
+        window.history.replaceState(null, '', `/gpu-resources/${storedId}`);
+        setCustomerId(storedId);
+        return;
+      }
+    } catch { /* ignore */ }
+    
+    setCustomerId(null); // explicitly missing
+  }, []);
+
+  // Transform API response to component format
+  const transformGPUData = (apiGpu: GPUResourceAPIShape): GPU => ({
+    id: apiGpu.id,
+    model: apiGpu.model,
+    memory: formatMemory(apiGpu.memory_gb, apiGpu.memory_used_gb),
+    memoryUsedGB: apiGpu.memory_used_gb,
+    cluster: apiGpu.cluster,
+    status: (apiGpu.status === 'available' || apiGpu.status === 'allocated' || apiGpu.status === 'offline') 
+      ? apiGpu.status : 'offline',
+    utilization: apiGpu.utilization,
+    temperature: apiGpu.temperature_c,
+    power: apiGpu.power_w,
+    uptime: secondsToPretty(apiGpu.uptime_sec),
+  });
+
+  // Fetch GPU data from API
+  useEffect(() => {
+    if (customerId === undefined) return; // waiting for parse
+    if (customerId === null) {
+      setError('customer_id is required');
+      setLoading(false);
+      return;
+    }
+
+    const token = getToken();
+    if (!token) {
+      setError('Not authenticated');
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    fetchGPUResources(customerId)
+      .then(response => {
+        if (cancelled) return;
+        
+        if (response.error) {
+          setError(response.error);
+          setLoading(false);
+          return;
+        }
+
+        const transformedData = response.gpus.map(transformGPUData);
+        setGpuData(transformedData);
+        setLoading(false);
+      })
+      .catch(err => {
+        if (cancelled) return;
+        console.error("Error fetching GPU resources:", err);
+        setError(err.message || 'Failed to load GPU resources');
+        setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [customerId]);
 
   const parseTotalMemory = (gpu: GPU) => {
     const m = gpu.memory.match(/(\d+)\s*GB/i);
@@ -196,11 +274,6 @@ export default function GPUResourcesPage() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
-
   const gpuSummary = {
     available: gpuData.filter((g) => g.status === "available").length,
     allocated: gpuData.filter((g) => g.status === "allocated").length,
@@ -231,7 +304,37 @@ export default function GPUResourcesPage() {
     URL.revokeObjectURL(url);
   };
 
-  if (loading) return <Loader />;
+  if (loading || customerId === undefined) return <Loader />;
+
+  // If no customer id was provided in the path, show a friendly empty state.
+  if (customerId === null) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md">
+          <h2 className="text-2xl font-semibold text-gray-800">Customer ID Required</h2>
+          <p className="text-gray-600 text-sm max-w-md">Please access the GPU resources via /gpu-resources/&lt;customer_id&gt;. Example: /gpu-resources/111111</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If there's an error, show error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md">
+          <h2 className="text-2xl font-semibold text-red-600">Error Loading GPU Resources</h2>
+          <p className="text-gray-600 text-sm">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col space-y-6 min-h-[70vh]">

@@ -4,7 +4,7 @@
 
 import { authFetch } from './auth';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://operateev-ai-backend.onrender.com';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:10000';
 
 // Raw shapes from backend
 export interface DashboardAPIResource {
