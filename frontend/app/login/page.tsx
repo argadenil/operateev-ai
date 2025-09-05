@@ -8,7 +8,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Loader from "../components/loader";
 import { useToast } from "../components/toaster";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://operateev-ai-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:10000";
 
 export default function LoginPage() {
   const router = useRouter();

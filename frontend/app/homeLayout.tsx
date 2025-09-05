@@ -66,9 +66,9 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     // Memoized navigation items (dashboard link adapts to presence of id)
     const navigationItems: NavItemType[] = useMemo(() => [
         { name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" },
-        { name: "GPU Resources", icon: "📁", href: "/gpu-resources" },
-        { name: "Job Management", icon: "📊", href: "/job-management" },
-        { name: "Settings", icon: "⚙️", href: "/settings" },
+        { name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" },
+        { name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" },
+        { name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" },
     ], [customerId]);
 
     // Preload (prefetch) target routes once on mount for snappier nav
