@@ -13,7 +13,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, BarChart3, RefreshCw, Activity, Settings2, Server, RefreshCcw } from "lucide-react";
+import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, BarChart3, RefreshCw, Activity, Settings2, Server } from "lucide-react";
 import StatCard from "../components/stat-card";
 
 // Chart.js - Register once
@@ -160,7 +160,7 @@ const Dashboard = React.memo(() => {
   const [resources, setResources] = React.useState<GPUResource[]>([]); // added
   const [summary, setSummary] = React.useState({ total: 0, running: 0, idle: 0, avgPower: 0 }); // added
   const [fetching, setFetching] = React.useState(false);
-  const [lastUpdated, setLastUpdated] = React.useState<Date | null>(null);
+  // removed lastUpdated timestamp functionality
   // customerId: undefined = pending (not yet parsed), null = explicitly missing (base /dashboard), string = present
   const [customerId, setCustomerId] = React.useState<string | null | undefined>(undefined);
   const missingIdNotified = React.useRef(false);
@@ -195,7 +195,7 @@ const Dashboard = React.memo(() => {
           idle: data.summary?.idle || 0,
           avgPower: data.summary?.avg_power || 0,
         });
-        setLastUpdated(new Date());
+  // lastUpdated removed
       })
       .catch((e: unknown) => {
         if (!signal.aborted) {
@@ -385,7 +385,7 @@ const Dashboard = React.memo(() => {
                               idle: data.summary?.idle || 0,
                               avgPower: data.summary?.avg_power || 0,
                             });
-                            setLastUpdated(new Date());
+                            // lastUpdated removed
                           } catch (e: unknown) { const msg = e instanceof Error ? e.message : 'Refresh failed'; pushError(msg, { title: 'Dashboard' }); }
                           finally { setFetching(false); }
                         }}>
@@ -404,11 +404,7 @@ const Dashboard = React.memo(() => {
                     );
                   })()}
                 </div>
-                {lastUpdated && (
-                  <div className="text-[10px] sm:text-xs text-slate-700 bg-white/70 backdrop-blur px-2 py-1 rounded-md border border-slate-200 shadow-sm flex items-center gap-1">
-                    <RefreshCcw size={11} className="text-indigo-500" /> Updated {lastUpdated.toLocaleTimeString()}
-                  </div>
-                )}
+                {/* lastUpdated badge removed */}
               </div>
             </div>
 
