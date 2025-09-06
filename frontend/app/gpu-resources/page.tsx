@@ -170,6 +170,7 @@ export default function GPUResourcesPage() {
   }, [customerId]);
 
   // Manual refresh handler
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleRefresh = async () => {
     if (!customerId || isRefreshing) return;
     setIsRefreshing(true);
@@ -323,6 +324,7 @@ export default function GPUResourcesPage() {
   // const totalPower = gpuData.reduce((a, g) => a + g.power, 0);
   const clusters = Array.from(new Set(gpuData.map(g => g.cluster)));
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const exportCSV = () => {
     const header = ["ID", "Model", "Cluster", "Memory", "MemoryUsedGB", "Utilization", "Temperature", "Power", "Status", "Uptime"];
     const rows = filteredData.map((g) => [g.id, g.model, g.cluster, g.memory, g.memoryUsedGB, g.utilization, g.temperature, g.power, g.status, g.uptime]);

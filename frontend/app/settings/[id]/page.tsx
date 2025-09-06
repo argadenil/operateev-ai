@@ -17,7 +17,7 @@ export default function Settings() {
 
   // Load settings on mount/param change
   useEffect(() => {
-    let abort = new AbortController();
+  const abort = new AbortController();
     async function load() {
       setLoading(true);
       const resp = await fetchSettings(customerId, abort.signal);
