@@ -349,9 +349,10 @@ func GetSettings(c echo.Context) error {
 
 // UpdateSettings upserts the settings for a user
 func UpdateSettings(c echo.Context) error {
-	userID := c.Param("user_id")
-	if strings.TrimSpace(userID) == "" {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "user_id required"})
+	// Align path param with routing and GetSettings: use customer_id consistently
+	customerID := c.Param("customer_id")
+	if strings.TrimSpace(customerID) == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "customer_id required"})
 	}
 	var req models.UpdateSettingsRequest
 	if err := c.Bind(&req); err != nil {
@@ -364,13 +365,13 @@ func UpdateSettings(c echo.Context) error {
 	}
 	jsonStr := string(b)
 
-	// Upsert into user_settings
+	// Upsert into user_settings by customer_id to match GetSettings lookup
 	_, execErr := db.Conn.ExecContext(
 		context.Background(),
-		`INSERT INTO "usersSchema"."user_settings" (user_id, settings_json)
+		`INSERT INTO "usersSchema"."user_settings" (customer_id, settings_json)
 		 VALUES ($1, $2)
-		 ON CONFLICT (user_id) DO UPDATE SET settings_json=EXCLUDED.settings_json`,
-		userID, jsonStr,
+		 ON CONFLICT (customer_id) DO UPDATE SET settings_json=EXCLUDED.settings_json`,
+		customerID, jsonStr,
 	)
 	if execErr != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to save settings"})
