@@ -12,7 +12,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { X, Copy, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, CheckCircle, BarChart3, Server, Activity, RefreshCw } from "lucide-react";
+import { X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, CheckCircle, BarChart3, Server, Activity } from "lucide-react";
 import StatCard from "../components/stat-card";
 import { fetchGPUResources, formatMemory, secondsToPretty, GPUResourceAPIShape, addGPUResource, AddGPURequest } from "@/lib/gpu-resources";
 import { getToken } from "@/lib/auth";
@@ -693,8 +693,9 @@ export default function GPUResourcesPage() {
                   } else {
                     setAddError(r.error);
                   }
-                } catch (err: any) {
-                  setAddError(err?.message || 'Failed to refresh list');
+                } catch (err: unknown) {
+                  const message = err instanceof Error ? err.message : 'Failed to refresh list';
+                  setAddError(message);
                 } finally {
                   setAdding(false);
                 }
@@ -748,7 +749,12 @@ export default function GPUResourcesPage() {
                   <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Status</label>
                   <select
                     value={addForm.status}
-                    onChange={(e) => setAddForm(f => ({ ...f, status: e.target.value as any }))}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === 'available' || v === 'allocated' || v === 'offline') {
+                        setAddForm(f => ({ ...f, status: v }));
+                      }
+                    }}
                     className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                   >
                     <option value="available">Available</option>

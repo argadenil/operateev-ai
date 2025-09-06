@@ -924,7 +924,12 @@ const Dashboard = React.memo(() => {
                   <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Status</label>
                   <select
                     value={addForm.status}
-                    onChange={(e) => setAddForm(f => ({ ...f, status: e.target.value as any }))}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === 'available' || v === 'allocated' || v === 'offline') {
+                        setAddForm(f => ({ ...f, status: v }));
+                      }
+                    }}
                     className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                   >
                     <option value="available">Available</option>
