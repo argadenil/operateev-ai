@@ -1,20 +1,90 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams } from "next/navigation";
 import Loader from "../../components/loader";
+import { defaultSettings, fetchSettings, updateSettings, type SettingsShape } from "@/lib/settings";
+import { useToast } from "../../components/toaster";
 
 export default function Settings() {
-  const [loading, setLoading] = React.useState(true);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000); // 1 second loader for demo
-    return () => clearTimeout(timer);
-  }, []);
+  const params = useParams<{ id: string }>();
+  const customerId = useMemo(() => (Array.isArray(params?.id) ? params.id[0] : params?.id) || "", [params]);
+  const { success, error } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [apiKey, setApiKey] = useState<string>("");
+  const [settings, setSettings] = useState<SettingsShape>(defaultSettings());
 
-    if (loading) {
-      return <Loader />;
+  // Load settings on mount/param change
+  useEffect(() => {
+    let abort = new AbortController();
+    async function load() {
+      setLoading(true);
+      const resp = await fetchSettings(customerId, abort.signal);
+      if (resp.error) {
+        error(resp.error, { title: "Failed to load settings" });
+      } else {
+        setSettings(resp.settings);
+        setApiKey(resp.api_key || "");
+      }
+      setLoading(false);
     }
+    if (customerId) load();
+    return () => abort.abort();
+  }, [customerId, error]);
+
+  async function saveAll() {
+    setSaving(true);
+    const resp = await updateSettings(customerId, settings);
+    setSaving(false);
+    if (!resp.ok) return error(resp.error || "Save failed", { title: "Error" });
+    success("Settings updated", { title: "Saved" });
+  }
+
+  // Input helpers
+  const bind = {
+    text:
+      (path: (s: SettingsShape) => string, set: (s: SettingsShape, v: string) => void) => ({
+        value: path(settings),
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+          const v = e.target.value;
+          setSettings((prev) => {
+            const copy = structuredClone(prev);
+            set(copy, v);
+            return copy;
+          });
+        },
+      }),
+    bool:
+      (path: (s: SettingsShape) => boolean, set: (s: SettingsShape, v: boolean) => void) => ({
+        checked: path(settings),
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+          const v = e.target.checked;
+          setSettings((prev) => {
+            const copy = structuredClone(prev);
+            set(copy, v);
+            return copy;
+          });
+        },
+      }),
+    number:
+      (path: (s: SettingsShape) => number, set: (s: SettingsShape, v: number) => void) => ({
+        value: path(settings) ?? 0,
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+          const v = Number(e.target.value || 0);
+          setSettings((prev) => {
+            const copy = structuredClone(prev);
+            set(copy, v);
+            return copy;
+          });
+        },
+      }),
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
   <div className="space-y-6 animate-slide-up">
         {/* Page Header */}
@@ -42,6 +112,7 @@ export default function Settings() {
                   id="full-name"
                   type="text"
                   placeholder="Jane Doe"
+                  {...bind.text(s=>s.profile.full_name,(s,v)=>{s.profile.full_name=v;})}
                   className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
                 />
               </div>
@@ -51,6 +122,7 @@ export default function Settings() {
                   id="email-address"
                   type="email"
                   placeholder="jane@example.com"
+                  {...bind.text(s=>s.profile.email,(s,v)=>{s.profile.email=v;})}
                   className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
                 />
               </div>
@@ -60,14 +132,17 @@ export default function Settings() {
                   id="phone-number"
                   type="tel"
                   placeholder="+1 (555) 123-4567"
+                  {...bind.text(s=>s.profile.phone,(s,v)=>{s.profile.phone=v;})}
                   className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
                 />
               </div>
               <button 
                 type="button"
-                className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base"
+                onClick={saveAll}
+                disabled={saving}
+                className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base disabled:opacity-60"
               >
-                Save Changes
+                {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </section>
@@ -82,10 +157,10 @@ export default function Settings() {
               Customize how your dashboard behaves and looks.
             </p>
             <div className="space-y-3 sm:space-y-4">
-              <Toggle label="Dark Mode" />
-              <Toggle label="Enable Animations" />
-              <Toggle label="Auto-Refresh Dashboard" />
-              <Toggle label="Compact Table View" />
+              <Toggle label="Dark Mode" checked={settings.preferences.dark_mode} onChange={(v)=>setSettings(s=>({...s, preferences:{...s.preferences, dark_mode:v}}))} />
+              <Toggle label="Enable Animations" checked={settings.preferences.enable_animations} onChange={(v)=>setSettings(s=>({...s, preferences:{...s.preferences, enable_animations:v}}))} />
+              <Toggle label="Auto-Refresh Dashboard" checked={settings.preferences.auto_refresh} onChange={(v)=>setSettings(s=>({...s, preferences:{...s.preferences, auto_refresh:v}}))} />
+              <Toggle label="Compact Table View" checked={settings.preferences.compact_table} onChange={(v)=>setSettings(s=>({...s, preferences:{...s.preferences, compact_table:v}}))} />
             </div>
           </section>
 
@@ -99,10 +174,10 @@ export default function Settings() {
               Manage how and when you receive updates.
             </p>
             <div className="space-y-3 sm:space-y-4">
-              <Toggle label="Email Notifications" />
-              <Toggle label="Push Notifications" />
-              <Toggle label="SMS Notifications" />
-              <Toggle label="System Alerts" />
+              <Toggle label="Email Notifications" checked={settings.notifications.email} onChange={(v)=>setSettings(s=>({...s, notifications:{...s.notifications, email:v}}))} />
+              <Toggle label="Push Notifications" checked={settings.notifications.push} onChange={(v)=>setSettings(s=>({...s, notifications:{...s.notifications, push:v}}))} />
+              <Toggle label="SMS Notifications" checked={settings.notifications.sms} onChange={(v)=>setSettings(s=>({...s, notifications:{...s.notifications, sms:v}}))} />
+              <Toggle label="System Alerts" checked={settings.notifications.system} onChange={(v)=>setSettings(s=>({...s, notifications:{...s.notifications, system:v}}))} />
             </div>
           </section>
 
@@ -118,15 +193,11 @@ export default function Settings() {
             <div className="space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Password</label>
-                <input
-                  type="password"
-                  placeholder="********"
-                  className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
-                />
+                <input type="password" placeholder="********" className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base" disabled />
               </div>
-              <Toggle label="Enable Two-Factor Authentication" />
-              <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-red-600 text-white rounded-[10px] font-medium hover:bg-red-700 transition text-sm sm:text-base">
-                Update Security
+              <Toggle label="Enable Two-Factor Authentication" checked={settings.security.two_fa_enabled} onChange={(v)=>setSettings(s=>({...s, security:{...s.security, two_fa_enabled:v}}))} />
+              <button onClick={saveAll} disabled={saving} className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-red-600 text-white rounded-[10px] font-medium hover:bg-red-700 transition text-sm sm:text-base disabled:opacity-60">
+                {saving ? 'Saving...' : 'Update Security'}
               </button>
             </div>
           </section>
@@ -141,15 +212,16 @@ export default function Settings() {
               Manage API keys and connected integrations.
             </p>
             <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700 text-sm sm:text-base">API Key #1</span>
-                <button className="text-indigo-600 font-medium text-sm sm:text-base hover:underline">
-                  Regenerate
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">API Key</label>
+                <input type="text" readOnly value={apiKey || '—'} className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm sm:text-base bg-gray-50" />
+                <button type="button" className="text-indigo-600 font-medium text-sm sm:text-base hover:underline disabled:opacity-60" disabled>
+                  Regenerate (coming soon)
                 </button>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-700 text-sm sm:text-base">Slack Integration</span>
-                <Toggle label="Enabled" />
+                <Toggle label="Enabled" checked={settings.integrations.slack_enabled} onChange={(v)=>setSettings(s=>({...s, integrations:{...s.integrations, slack_enabled:v}}))} />
               </div>
             </div>
           </section>
@@ -204,8 +276,8 @@ export default function Settings() {
               Control your data privacy and manage data exports.
             </p>
             <div className="space-y-3 sm:space-y-4">
-              <Toggle label="Analytics Tracking" />
-              <Toggle label="Data Sharing with Partners" />
+              <Toggle label="Analytics Tracking" checked={settings.privacy.analytics} onChange={(v)=>setSettings(s=>({...s, privacy:{...s.privacy, analytics:v}}))} />
+              <Toggle label="Data Sharing with Partners" checked={settings.privacy.data_sharing} onChange={(v)=>setSettings(s=>({...s, privacy:{...s.privacy, data_sharing:v}}))} />
               <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base">
                 Export My Data
               </button>
@@ -255,16 +327,12 @@ export default function Settings() {
             <div className="space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Workspace Name</label>
-                <input
-                  type="text"
-                  placeholder="My AI Workspace"
-                  className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
-                />
+                <input type="text" placeholder="My AI Workspace" {...bind.text(s=>s.workspace.name,(s,v)=>{s.workspace.name=v;})} className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base" />
               </div>
-              <Toggle label="Public Workspace" />
-              <Toggle label="Allow Guest Access" />
-              <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base">
-                Update Workspace
+              <Toggle label="Public Workspace" checked={settings.workspace.public} onChange={(v)=>setSettings(s=>({...s, workspace:{...s.workspace, public:v}}))} />
+              <Toggle label="Allow Guest Access" checked={settings.workspace.guest_access} onChange={(v)=>setSettings(s=>({...s, workspace:{...s.workspace, guest_access:v}}))} />
+              <button onClick={saveAll} disabled={saving} className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base disabled:opacity-60">
+                {saving ? 'Saving...' : 'Update Workspace'}
               </button>
             </div>
           </section>
@@ -286,9 +354,9 @@ export default function Settings() {
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-indigo-600 h-2 rounded-full" style={{width: '25%'}}></div>
               </div>
-              <Toggle label="Auto Backup" />
-              <Toggle label="Cloud Sync" />
-              <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base">
+              <Toggle label="Auto Backup" checked={settings.storage.auto_backup} onChange={(v)=>setSettings(s=>({...s, storage:{...s.storage, auto_backup:v}}))} />
+              <Toggle label="Cloud Sync" checked={settings.storage.cloud_sync} onChange={(v)=>setSettings(s=>({...s, storage:{...s.storage, cloud_sync:v}}))} />
+              <button onClick={saveAll} disabled={saving} className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base disabled:opacity-60">
                 Manage Storage
               </button>
             </div>
@@ -304,16 +372,17 @@ export default function Settings() {
               Configure advanced system preferences and experimental features.
             </p>
             <div className="space-y-3 sm:space-y-4">
-              <Toggle label="Developer Mode" />
-              <Toggle label="Beta Features" />
-              <Toggle label="Debug Mode" />
-              <Toggle label="Performance Monitoring" />
+        <Toggle label="Developer Mode" checked={settings.advanced.developer_mode} onChange={(v)=>setSettings(s=>({...s, advanced:{...s.advanced, developer_mode:v}}))} />
+        <Toggle label="Beta Features" checked={settings.advanced.beta_features} onChange={(v)=>setSettings(s=>({...s, advanced:{...s.advanced, beta_features:v}}))} />
+        <Toggle label="Debug Mode" checked={settings.advanced.debug_mode} onChange={(v)=>setSettings(s=>({...s, advanced:{...s.advanced, debug_mode:v}}))} />
+        <Toggle label="Performance Monitoring" checked={settings.advanced.performance_monitoring} onChange={(v)=>setSettings(s=>({...s, advanced:{...s.advanced, performance_monitoring:v}}))} />
               <div>
                 <label htmlFor="session-timeout" className="block text-sm font-medium text-gray-700">Session Timeout (minutes)</label>
                 <input
                   id="session-timeout"
                   type="number"
-                  placeholder="30"
+          placeholder="30"
+          {...bind.number(s=>s.advanced.session_timeout_min,(s,v)=>{s.advanced.session_timeout_min=v;})}
                   className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
                 />
               </div>
@@ -358,24 +427,25 @@ export default function Settings() {
   );
 }
 
-// Toggle Component
-function Toggle({ label }: { label: string }) {
-  const id = `toggle-${label.toLowerCase().replace(/\s+/g, '-')}`;
-  
-  return (
-    <div className="flex items-center justify-between">
-      <label htmlFor={id} className="text-gray-700 text-sm sm:text-base cursor-pointer">
-        {label}
-      </label>
-      <input
-        id={id}
-        type="checkbox"
-        className="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
-        aria-describedby={`${id}-description`}
-      />
-      <span id={`${id}-description`} className="sr-only">
-        Toggle {label}
-      </span>
-    </div>
-  );
-}
+  // Toggle Component
+  function Toggle({ label, checked, onChange }: { label: string; checked?: boolean; onChange?: (v:boolean)=>void }) {
+    const id = `toggle-${label.toLowerCase().replace(/\s+/g, '-')}`;
+    return (
+      <div className="flex items-center justify-between">
+        <label htmlFor={id} className="text-gray-700 text-sm sm:text-base cursor-pointer">
+          {label}
+        </label>
+        <input
+          id={id}
+          type="checkbox"
+          checked={!!checked}
+          onChange={(e)=>onChange?.(e.target.checked)}
+          className="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
+          aria-describedby={`${id}-description`}
+        />
+        <span id={`${id}-description`} className="sr-only">
+          Toggle {label}
+        </span>
+      </div>
+    );
+  }

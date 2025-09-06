@@ -1,20 +1,18 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Loader from "../components/loader";
 
+// This page redirects to /settings/:customerId using localStorage value from login
 export default function Settings() {
-  const [loading, setLoading] = React.useState(true);
+  const router = useRouter();
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000); // 1 second loader for demo
-    return () => clearTimeout(timer);
-  }, []);
+    const cid = typeof window !== 'undefined' ? localStorage.getItem('customer_id') : null;
+    if (cid) router.replace(`/settings/${cid}`);
+    else router.replace(`/login`);
+  }, [router]);
 
-    if (loading) {
-      return <Loader />;
-    }
   return (
   <div className="space-y-6 animate-slide-up">
         {/* Page Header */}
