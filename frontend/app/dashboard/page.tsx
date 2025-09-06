@@ -37,6 +37,7 @@ if (typeof window !== 'undefined') {
 }
 
 import { fetchDashboard, secondsToH, capitalizeStatus, DashboardAPIResource } from "../../lib/dashboard"; // added
+import { addGPUResource, AddGPURequest } from "../../lib/gpu-resources";
 import { useToast } from "../components/toaster"; // added
 
 type GPUResource = {
@@ -152,7 +153,7 @@ const chartOptions = {
 
 const Dashboard = React.memo(() => {
   const router = useRouter();
-  const { error: pushError } = useToast(); // added
+  const { error: pushError, success: pushSuccess } = useToast(); // added
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [loading, setLoading] = React.useState(true);
@@ -168,6 +169,16 @@ const Dashboard = React.memo(() => {
   const missingIdNotified = React.useRef(false);
   // Customer name for badge; prefer 'customer_name' then 'username'
   const [customerName, setCustomerName] = React.useState<string>("TEST Corp");
+  const [showAddModal, setShowAddModal] = React.useState(false);
+  const [adding, setAdding] = React.useState(false);
+  const [addError, setAddError] = React.useState<string | null>(null);
+  const [addForm, setAddForm] = React.useState<{
+    model: string;
+    memory_gb: number | '';
+    memory_used_gb: number | '';
+    cluster: string;
+    status: 'available' | 'allocated' | 'offline';
+  }>({ model: '', memory_gb: '', memory_used_gb: 0, cluster: '', status: 'available' });
 
   // Derive customer id strictly from URL (/dashboard/:id). Base /dashboard should not auto-use stored id.
   useEffect(() => {
@@ -432,7 +443,7 @@ const Dashboard = React.memo(() => {
                         }}>
                           <RefreshCw size={14} /> Refresh
                         </button>
-                        <button className={btn}>
+                        <button className={btn} onClick={() => setShowAddModal(true)}>
                           <PlusCircle size={15} /> Add GPU
                         </button>
                         {lastUpdated && (
@@ -816,6 +827,120 @@ const Dashboard = React.memo(() => {
                 </ul>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add GPU Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-lg p-4 sm:p-6 relative">
+            <div className="flex justify-between items-center border-b pb-3 mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Add GPU Resource</h2>
+              <button onClick={() => setShowAddModal(false)} className="text-gray-500 hover:text-gray-800 transition">
+                <X size={22} />
+              </button>
+            </div>
+
+            {addError && (
+              <div className="mb-3 text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded p-2">{addError}</div>
+            )}
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!customerId) {
+                  setAddError('customer_id is required');
+                  return;
+                }
+                setAdding(true);
+                setAddError(null);
+                const payload: AddGPURequest = {
+                  customer_id: customerId,
+                  model: addForm.model.trim(),
+                  memory_gb: typeof addForm.memory_gb === 'number' ? addForm.memory_gb : parseInt(String(addForm.memory_gb || 0), 10),
+                  memory_used_gb: typeof addForm.memory_used_gb === 'number' ? addForm.memory_used_gb : parseInt(String(addForm.memory_used_gb || 0), 10),
+                  cluster: addForm.cluster.trim() || undefined,
+                  status: addForm.status,
+                };
+                const res = await addGPUResource(payload);
+                if (res.error) {
+                  setAddError(res.error);
+                  setAdding(false);
+                  return;
+                }
+                setShowAddModal(false);
+                setAddForm({ model: '', memory_gb: '', memory_used_gb: 0, cluster: '', status: 'available' });
+                // Adding to gpu_resources won't reflect in dashboard list immediately; show success toast.
+                pushSuccess('GPU added successfully', { title: 'Add GPU' });
+                setAdding(false);
+              }}
+              className="space-y-3"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex flex-col">
+                  <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Model</label>
+                  <input
+                    required
+                    value={addForm.model}
+                    onChange={(e) => setAddForm(f => ({ ...f, model: e.target.value }))}
+                    placeholder="e.g., NVIDIA A100"
+                    className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Memory (GB)</label>
+                  <input
+                    required
+                    type="number"
+                    min={1}
+                    value={addForm.memory_gb}
+                    onChange={(e) => setAddForm(f => ({ ...f, memory_gb: e.target.value === '' ? '' : Number(e.target.value) }))}
+                    placeholder="40"
+                    className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Used (GB)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={addForm.memory_used_gb}
+                    onChange={(e) => setAddForm(f => ({ ...f, memory_used_gb: e.target.value === '' ? 0 : Number(e.target.value) }))}
+                    placeholder="0"
+                    className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Cluster</label>
+                  <input
+                    value={addForm.cluster}
+                    onChange={(e) => setAddForm(f => ({ ...f, cluster: e.target.value }))}
+                    placeholder="cluster-1"
+                    className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 mb-1">Status</label>
+                  <select
+                    value={addForm.status}
+                    onChange={(e) => setAddForm(f => ({ ...f, status: e.target.value as any }))}
+                    className="px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  >
+                    <option value="available">Available</option>
+                    <option value="allocated">Allocated</option>
+                    <option value="offline">Offline</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 rounded-lg border bg-white hover:bg-gray-50 text-sm">Cancel</button>
+                <button type="submit" disabled={adding} className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60 text-sm">
+                  {adding ? 'Adding…' : 'Add GPU'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
