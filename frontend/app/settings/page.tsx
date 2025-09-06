@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Loader from "../components/loader";
+// Loader import removed as it's not used on this redirect page
 
 // This page redirects to /settings/:customerId using localStorage value from login
 export default function Settings() {
