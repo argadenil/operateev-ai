@@ -1,7 +1,7 @@
 // Simple auth utilities for frontend.
 // NOTE: For production you should move to httpOnly cookies + refresh tokens.
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:10000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://operateev-ai-backend.onrender.com";
 
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
