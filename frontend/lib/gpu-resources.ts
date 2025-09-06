@@ -47,6 +47,38 @@ export async function fetchGPUResources(customerId: string, signal?: AbortSignal
   return data;
 }
 
+// Payload to add a new GPU resource
+export interface AddGPURequest {
+  customer_id: string;
+  model: string;
+  memory_gb: number;
+  memory_used_gb?: number;
+  cluster?: string;
+  status?: 'available' | 'allocated' | 'offline' | string;
+  utilization?: number;
+  temperature_c?: number;
+  power_w?: number;
+  uptime_sec?: number;
+}
+
+// Adds a GPU resource and returns the created row
+export async function addGPUResource(payload: AddGPURequest): Promise<{ gpu?: GPUResourceAPIShape; error?: string }> {
+  if (!payload?.customer_id || !payload?.model || !payload?.memory_gb || payload.memory_gb <= 0) {
+    return { error: 'customer_id, model and positive memory_gb are required' };
+  }
+  const url = `${API_BASE}/add-gpu`;
+  const resp = await authFetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) {
+    return { error: data.error || 'Failed to add GPU resource' };
+  }
+  return { gpu: data as GPUResourceAPIShape };
+}
+
 export function formatMemory(totalGB: number, usedGB: number): string {
   if (!totalGB) return '0 GB';
   return `${usedGB} / ${totalGB} GB`;
