@@ -1,395 +1,381 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Loader from "../components/loader";
 
-// Enhanced Toggle Component
-function Toggle({ label, checked, onChange, description }: { 
-  label: string; 
-  checked: boolean; 
-  onChange: (checked: boolean) => void;
-  description?: string;
-}) {
-  return (
-    <div className="flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50/50 transition-all duration-300">
-      <div className="flex-1">
-        <span className="text-gray-900 font-semibold">{label}</span>
-        {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
-      </div>
-      <label className="relative inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          className="sr-only"
-          checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
-        />
-        <div className={`w-14 h-7 rounded-full transition-all duration-300 shadow-inner ${checked ? 'bg-gradient-to-r from-indigo-500 to-purple-600' : 'bg-gray-200'}`}>
-          <div className={`w-5 h-5 rounded-full bg-white shadow-lg transform transition-all duration-300 mt-1 ${checked ? 'translate-x-8' : 'translate-x-1'}`}></div>
-        </div>
-      </label>
-    </div>
-  );
-}
-
 export default function Settings() {
-  const [loading, setLoading] = useState(true);
-  const [settings, setSettings] = useState({
-    // Notifications
-    emailNotifications: true,
-    pushNotifications: false,
-    slackNotifications: false,
-    slackWebhookUrl: "",
-    
-    // Appearance
-    darkMode: false,
-    animations: true,
-    compactView: false,
-    
-    // System
-    autoScaling: false,
-    maxGPUInstances: 10,
-    defaultPriority: 5,
-    sessionTimeout: 60,
-    
-    // Preferences
-    timezone: "UTC",
-    language: "en",
-    dateFormat: "MM/DD/YYYY",
-    
-    // Privacy
-    analyticsEnabled: true,
-    crashReporting: true,
-    usageStatistics: false
-  });
-
+  const [loading, setLoading] = React.useState(true);
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1000);
+    }, 1000); // 1 second loader for demo
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSettingChange = (key: string, value: any) => {
-    setSettings(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-  const handleSaveSettings = () => {
-    // TODO: Implement API call to save settings
-    console.log("Saving settings:", settings);
-    // Show success message
-  };
-
-  if (loading) {
-    return <Loader />;
-  }
-
+    if (loading) {
+      return <Loader />;
+    }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Enhanced Page Header */}
-        <div className="relative overflow-hidden bg-white rounded-3xl shadow-xl border border-slate-200/60 backdrop-blur-xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-pink-500/5"></div>
-          <div className="relative p-8">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                <span className="text-2xl font-bold text-white">⚙️</span>
+  <div className="space-y-6 animate-slide-up">
+        {/* Page Header */}
+        {/* <div className="mb-4 text-center md:text-left">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1">Account Settings</h1>
+          <p className="text-gray-600 text-sm sm:text-base">
+            Manage your profile, security, notifications, and integrations in one place.
+          </p>
+        </div> */}
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Profile */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">person</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Profile</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Update your personal info and contact details.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <div>
+                <label htmlFor="full-name" className="block text-sm font-medium text-gray-700">Full Name</label>
+                <input
+                  id="full-name"
+                  type="text"
+                  placeholder="Jane Doe"
+                  className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                />
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent">
-                  Settings
-                </h1>
-                <p className="text-lg text-slate-600 mt-1">
-                  Configure your application preferences and system settings
-                </p>
+                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">Email Address</label>
+                <input
+                  id="email-address"
+                  type="email"
+                  placeholder="jane@example.com"
+                  className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                />
               </div>
-            </div>
-          </div>
-        </div>
-
-  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Enhanced Notifications */}
-          <section className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-slate-200/60 p-8 hover:shadow-3xl transition-all duration-300">
-            <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mr-4">
-                <span className="text-white text-xl">🔔</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Notifications</h2>
-            </div>
-            <div className="space-y-4">
-              <Toggle
-                label="Email Notifications"
-                checked={settings.emailNotifications}
-                onChange={(checked) => handleSettingChange('emailNotifications', checked)}
-                description="Receive updates via email"
-              />
-              <Toggle
-                label="Push Notifications"
-                checked={settings.pushNotifications}
-                onChange={(checked) => handleSettingChange('pushNotifications', checked)}
-                description="Browser push notifications"
-              />
-              <Toggle
-                label="Slack Integration"
-                checked={settings.slackNotifications}
-                onChange={(checked) => handleSettingChange('slackNotifications', checked)}
-                description="Send alerts to Slack channel"
-              />
-              {settings.slackNotifications && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200">
-                  <label htmlFor="slackWebhook" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Slack Webhook URL
-                  </label>
-                  <input
-                    id="slackWebhook"
-                    type="url"
-                    value={settings.slackWebhookUrl}
-                    onChange={(e) => handleSettingChange('slackWebhookUrl', e.target.value)}
-                    placeholder="https://hooks.slack.com/services/..."
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                  />
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Enhanced Appearance */}
-          <section className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-slate-200/60 p-8 hover:shadow-3xl transition-all duration-300">
-            <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
-                <span className="text-white text-xl">🎨</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Appearance</h2>
-            </div>
-            <div className="space-y-4">
-              <Toggle
-                label="Dark Mode"
-                checked={settings.darkMode}
-                onChange={(checked) => handleSettingChange('darkMode', checked)}
-                description="Switch to dark theme"
-              />
-              <Toggle
-                label="Enable Animations"
-                checked={settings.animations}
-                onChange={(checked) => handleSettingChange('animations', checked)}
-                description="Smooth transitions and effects"
-              />
-              <Toggle
-                label="Compact View"
-                checked={settings.compactView}
-                onChange={(checked) => handleSettingChange('compactView', checked)}
-                description="Reduce spacing and padding"
-              />
-            </div>
-          </section>
-
-          {/* Enhanced System Configuration */}
-          <section className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-slate-200/60 p-8 hover:shadow-3xl transition-all duration-300">
-            <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mr-4">
-                <span className="text-white text-xl">⚙️</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">System</h2>
-            </div>
-            <div className="space-y-6">
-              <Toggle
-                label="Auto Scaling"
-                checked={settings.autoScaling}
-                onChange={(checked) => handleSettingChange('autoScaling', checked)}
-                description="Automatically scale GPU resources"
-              />
-              
               <div>
-                <label htmlFor="maxGPU" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Max GPU Instances
-                </label>
-                <select
-                  id="maxGPU"
-                  value={settings.maxGPUInstances}
-                  onChange={(e) => handleSettingChange('maxGPUInstances', parseInt(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                >
-                  <option value={5}>5 instances</option>
-                  <option value={10}>10 instances</option>
-                  <option value={20}>20 instances</option>
-                  <option value={50}>50 instances</option>
-                </select>
+                <label htmlFor="phone-number" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                <input
+                  id="phone-number"
+                  type="tel"
+                  placeholder="+1 (555) 123-4567"
+                  className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                />
               </div>
-
-              <div>
-                <label htmlFor="priority" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Default Job Priority
-                </label>
-                <select
-                  id="priority"
-                  value={settings.defaultPriority}
-                  onChange={(e) => handleSettingChange('defaultPriority', parseInt(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                >
-                  <option value={1}>Low (1)</option>
-                  <option value={3}>Medium (3)</option>
-                  <option value={5}>Normal (5)</option>
-                  <option value={7}>High (7)</option>
-                  <option value={10}>Critical (10)</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="sessionTimeout" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Session Timeout (minutes)
-                </label>
-                <select
-                  id="sessionTimeout"
-                  value={settings.sessionTimeout}
-                  onChange={(e) => handleSettingChange('sessionTimeout', parseInt(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                >
-                  <option value={15}>15 minutes</option>
-                  <option value={30}>30 minutes</option>
-                  <option value={60}>1 hour</option>
-                  <option value={120}>2 hours</option>
-                  <option value={480}>8 hours</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          {/* Enhanced Preferences */}
-          <section className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-slate-200/60 p-8 hover:shadow-3xl transition-all duration-300">
-            <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mr-4">
-                <span className="text-white text-xl">🎛️</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Preferences</h2>
-            </div>
-            <div className="space-y-6">
-              <div>
-                <label htmlFor="timezone" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Timezone
-                </label>
-                <select
-                  id="timezone"
-                  value={settings.timezone}
-                  onChange={(e) => handleSettingChange('timezone', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                >
-                  <option value="UTC">UTC</option>
-                  <option value="America/New_York">Eastern Time</option>
-                  <option value="America/Chicago">Central Time</option>
-                  <option value="America/Denver">Mountain Time</option>
-                  <option value="America/Los_Angeles">Pacific Time</option>
-                  <option value="Europe/London">London</option>
-                  <option value="Europe/Paris">Paris</option>
-                  <option value="Asia/Tokyo">Tokyo</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="language" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Language
-                </label>
-                <select
-                  id="language"
-                  value={settings.language}
-                  onChange={(e) => handleSettingChange('language', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                >
-                  <option value="en">English</option>
-                  <option value="es">Español</option>
-                  <option value="fr">Français</option>
-                  <option value="de">Deutsch</option>
-                  <option value="ja">日本語</option>
-                  <option value="ko">한국어</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="dateFormat" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Date Format
-                </label>
-                <select
-                  id="dateFormat"
-                  value={settings.dateFormat}
-                  onChange={(e) => handleSettingChange('dateFormat', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                >
-                  <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                  <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                  <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                  <option value="DD MMM YYYY">DD MMM YYYY</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          {/* Privacy & Data */}
-          <section className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:col-span-3">
-            <div className="flex items-center mb-6">
-              <span className="material-icons text-indigo-500 text-2xl mr-3">privacy_tip</span>
-              <h2 className="text-xl font-semibold text-gray-900">Privacy & Data</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Toggle
-                label="Analytics"
-                checked={settings.analyticsEnabled}
-                onChange={(checked) => handleSettingChange('analyticsEnabled', checked)}
-                description="Help improve the platform"
-              />
-              <Toggle
-                label="Crash Reporting"
-                checked={settings.crashReporting}
-                onChange={(checked) => handleSettingChange('crashReporting', checked)}
-                description="Automatically report errors"
-              />
-              <Toggle
-                label="Usage Statistics"
-                checked={settings.usageStatistics}
-                onChange={(checked) => handleSettingChange('usageStatistics', checked)}
-                description="Share anonymous usage data"
-              />
-            </div>
-          </section>
-
-          {/* Data Management */}
-          <section className="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 lg:col-span-3">
-            <div className="flex items-center mb-6">
-              <span className="material-icons text-indigo-500 text-2xl mr-3">storage</span>
-              <h2 className="text-xl font-semibold text-gray-900">Data Management</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-center">
-                <span className="material-icons text-gray-600 text-2xl mb-2 block">download</span>
-                <span className="text-sm font-medium text-gray-900">Export Data</span>
-                <p className="text-xs text-gray-500 mt-1">Download your data</p>
-              </button>
-              
-              <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-center">
-                <span className="material-icons text-gray-600 text-2xl mb-2 block">sync</span>
-                <span className="text-sm font-medium text-gray-900">Sync Settings</span>
-                <p className="text-xs text-gray-500 mt-1">Backup preferences</p>
-              </button>
-              
-              <button className="p-4 border border-red-300 rounded-lg hover:bg-red-50 transition text-center">
-                <span className="material-icons text-red-600 text-2xl mb-2 block">delete_forever</span>
-                <span className="text-sm font-medium text-red-900">Delete Data</span>
-                <p className="text-xs text-red-500 mt-1">Permanently remove</p>
+              <button 
+                type="button"
+                className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base"
+              >
+                Save Changes
               </button>
             </div>
           </section>
-        </div>
 
-        {/* Save Button */}
-        <div className="flex justify-end mt-8">
-          <button
-            onClick={handleSaveSettings}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition shadow-md"
-          >
-            Save All Settings
-          </button>
-        </div>
-      </div>
+          {/* Preferences */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">settings</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Preferences</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Customize how your dashboard behaves and looks.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <Toggle label="Dark Mode" />
+              <Toggle label="Enable Animations" />
+              <Toggle label="Auto-Refresh Dashboard" />
+              <Toggle label="Compact Table View" />
+            </div>
+          </section>
+
+          {/* Notifications */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">notifications</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Notifications</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Manage how and when you receive updates.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <Toggle label="Email Notifications" />
+              <Toggle label="Push Notifications" />
+              <Toggle label="SMS Notifications" />
+              <Toggle label="System Alerts" />
+            </div>
+          </section>
+
+          {/* Security */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">lock</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Security</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Update your password and manage multi-factor authentication.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <input
+                  type="password"
+                  placeholder="********"
+                  className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                />
+              </div>
+              <Toggle label="Enable Two-Factor Authentication" />
+              <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-red-600 text-white rounded-[10px] font-medium hover:bg-red-700 transition text-sm sm:text-base">
+                Update Security
+              </button>
+            </div>
+          </section>
+
+          {/* API & Integrations */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">api</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">API & Integrations</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Manage API keys and connected integrations.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 text-sm sm:text-base">API Key #1</span>
+                <button className="text-indigo-600 font-medium text-sm sm:text-base hover:underline">
+                  Regenerate
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 text-sm sm:text-base">Slack Integration</span>
+                <Toggle label="Enabled" />
+              </div>
+            </div>
+          </section>
+
+          {/* Activity Logs */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">history</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Activity Logs</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              View recent account activity and logins.
+            </p>
+            <ul className="space-y-1 sm:space-y-2 text-gray-700 text-xs sm:text-sm">
+              <li>📌 Logged in from New York, USA – 2 hours ago</li>
+              <li>🔑 API key regenerated – 1 day ago</li>
+              <li>🔔 Notification settings updated – 3 days ago</li>
+            </ul>
+          </section>
+
+          {/* Billing & Subscription */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">credit card</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Billing & Subscription</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Manage your subscription plan and payment methods.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 text-sm sm:text-base">Current Plan</span>
+                <span className="px-2 py-1 bg-green-100 text-green-800 rounded-md text-xs font-medium">Pro</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 text-sm sm:text-base">Next Billing</span>
+                <span className="text-gray-600 text-sm">Jan 15, 2024</span>
+              </div>
+              <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base">
+                Manage Billing
+              </button>
+            </div>
+          </section>
+
+          {/* Data & Privacy */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">privacy tip</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Data & Privacy</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Control your data privacy and manage data exports.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <Toggle label="Analytics Tracking" />
+              <Toggle label="Data Sharing with Partners" />
+              <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base">
+                Export My Data
+              </button>
+              <button className="w-full px-4 sm:px-5 py-2 bg-red-600 text-white rounded-[10px] font-medium hover:bg-red-700 transition text-sm sm:text-base">
+                Delete Account
+              </button>
+            </div>
+          </section>
+
+          {/* Team Management */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">group</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Team Management</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Invite team members and manage permissions.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 text-sm sm:text-base">Team Members</span>
+                <span className="text-gray-600 text-sm">5/10</span>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Invite Email</label>
+                <input
+                  type="email"
+                  placeholder="colleague@company.com"
+                  className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                />
+              </div>
+              <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base">
+                Send Invitation
+              </button>
+            </div>
+          </section>
+
+          {/* Workspace Settings */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">work</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Workspace Settings</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Configure workspace defaults and organization settings.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Workspace Name</label>
+                <input
+                  type="text"
+                  placeholder="My AI Workspace"
+                  className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                />
+              </div>
+              <Toggle label="Public Workspace" />
+              <Toggle label="Allow Guest Access" />
+              <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base">
+                Update Workspace
+              </button>
+            </div>
+          </section>
+
+          {/* Storage & Backup */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">storage</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Storage & Backup</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Monitor storage usage and configure backup settings.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 text-sm sm:text-base">Storage Used</span>
+                <span className="text-gray-600 text-sm">2.5 GB / 10 GB</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-indigo-600 h-2 rounded-full" style={{width: '25%'}}></div>
+              </div>
+              <Toggle label="Auto Backup" />
+              <Toggle label="Cloud Sync" />
+              <button className="mt-3 sm:mt-4 w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base">
+                Manage Storage
+              </button>
+            </div>
+          </section>
+
+          {/* Advanced Settings */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">tune</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Advanced Settings</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Configure advanced system preferences and experimental features.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <Toggle label="Developer Mode" />
+              <Toggle label="Beta Features" />
+              <Toggle label="Debug Mode" />
+              <Toggle label="Performance Monitoring" />
+              <div>
+                <label htmlFor="session-timeout" className="block text-sm font-medium text-gray-700">Session Timeout (minutes)</label>
+                <input
+                  id="session-timeout"
+                  type="number"
+                  placeholder="30"
+                  className="mt-1 w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Support & Help */}
+      <section className="bg-white shadow-lg rounded-[15px] border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition">
+            <div className="flex items-center mb-4">
+        <span className="material-icons text-indigo-500 text-2xl sm:text-3xl mr-2">help</span>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Support & Help</h2>
+            </div>
+            <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
+              Get help, report issues, and access documentation.
+            </p>
+            <div className="space-y-3 sm:space-y-4">
+              <button 
+                type="button"
+                className="w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base"
+              >
+                View Documentation
+              </button>
+              <button 
+                type="button"
+                className="w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base"
+              >
+                Report Issue
+              </button>
+              <button 
+                type="button"
+                className="w-full px-4 sm:px-5 py-2 bg-indigo-600 text-white rounded-[10px] font-medium hover:bg-indigo-700 transition text-sm sm:text-base"
+              >
+                Contact Support
+              </button>
+              <div className="text-center text-gray-500 text-xs sm:text-sm">
+                Response time: ~2 hours
+              </div>
+            </div>
+          </section>
+    </div>
+  </div>
+  );
+}
+
+// Toggle Component
+function Toggle({ label }: { label: string }) {
+  const id = `toggle-${label.toLowerCase().replace(/\s+/g, '-')}`;
+  
+  return (
+    <div className="flex items-center justify-between">
+      <label htmlFor={id} className="text-gray-700 text-sm sm:text-base cursor-pointer">
+        {label}
+      </label>
+      <input
+        id={id}
+        type="checkbox"
+        className="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
+        aria-describedby={`${id}-description`}
+      />
+      <span id={`${id}-description`} className="sr-only">
+        Toggle {label}
+      </span>
     </div>
   );
 }
