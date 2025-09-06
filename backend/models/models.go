@@ -138,3 +138,17 @@ type UpdateJobRequest struct {
 	Status      string `json:"status"`
 	Priority    int    `json:"priority"`
 }
+
+// AddGPURequest represents the payload to add a new GPU resource to inventory.
+type AddGPURequest struct {
+	CustomerID  string `json:"customer_id"`
+	Model       string `json:"model"`
+	MemoryGB    int    `json:"memory_gb"`
+	MemoryUsed  int    `json:"memory_used_gb"`
+	Cluster     string `json:"cluster"`
+	Status      string `json:"status"`
+	Utilization int    `json:"utilization"`
+	Temperature int    `json:"temperature_c"`
+	PowerW      int    `json:"power_w"`
+	UptimeSec   int    `json:"uptime_sec"`
+}

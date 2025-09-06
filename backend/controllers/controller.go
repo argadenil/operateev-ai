@@ -201,6 +201,49 @@ func GetGPUResources(c echo.Context) error {
 	return c.JSON(http.StatusOK, models.GPUResourcesResponse{GPUs: gpus, Summary: summary})
 }
 
+// AddGPUResource inserts a new GPU resource row.
+func AddGPUResource(c echo.Context) error {
+	var req models.AddGPURequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
+	}
+	// minimal validation
+	if strings.TrimSpace(req.CustomerID) == "" || strings.TrimSpace(req.Model) == "" || req.MemoryGB <= 0 {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "customer_id, model and positive memory_gb are required"})
+	}
+	if req.Status == "" {
+		req.Status = "available"
+	}
+
+	// Insert and return created record id
+	var id int
+	err := db.Conn.QueryRowContext(
+		context.Background(),
+		`INSERT INTO "usersSchema"."gpu_resources" (customer_id, model, memory_gb, memory_used_gb, cluster, status, utilization, temperature_c, power_w, uptime_sec)
+		 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+		 RETURNING id`,
+		req.CustomerID, req.Model, req.MemoryGB, req.MemoryUsed, req.Cluster, req.Status, req.Utilization, req.Temperature, req.PowerW, req.UptimeSec,
+	).Scan(&id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to add gpu resource"})
+	}
+
+	created := models.GPUResource{
+		ID:          id,
+		CustomerID:  req.CustomerID,
+		Model:       req.Model,
+		MemoryGB:    req.MemoryGB,
+		MemoryUsed:  req.MemoryUsed,
+		Cluster:     req.Cluster,
+		Status:      req.Status,
+		Utilization: req.Utilization,
+		Temperature: req.Temperature,
+		PowerW:      req.PowerW,
+		UptimeSec:   req.UptimeSec,
+	}
+	return c.JSON(http.StatusCreated, created)
+}
+
 // GetJobs retrieves all jobs for a specific customer with summary statistics
 func GetJobs(c echo.Context) error {
 	customerID := c.Param("customer_id")
