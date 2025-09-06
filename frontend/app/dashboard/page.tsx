@@ -13,7 +13,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, BarChart3, RefreshCw, Activity, Settings2, Server } from "lucide-react";
+import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Cpu, PlayCircle, PauseCircle, Zap, PlusCircle, RefreshCw, Activity, Server } from "lucide-react";
 import StatCard from "../components/stat-card";
 
 // Chart.js - Register once
@@ -253,7 +253,7 @@ const Dashboard = React.memo(() => {
         }
       });
     return () => abort.abort();
-  }, [customerId, loadDashboard]);
+  }, [customerId, loadDashboard, pushError]);
 
   // Memoize chart data
   const lineChartData = useMemo(() => createLineChartData(), []);
