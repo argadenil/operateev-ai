@@ -26,7 +26,7 @@ import {
 } from "chart.js";
 import { Pie, Bar } from "react-chartjs-2";
 import StatCard from "../components/stat-card";
-import { fetchJobs, JobAPIShape, formatDuration, formatDateTime, getStatusColor, getStatusIcon } from "../../lib/job-management";
+import { fetchJobs, JobAPIShape, formatDuration, formatDateTime } from "../../lib/job-management";
 
 ChartJS.register(CategoryScale, LinearScale, ArcElement, BarElement, Title, Tooltip, Legend);
 
@@ -163,8 +163,9 @@ export default function JobManagementPage() {
         setSummary(data.summary || summary);
         setError(null);
       }
-    } catch (e: any) {
-      setError(e?.message || 'Failed to refresh jobs');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Failed to refresh jobs';
+      setError(msg);
     } finally {
       setIsRefreshing(false);
     }

@@ -14,7 +14,7 @@ import {
 import Loader from "../components/loader";
 import { X, Copy, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, CheckCircle, BarChart3, Server, Activity, RefreshCw } from "lucide-react";
 import StatCard from "../components/stat-card";
-import { fetchGPUResources, formatMemory, secondsToPretty, GPUResourceAPIShape, GPUResourcesResponseAPIShape } from "@/lib/gpu-resources";
+import { fetchGPUResources, formatMemory, secondsToPretty, GPUResourceAPIShape } from "@/lib/gpu-resources";
 import { getToken } from "@/lib/auth";
 
 type GPU = {
@@ -172,8 +172,9 @@ export default function GPUResourcesPage() {
       const transformedData = resp.gpus.map(transformGPUData);
       setGpuData(transformedData);
       setError(null);
-    } catch (e: any) {
-      setError(e?.message || 'Failed to refresh GPU resources');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Failed to refresh GPU resources';
+      setError(msg);
     } finally {
       setIsRefreshing(false);
     }
