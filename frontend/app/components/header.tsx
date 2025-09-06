@@ -82,7 +82,6 @@ export default function Header({
   }
 
   const menuItems = [
-    { label: "Profile", onClick: () => router.push(customerId ? `/profile/${customerId}` : '/profile') },
     { label: "Settings", onClick: () => router.push(customerId ? `/settings/${customerId}` : '/settings') },
     { label: "Logout", onClick: handleLogout },
   ];
@@ -206,7 +205,7 @@ export default function Header({
             <div
               className={`rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold cursor-pointer hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl ring-2 ring-white/10 hover:ring-white/20 ${isMobile ? 'w-9 h-9' : 'w-11 h-11'
                 }`}
-              title="Profile"
+              title="Account"
               onClick={() => setDropdownOpen(!dropdownOpen)}
               id="profile-button"
               role="button"
