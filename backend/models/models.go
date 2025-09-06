@@ -152,3 +152,66 @@ type AddGPURequest struct {
 	PowerW      int    `json:"power_w"`
 	UptimeSec   int    `json:"uptime_sec"`
 }
+
+// Settings represents configurable settings for a user account.
+// It mirrors the sections present in the frontend Settings page.
+type Settings struct {
+	Profile struct {
+		FullName string `json:"full_name"`
+		Email    string `json:"email"`
+		Phone    string `json:"phone"`
+	} `json:"profile"`
+	Preferences struct {
+		DarkMode         bool `json:"dark_mode"`
+		EnableAnimations bool `json:"enable_animations"`
+		AutoRefresh      bool `json:"auto_refresh"`
+		CompactTable     bool `json:"compact_table"`
+	} `json:"preferences"`
+	Notifications struct {
+		Email  bool `json:"email"`
+		Push   bool `json:"push"`
+		SMS    bool `json:"sms"`
+		System bool `json:"system"`
+	} `json:"notifications"`
+	Security struct {
+		TwoFAEnabled bool   `json:"two_fa_enabled"`
+		PasswordHint string `json:"password_hint,omitempty"`
+	} `json:"security"`
+	Integrations struct {
+		SlackEnabled bool `json:"slack_enabled"`
+	} `json:"integrations"`
+	Privacy struct {
+		Analytics     bool `json:"analytics"`
+		DataSharing   bool `json:"data_sharing"`
+		AllowExport   bool `json:"allow_export"`
+		AllowDeletion bool `json:"allow_deletion"`
+	} `json:"privacy"`
+	Workspace struct {
+		Name        string `json:"name"`
+		Public      bool   `json:"public"`
+		GuestAccess bool   `json:"guest_access"`
+	} `json:"workspace"`
+	Storage struct {
+		AutoBackup bool `json:"auto_backup"`
+		CloudSync  bool `json:"cloud_sync"`
+	} `json:"storage"`
+	Advanced struct {
+		DeveloperMode         bool `json:"developer_mode"`
+		BetaFeatures          bool `json:"beta_features"`
+		DebugMode             bool `json:"debug_mode"`
+		PerformanceMonitoring bool `json:"performance_monitoring"`
+		SessionTimeoutMin     int  `json:"session_timeout_min"`
+	} `json:"advanced"`
+}
+
+// GetSettingsResponse bundles settings and metadata.
+type GetSettingsResponse struct {
+	CustomerID int      `json:"customer_id"`
+	Settings   Settings `json:"settings"`
+	APIKey     string   `json:"api_key,omitempty"`
+}
+
+// UpdateSettingsRequest accepts new settings to persist.
+type UpdateSettingsRequest struct {
+	Settings Settings `json:"settings"`
+}
