@@ -3,7 +3,7 @@
 
 import { authFetch } from './auth';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:10000';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://operateev-ai-backend.onrender.com';
 
 export interface JobAPIShape {
   id: number;
