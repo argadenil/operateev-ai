@@ -49,7 +49,10 @@ export default function SettingsPage() {
         }
       })
       .catch((e: unknown) => {
-        if ((e as any)?.name !== 'AbortError') error('Failed to load settings');
+        const isAbort = e instanceof DOMException
+          ? e.name === 'AbortError'
+          : e instanceof Error && e.name === 'AbortError';
+        if (!isAbort) error('Failed to load settings');
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
