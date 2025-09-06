@@ -13,6 +13,16 @@ export function clearToken() {
   try { localStorage.removeItem('auth_token'); } catch {}
 }
 
+// Clear all locally stored auth/session data
+export function clearAuthData() {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('customer_id');
+    localStorage.removeItem('username');
+  } catch {}
+}
+
 export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
   const token = getToken();
   const headers = new Headers(init.headers || {});
@@ -24,26 +34,23 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
 
 // Logout helper: best-effort POST to backend, always clears token locally.
 export async function logout(): Promise<{ ok: boolean; error?: string }> {
+  // Capture token for backend notification, but make the UX instant by clearing local state first.
   const token = getToken();
-  if (!token) {
-    clearToken();
-    return { ok: true };
-  }
+  clearAuthData();
+
+  // Fire-and-forget best-effort server notification; do not block navigation.
   try {
-    const resp = await fetch(`${API_BASE}/logout`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
-    clearToken();
-    if (!resp.ok) {
-      let msg = 'Logout failed';
-      try { const data = await resp.json(); msg = data.error || msg; } catch {}
-      return { ok: false, error: msg };
+    if (token && API_BASE) {
+  // keepalive helps when navigating away right after calling fetch
+  fetch(`${API_BASE}/logout`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        keepalive: true,
+      }).catch(() => {});
     }
-    return { ok: true };
-  } catch (e: unknown) {
-    clearToken();
-    const msg = e instanceof Error ? e.message : 'Network error';
-    return { ok: false, error: msg };
+  } catch {
+    // Ignore network errors; local logout already completed
   }
+
+  return { ok: true };
 }
