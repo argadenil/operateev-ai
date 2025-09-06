@@ -4,9 +4,11 @@ package controllers
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"operateev/db"
 	"operateev/models"
+	"strconv"
 	"strings"
 	"time"
 
@@ -304,4 +306,110 @@ func GetJobs(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, models.JobResponse{Jobs: jobs, Summary: summary})
+}
+
+// GetSettings returns the settings for a user. For now, uses customer_id path param.
+func GetSettings(c echo.Context) error {
+	customerID := c.Param("customer_id")
+	if strings.TrimSpace(customerID) == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "customer_id required"})
+	}
+
+	// Fetch settings JSON and api key from DB (nullable)
+	var settingsJSON sql.NullString
+	var apiKey sql.NullString
+	err := db.Conn.QueryRowContext(
+		context.Background(),
+		`SELECT settings_json, api_key FROM "usersSchema"."user_settings" WHERE customer_id=$1`,
+		customerID,
+	).Scan(&settingsJSON, &apiKey)
+
+	// If no row, return sensible defaults without error
+	if err == sql.ErrNoRows {
+		def := defaultSettings()
+		return c.JSON(http.StatusOK, models.GetSettingsResponse{CustomerID: atoiSafe(customerID), Settings: def})
+	}
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to load settings"})
+	}
+
+	st := defaultSettings()
+	if settingsJSON.Valid && strings.TrimSpace(settingsJSON.String) != "" {
+		var parsed models.Settings
+		if uErr := json.Unmarshal([]byte(settingsJSON.String), &parsed); uErr == nil {
+			st = parsed
+		}
+	}
+	resp := models.GetSettingsResponse{CustomerID: atoiSafe(customerID), Settings: st}
+	if apiKey.Valid {
+		resp.APIKey = apiKey.String
+	}
+	return c.JSON(http.StatusOK, resp)
+}
+
+// UpdateSettings upserts the settings for a user
+func UpdateSettings(c echo.Context) error {
+	userID := c.Param("user_id")
+	if strings.TrimSpace(userID) == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "user_id required"})
+	}
+	var req models.UpdateSettingsRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
+	}
+
+	b, err := json.Marshal(req.Settings)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid settings format"})
+	}
+	jsonStr := string(b)
+
+	// Upsert into user_settings
+	_, execErr := db.Conn.ExecContext(
+		context.Background(),
+		`INSERT INTO "usersSchema"."user_settings" (user_id, settings_json)
+		 VALUES ($1, $2)
+		 ON CONFLICT (user_id) DO UPDATE SET settings_json=EXCLUDED.settings_json`,
+		userID, jsonStr,
+	)
+	if execErr != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to save settings"})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{"message": "settings updated"})
+}
+
+// Clean settings helpers
+func defaultSettings() models.Settings {
+	var s models.Settings
+	// Defaults that match a sensible starting point
+	s.Preferences.DarkMode = false
+	s.Preferences.EnableAnimations = true
+	s.Preferences.AutoRefresh = true
+	s.Preferences.CompactTable = false
+	s.Notifications.Email = true
+	s.Notifications.Push = false
+	s.Notifications.SMS = false
+	s.Notifications.System = true
+	s.Security.TwoFAEnabled = false
+	s.Integrations.SlackEnabled = false
+	s.Privacy.Analytics = true
+	s.Privacy.DataSharing = false
+	s.Privacy.AllowExport = true
+	s.Privacy.AllowDeletion = false
+	s.Workspace.Public = false
+	s.Workspace.GuestAccess = false
+	s.Storage.AutoBackup = false
+	s.Storage.CloudSync = false
+	s.Advanced.DeveloperMode = false
+	s.Advanced.BetaFeatures = false
+	s.Advanced.DebugMode = false
+	s.Advanced.PerformanceMonitoring = false
+	s.Advanced.SessionTimeoutMin = 30
+	return s
+}
+
+func atoiSafe(s string) int {
+	n, _ := strconv.Atoi(s)
+	return n
 }

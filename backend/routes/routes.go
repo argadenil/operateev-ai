@@ -37,4 +37,9 @@ func Register(e *echo.Echo) {
 	e.GET("/get-jobs/:customer_id", controllers.GetJobs)
 	/*---------------------------------------------------------------------------------------------*/
 
+	// Settings: Get, Update, Regenerate API Key for a given user
+	e.GET("/settings/:customer_id", controllers.GetSettings)
+	e.PUT("/settings/:customer_id", controllers.UpdateSettings)
+	/*---------------------------------------------------------------------------------------------*/
+
 }
