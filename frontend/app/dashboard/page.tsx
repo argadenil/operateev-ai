@@ -404,12 +404,6 @@ const Dashboard = React.memo(() => {
                         <button className={btn}>
                           <PlusCircle size={15} /> Add GPU
                         </button>
-                        <button className={btn}>
-                          <BarChart3 size={15} /> Reports
-                        </button>
-                        <button className={`hidden lg:inline-flex ${btn}`}>
-                          <Settings2 size={15} /> Settings
-                        </button>
                       </>
                     );
                   })()}
