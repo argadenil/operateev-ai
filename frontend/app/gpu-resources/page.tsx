@@ -12,7 +12,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { X, Copy, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, CheckCircle, BarChart3, Server, Activity } from "lucide-react";
+import { X, Copy, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, CheckCircle, BarChart3, Server, Activity, RefreshCw } from "lucide-react";
 import StatCard from "../components/stat-card";
 import { fetchGPUResources, formatMemory, secondsToPretty, GPUResourceAPIShape, GPUResourcesResponseAPIShape } from "@/lib/gpu-resources";
 import { getToken } from "@/lib/auth";
@@ -73,6 +73,7 @@ export default function GPUResourcesPage() {
   const [gpuData, setGpuData] = React.useState<GPU[]>(initialGPUList);
   const [customerId, setCustomerId] = React.useState<string | null | undefined>(undefined);
   const [error, setError] = React.useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
 
   // Parse customer id from URL path or localStorage
   useEffect(() => {
@@ -157,6 +158,26 @@ export default function GPUResourcesPage() {
       cancelled = true;
     };
   }, [customerId]);
+
+  // Manual refresh handler
+  const handleRefresh = async () => {
+    if (!customerId || isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      const resp = await fetchGPUResources(customerId);
+      if (resp.error) {
+        setError(resp.error);
+        return;
+      }
+      const transformedData = resp.gpus.map(transformGPUData);
+      setGpuData(transformedData);
+      setError(null);
+    } catch (e: any) {
+      setError(e?.message || 'Failed to refresh GPU resources');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const parseTotalMemory = (gpu: GPU) => {
     const m = gpu.memory.match(/(\d+)\s*GB/i);
@@ -430,6 +451,13 @@ export default function GPUResourcesPage() {
           </div>
         </div>
         <div className="flex gap-3 md:ml-auto">
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing || !customerId}
+            className="bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center text-sm shadow"
+          >
+            <RefreshCw size={16} /> {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </button>
 
           <button
             onClick={exportCSV}
