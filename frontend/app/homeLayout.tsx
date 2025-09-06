@@ -130,9 +130,21 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
                 <nav className="flex flex-col mt-16 md:mt-40 space-y-2 relative z-10">
                     {navigationItems.map((item) => {
-                        const isActive = item.name === 'Dashboard'
-                            ? pathname.startsWith('/dashboard') // match /dashboard or /dashboard/:id
-                            : pathname === item.href;
+                        // Mark active for base and nested routes
+                        let isActive = false;
+                        if (pathname) {
+                            if (item.name === 'Dashboard') {
+                                isActive = pathname.startsWith('/dashboard');
+                            } else if (item.name === 'GPU Resources') {
+                                isActive = pathname.startsWith('/gpu-resources');
+                            } else if (item.name === 'Job Management') {
+                                isActive = pathname.startsWith('/job-management');
+                            } else if (item.name === 'Settings') {
+                                isActive = pathname.startsWith('/settings');
+                            } else {
+                                isActive = pathname === item.href;
+                            }
+                        }
                         return (
                             <NavItem
                                 key={item.href}
