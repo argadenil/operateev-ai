@@ -68,17 +68,19 @@ export default function Header({
 
   const [loggingOut, setLoggingOut] = useState(false);
 
-  async function handleLogout() {
+  function handleLogout() {
     if (loggingOut) return;
     setLoggingOut(true);
-    const res = await logout(); // Regardless of server response, token cleared.
-    if (res.ok) {
-      success("You have been logged out", { title: "Logged out" });
-    } else if (res.error) {
-      pushError(res.error, { title: "Logout issue" });
-    }
+    setDropdownOpen(false);
+    // Fire-and-forget; logout now clears local storage immediately and pings server in background
+    logout().then((res) => {
+      if (!res.ok && res.error) {
+        // Optional: we can log this somewhere; avoid blocking UX
+        pushError(res.error, { title: "Logout issue" });
+      }
+    }).finally(() => setLoggingOut(false));
+    success("You have been logged out", { title: "Logged out" });
     router.replace('/login');
-    setLoggingOut(false);
   }
 
   const menuItems = [
