@@ -161,9 +161,13 @@ const Dashboard = React.memo(() => {
   const [summary, setSummary] = React.useState({ total: 0, running: 0, idle: 0, avgPower: 0 }); // added
   // removed fetching state
   // removed lastUpdated timestamp functionality
+  const [lastUpdated, setLastUpdated] = React.useState<Date | null>(null);
+  const [nowTs, setNowTs] = React.useState<number>(() => Date.now());
   // customerId: undefined = pending (not yet parsed), null = explicitly missing (base /dashboard), string = present
   const [customerId, setCustomerId] = React.useState<string | null | undefined>(undefined);
   const missingIdNotified = React.useRef(false);
+  // Customer name for badge; prefer 'customer_name' then 'username'
+  const [customerName, setCustomerName] = React.useState<string>("TEST Corp");
 
   // Derive customer id strictly from URL (/dashboard/:id). Base /dashboard should not auto-use stored id.
   useEffect(() => {
@@ -186,6 +190,15 @@ const Dashboard = React.memo(() => {
     // Nothing found -> mark explicitly missing
     setCustomerId(null);
   }, [router]);
+  
+  // Load customer display name from localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const name = (localStorage.getItem('customer_name') || localStorage.getItem('username') || '').trim();
+      if (name) setCustomerName(name);
+    } catch { /* ignore */ }
+  }, []);
   const loadDashboard = React.useCallback((cid: string, signal: AbortSignal) => {
     return fetchDashboard(cid, signal)
       .then((data) => {
@@ -210,7 +223,7 @@ const Dashboard = React.memo(() => {
           idle: data.summary?.idle || 0,
           avgPower: data.summary?.avg_power || 0,
         });
-  // lastUpdated removed
+  setLastUpdated(new Date());
       })
       .catch((e: unknown) => {
         if (!signal.aborted) {
@@ -258,6 +271,23 @@ const Dashboard = React.memo(() => {
   const handleCloseModal = useCallback(() => {
     setSelectedModel(null);
   }, []);
+
+  // Tick every 30s to update the relative time label
+  useEffect(() => {
+    if (!lastUpdated) return;
+    const id = setInterval(() => setNowTs(Date.now()), 30000);
+    return () => clearInterval(id);
+  }, [lastUpdated]);
+
+  // Friendly relative label for last updated
+  const lastUpdatedLabel = useMemo(() => {
+    if (!lastUpdated) return '';
+    const diffMs = nowTs - lastUpdated.getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if (mins <= 0) return 'just now';
+    if (mins === 1) return '1 min ago';
+    return `${mins} mins ago`;
+  }, [lastUpdated, nowTs]);
 
   // Adjust columns and table data to use resources
   const columns = useMemo<ColumnDef<GPUResource>[]>(() => [
@@ -359,11 +389,11 @@ const Dashboard = React.memo(() => {
                     {/* Company name badge (enhanced) */}
                     <span
                       className="relative inline-flex items-center gap-2 pl-3 pr-4 py-1.5 rounded-lg text-base sm:text-2xl font-semibold tracking-tight bg-white ring-1 ring-slate-200 shadow-sm focus:outline-none cursor-default select-none text-slate-800"
-                      aria-label="Company: TEST Corp"
-                      title="TEST Corp"
+                      aria-label={`Company: ${customerName}`}
+                      title={customerName}
                     >
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow" />
-                      <span className="leading-none">TEST Corp</span>
+                      <span className="leading-none">{customerName}</span>
                     </span>
                   </p>
                 </div>
@@ -397,6 +427,7 @@ const Dashboard = React.memo(() => {
                               idle: data.summary?.idle || 0,
                               avgPower: data.summary?.avg_power || 0,
                             });
+                            setLastUpdated(new Date());
                           } catch (e: unknown) { const msg = e instanceof Error ? e.message : 'Refresh failed'; pushError(msg, { title: 'Dashboard' }); }
                         }}>
                           <RefreshCw size={14} /> Refresh
@@ -404,6 +435,16 @@ const Dashboard = React.memo(() => {
                         <button className={btn}>
                           <PlusCircle size={15} /> Add GPU
                         </button>
+                        {lastUpdated && (
+                          <span
+                            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs ml-1 sm:ml-2 whitespace-nowrap px-2.5 py-1 rounded-md bg-white/95 text-slate-800 ring-1 ring-indigo-300 shadow-sm"
+                            title={lastUpdated.toLocaleString()}
+                          >
+                            <RefreshCw size={12} className="text-indigo-500" />
+                            <span className="font-semibold">Last updated</span>
+                            <span className="text-slate-600">• {lastUpdatedLabel}</span>
+                          </span>
+                        )}
                       </>
                     );
                   })()}

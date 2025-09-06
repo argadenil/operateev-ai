@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useRouter } from 'next/navigation';
 import {
   useReactTable,
@@ -13,7 +13,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Loader from "../components/loader";
-import { X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, BarChart3, PlayCircle, CheckCircle, XCircle, Clock, Timer } from "lucide-react";
+import { X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, BarChart3, PlayCircle, CheckCircle, XCircle, Clock, Timer, RefreshCw } from "lucide-react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -77,7 +77,7 @@ export default function JobManagementPage() {
   const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const [selectedJob, setSelectedJob] = React.useState<Job | null>(null);
   const [statusFilter] = React.useState<"all" | Job["status"]>("all"); // setter removed (unused)
   const [customerId, setCustomerId] = React.useState<string | null | undefined>(undefined);
@@ -91,6 +91,7 @@ export default function JobManagementPage() {
     cancelled: 0,
   });
   const [error, setError] = React.useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
 
   // Customer ID handling (same pattern as dashboard)
   React.useEffect(() => {
@@ -150,6 +151,25 @@ export default function JobManagementPage() {
     return () => controller.abort();
   }, [customerId]);
 
+  const handleRefresh = async () => {
+    if (!customerId || isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      const data = await fetchJobs(customerId);
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setJobs(data.jobs || []);
+        setSummary(data.summary || summary);
+        setError(null);
+      }
+    } catch (e: any) {
+      setError(e?.message || 'Failed to refresh jobs');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const filteredData =
     statusFilter === "all" ? jobs : jobs.filter((job) => job.status === statusFilter);
 
@@ -202,7 +222,8 @@ export default function JobManagementPage() {
   });
 
   // Early returns for loading/error states
-  if (loading) return <Loader />;
+  // Show loader while fetching OR while customerId is being resolved (undefined)
+  if (loading || customerId === undefined) return <Loader />;
   
   if (customerId === null) {
     return (
@@ -263,7 +284,7 @@ export default function JobManagementPage() {
     },
   };
 
-  if (loading) return <Loader />;
+  // (duplicate guarded above)
 
   return (
     <div className="space-y-6">
@@ -286,6 +307,13 @@ export default function JobManagementPage() {
         <section>
           <div className="flex items-center gap-3 mb-4">
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Analytics</h2>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing || !customerId}
+              className="ml-auto bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex items-center gap-2 text-sm shadow"
+            >
+              <RefreshCw size={16} /> {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
             {/* Status Distribution */}
