@@ -461,28 +461,6 @@ export default function GPUResourcesPage() {
             </select>
           </div>
         </div>
-        <div className="flex gap-3 md:ml-auto">
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors w-full sm:w-auto justify-center text-sm shadow"
-          >
-            + Add GPU
-          </button>
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing || !customerId}
-            className="bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center text-sm shadow"
-          >
-            <RefreshCw size={16} /> {isRefreshing ? 'Refreshing...' : 'Refresh'}
-          </button>
-
-          <button
-            onClick={exportCSV}
-            className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 flex items-center gap-2 w-full sm:w-auto justify-center text-sm shadow"
-          >
-            <Copy size={16} /> Export CSV
-          </button>
-        </div>
       </div>
 
       {/* Table */}
