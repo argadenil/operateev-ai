@@ -8,9 +8,9 @@ export default function Chat() {
   const [messages, setMessages] = useState([
     { id: 1, sender: "bot", text: "Hello 👋 How can I help you today?" }
   ]);
-
   const [input, setInput] = useState("");
   const [currentTime, setCurrentTime] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -32,6 +32,7 @@ export default function Chat() {
     setMessages((prev) => [...prev, userMessage]);
     const prompt = input;
     setInput("");
+    setIsProcessing(true);
 
     try {
       const res = await fetch("http://localhost:8003/chat", {
@@ -62,6 +63,8 @@ export default function Chat() {
           text: "Sorry, I couldn't get a response from the server."
         },
       ]);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -85,12 +88,11 @@ export default function Chat() {
       </div>
 
       {/* Messages */}
-<div className="flex-grow overflow-y-auto p-6 space-y-6 bg-gradient-to-br from-white/70 via-indigo-50/40 to-purple-50/40 backdrop-blur-md">
+      <div className="flex-grow overflow-y-auto p-6 space-y-6 bg-gradient-to-br from-white/70 via-indigo-50/40 to-purple-50/40 backdrop-blur-md">
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex items-end ${msg.sender === "user" ? "justify-end" : "justify-start"
-              }`}
+            className={`flex items-end ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
           >
             {/* Bot Avatar */}
             {msg.sender === "bot" && (
@@ -109,15 +111,15 @@ export default function Chat() {
             <div
               className={`relative px-6 py-4 max-w-xs sm:max-w-sm md:max-w-md break-words shadow-lg transition-all duration-300 hover:shadow-xl ${msg.sender === "user"
                   ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-3xl rounded-br-lg"
-                  : "bg-white text-gray-800 rounded-3xl rounded-bl-lg border border-gray-100"
+                  : "bg-gradient-to-br from-cyan-600 to-teal-700 text-white rounded-3xl rounded-bl-lg border border-cyan-500"
                 }`}
             >
-              <div className={`text-sm leading-relaxed ${msg.sender === "user" ? "text-white" : "text-gray-800"}`}>
+              <div className={`text-sm leading-relaxed ${msg.sender === "user" ? "text-white" : "text-white"}`}>
                 {msg.text}
               </div>
 
               {/* Message timestamp */}
-              <div className={`text-xs mt-2 ${msg.sender === "user" ? "text-white/70" : "text-gray-500"}`}>
+              <div className={`text-xs mt-2 ${msg.sender === "user" ? "text-white/70" : "text-white/70"}`}>
                 {currentTime || '--:--'}
               </div>
             </div>
@@ -132,6 +134,30 @@ export default function Chat() {
             )}
           </div>
         ))}
+        {/* Processing indicator */}
+        {isProcessing && (
+          <div className="flex items-end justify-start space-x-3">
+            {/* AI Avatar */}
+            <div className="w-10 h-10 flex-shrink-0">
+              <Image
+                src="/images/robot.png"
+                alt="AI Avatar"
+                width={40}
+                height={40}
+                className="rounded-2xl shadow-md object-cover ring-2 ring-indigo-100"
+              />
+            </div>
+
+            {/* Processing Message */}
+            <div className="relative px-5 py-3 max-w-xs sm:max-w-sm md:max-w-md break-words shadow-lg bg-white text-gray-800 rounded-3xl rounded-bl-lg border border-gray-100 animate-pulse">
+              <div className="flex items-center gap-2 text-sm text-gray-800">
+                <span className="w-3 h-3 rounded-full bg-indigo-400 animate-bounce" />
+                <span>Processing...</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
