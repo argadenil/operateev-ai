@@ -1,3 +1,6 @@
+# Tip: Run the app with:
+# uvicorn ai_chatbot:app --host 0.0.0.0 --port 8000 --reload
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware

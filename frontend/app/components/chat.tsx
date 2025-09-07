@@ -151,7 +151,7 @@ export default function Chat() {
             {/* Processing Message */}
             <div className="relative px-5 py-3 max-w-xs sm:max-w-sm md:max-w-md break-words shadow-lg bg-white text-gray-800 rounded-3xl rounded-bl-lg border border-gray-100 animate-pulse">
               <div className="flex items-center gap-2 text-sm text-gray-800">
-                <span className="w-3 h-3 rounded-full bg-indigo-400 animate-bounce" />
+                <span className="w-3 h-3 rounded-full bg-cyan-600 animate-bounce" />
                 <span>Processing...</span>
               </div>
             </div>
