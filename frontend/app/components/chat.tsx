@@ -6,26 +6,7 @@ import Image from "next/image";
 
 export default function Chat() {
   const [messages, setMessages] = useState([
-    { id: 1, sender: "bot", text: "Hello 👋 How can I help you today?" },
-    { id: 2, sender: "user", text: "I just wanted to check system status." },
-    { id: 3, sender: "bot", text: "System is running smoothly ✅" },
-    { id: 4, sender: "user", text: "Great! Can I see today's activity logs?" },
-    { id: 5, sender: "bot", text: "Sure! Fetching logs for you... 📊" },
-    { id: 6, sender: "bot", text: "Logs show no errors, only routine checks." },
-    { id: 7, sender: "user", text: "Perfect, thanks!" },
-    { id: 8, sender: "bot", text: "Anytime 🚀" },
-    { id: 9, sender: "user", text: "Can you summarize yesterday's performance?" },
-    { id: 10, sender: "bot", text: "Yesterday was stable with all systems nominal." },
-    { id: 11, sender: "user", text: "What about server CPU usage?" },
-    { id: 12, sender: "bot", text: "Average CPU usage was 42%, within safe limits." },
-    { id: 13, sender: "user", text: "Any errors reported by the database?" },
-    { id: 14, sender: "bot", text: "No errors. All database queries executed successfully." },
-    { id: 15, sender: "user", text: "How many users logged in yesterday?" },
-    { id: 16, sender: "bot", text: "Total active users: 1,234 👥" },
-    { id: 17, sender: "user", text: "Can you check the last deployment status?" },
-    { id: 18, sender: "bot", text: "Last deployment completed successfully without downtime." },
-    { id: 19, sender: "user", text: "Any pending system alerts?" },
-    { id: 20, sender: "bot", text: "No pending alerts. All systems operational ✅" },
+    { id: 1, sender: "bot", text: "Hello 👋 How can I help you today?" }
   ]);
 
   const [input, setInput] = useState("");
@@ -41,27 +22,47 @@ export default function Chat() {
     setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   }, []);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
-    const newMessage = {
+    const userMessage = {
       id: messages.length + 1,
       sender: "user" as const,
       text: input,
     };
-    setMessages([...messages, newMessage]);
+    setMessages((prev) => [...prev, userMessage]);
+    const prompt = input;
     setInput("");
 
-    // Dummy bot reply
-    setTimeout(() => {
+    try {
+      const res = await fetch("http://localhost:8007/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to get response from AI backend");
+      }
+      const data = await res.json();
       setMessages((prev) => [
         ...prev,
         {
           id: prev.length + 1,
           sender: "bot" as const,
-          text: "🤖 Got it! This is a dummy reply.",
+          text: data.response || "(No response)"
         },
       ]);
-    }, 1000);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          sender: "bot" as const,
+          text: "Sorry, I couldn't get a response from the server."
+        },
+      ]);
+    }
   };
 
   return (
