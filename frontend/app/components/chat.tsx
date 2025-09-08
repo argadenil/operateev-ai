@@ -35,7 +35,7 @@ export default function Chat() {
     setIsProcessing(true);
 
     try {
-      const res = await fetch("http://localhost:10000/chat", {
+      const res = await fetch("http://localhost:8000/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
