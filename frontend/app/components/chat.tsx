@@ -33,14 +33,14 @@ export default function Chat() {
     const prompt = input;
     setInput("");
     setIsProcessing(true);
-
+    const customer_id = localStorage.getItem("customer_id"); // Example customer ID
     try {
       const res = await fetch("http://localhost:8000/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt , customer_id: customer_id }),
       });
       if (!res.ok) {
         throw new Error("Failed to get response from AI backend");
