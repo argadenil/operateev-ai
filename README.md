@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# operateev-ai
 
-## Getting Started
+Monorepo containing a Go backend API and a Next.js frontend UI.
 
-First, run the development server:
+## Stack
+- **Backend**: Go (module in `backend/`) – HTTP API (controllers, routes, middleware, models, utils). Entry: `backend/main.go`.
+- **Frontend**: Next.js / React (App Router) in `frontend/`.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Repository Layout
+```
+backend/        Go API service
+frontend/       Next.js web app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick Start
+### Prerequisites
+- Go 1.22+ (check with `go version`)
+- Node.js 18+ & pnpm/npm/yarn (choose one)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Backend
+```bash
+cd backend
+# tidy & download deps
+go mod tidy
+# run
+go run ./...
+```
+Service will start on default port (set in `main.go` or env). Create a `.env` (if needed) for DB keys, API keys, etc.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Suggested env vars:
+```
+PORT=8080
+DB_URL=postgres://user:pass@host:5432/dbname?sslmode=disable
+```
 
-## Learn More
+### Frontend
+```bash
+cd frontend
+npm install   # or pnpm install / yarn
+npm run dev   # starts Next.js dev server
+```
+Visit: http://localhost:3000
 
-To learn more about Next.js, take a look at the following resources:
+## Development Notes
+- Commit to feature branches off `main-dev-p1`, open PRs before merging.
+- Keep backend and frontend changes in separate commits when possible.
+- Add/update README sections when introducing new services or scripts.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Testing (Add As Implemented)
+Backend: add Go tests under `backend/**_test.go` then run `go test ./...`.
+Frontend: add tests (e.g. Vitest / Jest) once configured.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Coding Guidelines
+- Go: idiomatic, run `go fmt ./...` before commit.
+- TS/JS: follow ESLint config in `frontend/` (run `npm run lint`).
 
-## Deploy on Vercel
+## Git Ignore Highlights
+- Backend ignores `tml/` (temporary local workspace directory).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contributing
+1. Fork / branch
+2. Implement + tests
+3. Update docs
+4. PR with concise description
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Future Enhancements
+- Containerization (Dockerfiles for backend & frontend)
+- CI pipeline (lint, test, build)
+- Centralized env management
+
+## License
+Add license information here (e.g., MIT) if applicable.
