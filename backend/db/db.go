@@ -28,7 +28,8 @@ func Connect(dsn string) error {
 
 // InitializeDB connects to the database using the default DSN and sets up the global connection.
 func InitializeDB() error {
-	dsn := "postgresql://operateev_ai_user:Ivl7TSwqxRCKXQ7aq0Lwm2rFpGHG6YhD@dpg-d2taiube5dus73dldfo0-a.ohio-postgres.render.com/operateev_ai"
+	dsn := "postgres://postgres:nilesh3496@localhost:5432/postgres?sslmode=disable"
+	//dsn := "postgresql://operateev_ai_user:Ivl7TSwqxRCKXQ7aq0Lwm2rFpGHG6YhD@dpg-d2taiube5dus73dldfo0-a.ohio-postgres.render.com/operateev_ai"
 	if err := Connect(dsn); err != nil {
 		log.Fatal("db connection failed: ", err)
 	}
