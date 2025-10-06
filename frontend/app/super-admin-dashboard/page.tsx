@@ -29,7 +29,7 @@ import {
     CheckCircle,
     XCircle,
     Bell,
-    BellOff
+    BellOff,
 } from 'lucide-react';
 import {
     Chart as ChartJS,
@@ -61,18 +61,77 @@ const PieChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Pie),
 const LineChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Line), { ssr: false });
 
 const headlineStats = [
-    { title: 'Total Admins', value: 18, icon: UserCog, palette: 'blue' as const, change: +2, changeType: 'increase' as const },
-    { title: 'Total Customers', value: 1264, icon: Users, palette: 'emerald' as const, change: +156, changeType: 'increase' as const },
-    { title: 'Clusters', value: 12, icon: Server, palette: 'violet' as const, change: 0, changeType: 'neutral' as const },
-    { title: 'Nodes', value: 84, icon: MonitorSmartphone, palette: 'orange' as const, change: -4, changeType: 'decrease' as const },
-    { title: 'GPUs', value: 512, icon: Cpu, palette: 'indigo' as const, change: +32, changeType: 'increase' as const }
+  { 
+    title: 'Total Admins', 
+    value: 18, 
+    icon: UserCog, 
+    palette: 'blue' as const, 
+    change: +2, 
+    changeType: 'increase' as const,
+    description: 'Compared to last week' 
+  },
+  { 
+    title: 'Total Customers', 
+    value: 1264, 
+    icon: Users, 
+    palette: 'emerald' as const, 
+    change: +156, 
+    changeType: 'increase' as const,
+    description: 'New signups this month'
+  },
+  { 
+    title: 'Clusters', 
+    value: 12, 
+    icon: Server, 
+    palette: 'violet' as const, 
+    change: 0, 
+    changeType: 'neutral' as const,
+    description: 'Stable since last update'
+  },
+  { 
+    title: 'Nodes', 
+    value: 84, 
+    icon: MonitorSmartphone, 
+    palette: 'orange' as const, 
+    change: -4, 
+    changeType: 'decrease' as const,
+    description: 'Some nodes offline'
+  },
+  { 
+    title: 'GPUs', 
+    value: 512, 
+    icon: Cpu, 
+    palette: 'indigo' as const, 
+    change: +32, 
+    changeType: 'increase' as const,
+    description: 'Available for allocation'
+  }
 ];
 
 const secondaryStats = [
-    { title: 'Active Users', value: '1.1k', icon: UserCheck, palette: 'emerald' as const, description: 'Inactive: 58' },
-    { title: 'Used GPUs', value: 356, icon: Cpu, palette: 'sky' as const, description: 'Available: 156' },
-    { title: 'Failed GPUs', value: 6, icon: ZapOff, palette: 'red' as const, description: 'Offline nodes: 4' }
+  { 
+    title: 'Active Users', 
+    value: '1.1k', 
+    icon: UserCheck, 
+    palette: 'emerald' as const, 
+    description: 'Inactive: 58' 
+  },
+  { 
+    title: 'Used GPUs', 
+    value: 356, 
+    icon: Cpu, 
+    palette: 'sky' as const, 
+    description: 'Available: 156' 
+  },
+  { 
+    title: 'Failed GPUs', 
+    value: 6, 
+    icon: ZapOff, 
+    palette: 'red' as const, 
+    description: 'Offline nodes: 4' 
+  },
 ];
+
 
 const customersPerAdminData: ChartData<'bar'> = {
     labels: ['Avery', 'Jordan', 'Morgan', 'Taylor', 'Riley', 'Bailey'],
