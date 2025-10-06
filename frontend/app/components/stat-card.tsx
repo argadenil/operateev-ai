@@ -6,7 +6,7 @@ export type StatCardProps = {
     title: string;
     value: React.ReactNode;
     icon: LucideIcon;
-    palette: 'blue' | 'emerald' | 'amber' | 'orange' | 'violet' | 'red' | 'yellow' | 'indigo' | 'sky' | 'teal' | 'pink' | 'gray';
+    palette: 'blue' | 'emerald' | 'amber' | 'orange' | 'violet' | 'red' | 'yellow' | 'indigo' | 'sky' | 'teal' | 'pink' | 'gray' | 'fuchsia' | 'orange-red' | 'blue-gray' | 'cyan' | 'lime' | 'rose';
     className?: string;
     size?: 'sm' | 'md';
     uppercaseTitle?: boolean;
@@ -100,24 +100,25 @@ const paletteMap: Record<string, {
         progressBar: 'bg-pink-400',
         progressBg: 'bg-white/20'
     },
-    red: {
-        gradient: "bg-[linear-gradient(to_right,_#ef6c6c,_#e57373)]", // softer red gradient
-        iconWrap: 'bg-white/15 backdrop-blur-sm', // lighter backdrop
-        iconColor: 'text-white', // still readable
-        title: 'text-white/90', // softer title
-        value: 'text-white', // clear value
-        shadow: 'shadow-red-300/30', // subtle shadow
-        changeColors: {
-            increase: 'text-white/90 bg-white/15 border-white/20',
-            decrease: 'text-white/80 bg-white/10 border-white/15',
-            neutral: 'text-white/70 bg-white/5 border-white/10'
-        },
-        progressBar: 'bg-red-300', // softer progress bar
-        progressBg: 'bg-white/10' // subtle background
-    }
+red: {
+  gradient: "bg-[linear-gradient(to_right,_#d15241,_#e57373,_#f28f79)]", // warm red-to-copper gradient
+  iconWrap: "bg-white/15 backdrop-blur-sm", // subtle blur
+  iconColor: "text-white", // clean contrast
+  title: "text-white/90", // soft readable title
+  value: "text-white", // clear strong value
+  shadow: "shadow-[0_4px_20px_rgba(210,82,65,0.35)]", // red-copper soft shadow
+  changeColors: {
+    increase: "text-white/90 bg-white/15 border-white/20",
+    decrease: "text-white/80 bg-white/10 border-white/15",
+    neutral: "text-white/70 bg-white/5 border-white/10",
+  },
+  progressBar: "bg-[#e2725b]", // copper red progress
+  progressBg: "bg-white/10", // subtle track background
+},
 
 
-    ,
+
+    
     yellow: {
         gradient: "bg-[linear-gradient(to_right,_#f7971e,_#ffd200)]",
         iconWrap: 'bg-white/20 backdrop-blur-md',

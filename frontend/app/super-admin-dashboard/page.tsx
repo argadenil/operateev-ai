@@ -17,19 +17,10 @@ import {
     Thermometer,
     ZapOff,
     LucideIcon,
-    RefreshCw,
-    Download,
-    Filter,
     Search,
     ChevronDown,
     ChevronUp,
-    TrendingUp,
-    TrendingDown,
-    Clock,
     CheckCircle,
-    XCircle,
-    Bell,
-    BellOff,
 } from 'lucide-react';
 import {
     Chart as ChartJS,
@@ -83,7 +74,7 @@ const headlineStats = [
         title: 'Clusters',
         value: 12,
         icon: Server,
-        palette: 'violet' as const,
+        palette: 'gray' as const,
         change: 0,
         changeType: 'neutral' as const,
         description: 'Stable since last update'
@@ -636,36 +627,6 @@ function HeatmapCard({ title, subtitle, data }: HeatmapCardProps) {
     );
 }
 
-function AlertItem({ text, severity, icon: Icon }: { text: string; severity: AlertSeverity; icon: LucideIcon }) {
-    const severityStyles: Record<AlertSeverity, string> = {
-        error: 'bg-red-50 text-red-600 border-red-100',
-        warning: 'bg-amber-50 text-amber-600 border-amber-100',
-        info: 'bg-blue-50 text-blue-600 border-blue-100'
-    };
-
-    return (
-        <li className={`rounded-xl border px-4 py-3 flex items-start gap-3 ${severityStyles[severity]}`}>
-            <span className="pt-0.5">
-                <Icon size={18} />
-            </span>
-            <span className="text-sm font-medium leading-snug">{text}</span>
-        </li>
-    );
-}
-
-function ActivityItem({ text, icon: Icon, timestamp }: { text: string; icon: LucideIcon; timestamp: string }) {
-    return (
-        <li className="flex items-start gap-3 rounded-xl border border-slate-200/70 px-4 py-3 bg-slate-50/60">
-            <span className="mt-1 text-blue-600">
-                <Icon size={18} />
-            </span>
-            <div className="flex-1">
-                <p className="text-sm font-medium text-slate-800">{text}</p>
-                <p className="text-xs text-slate-500">{timestamp}</p>
-            </div>
-        </li>
-    );
-}
 
 function ShortcutButton({ text, href, icon: Icon }: { text: string; href: string; icon: LucideIcon }) {
     return (
