@@ -40,7 +40,7 @@ if (typeof window !== 'undefined') {
 import { fetchDashboard, secondsToH, capitalizeStatus, DashboardAPIResource } from "../../lib/dashboard"; // added
 import { addGPUResource, AddGPURequest } from "../../lib/gpu-resources";
 import { useToast } from "../components/toaster"; // added
-import SuperadminDashboard from "../super-admin-dashboard/page";
+import SuperadminDashboard from "../super-admin/page";
 
 type GPUResource = {
   id: number;

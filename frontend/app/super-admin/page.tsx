@@ -59,16 +59,29 @@ const headlineStats = [
         palette: 'blue' as const,
         change: +2,
         changeType: 'increase' as const,
-        description: 'Compared to last week'
+        description: '2 new this week',
+        dataViz: { 
+            type: 'dotIndicator' as const, 
+            items: [
+                { label: 'Super Admins', count: 3, color: 'bg-purple-400' },
+                { label: 'Admins', count: 10, color: 'bg-blue-400' },
+                { label: 'Support', count: 5, color: 'bg-cyan-400' }
+            ]
+        }
     },
     {
         title: 'Total Customers',
-        value: 1264,
+        value: '1.26K',
         icon: Users,
         palette: 'emerald' as const,
         change: +156,
         changeType: 'increase' as const,
-        description: 'New signups this month'
+        description: '+12.3% growth this month',
+        dataViz: { 
+            type: 'comparison' as const,
+            primary: { label: 'Enterprise', value: '842' },
+            secondary: { label: 'Startup', value: '422' }
+        }
     },
     {
         title: 'Clusters',
@@ -77,7 +90,12 @@ const headlineStats = [
         palette: 'gray' as const,
         change: 0,
         changeType: 'neutral' as const,
-        description: 'Stable since last update'
+        description: 'Stable since last update',
+        dataViz: {
+            type: 'comparison' as const,
+            primary: { label: 'Active', value: '10' },
+            secondary: { label: 'Idle', value: '2' }
+        }
     },
     {
         title: 'Nodes',
@@ -86,7 +104,15 @@ const headlineStats = [
         palette: 'orange' as const,
         change: -4,
         changeType: 'decrease' as const,
-        description: 'Some nodes offline'
+        description: 'Some nodes offline',
+        dataViz: {
+            type: 'dotIndicator' as const,
+            items: [
+                { label: 'Online', count: 76, color: 'bg-green-400' },
+                { label: 'Maintenance', count: 4, color: 'bg-yellow-400' },
+                { label: 'Offline', count: 4, color: 'bg-red-400' }
+            ]
+        }
     },
     {
         title: 'GPUs',
@@ -95,7 +121,19 @@ const headlineStats = [
         palette: 'indigo' as const,
         change: +32,
         changeType: 'increase' as const,
-        description: 'Available for allocation'
+        description: 'Available for allocation',
+        dataViz: {
+            type: 'tags' as const, items: ['V100',
+                'A100',
+                'H100',
+                'RTX 4090',
+                'RTX 3090',
+                'T4',
+                'L40S',
+                'MI300X',
+                'H200',
+                'A800']
+        }
     }
 ];
 
@@ -105,21 +143,42 @@ const secondaryStats = [
         value: '1.1k',
         icon: UserCheck,
         palette: 'emerald' as const,
-        description: 'Inactive: 58'
+        description: 'Inactive: 58',
+        dataViz: {
+            type: 'comparison' as const,
+            primary: { label: 'Active', value: '1.1k' },
+            secondary: { label: 'Inactive', value: '58' }
+        }
     },
     {
         title: 'Used GPUs',
         value: 356,
         icon: Cpu,
         palette: 'sky' as const,
-        description: 'Available: 156'
+        description: 'Available: 156',
+        dataViz: {
+            type: 'dotIndicator' as const,
+            items: [
+                { label: 'In Use', count: 356, color: 'bg-red-400' },
+                { label: 'Available', count: 156, color: 'bg-green-400' },
+                { label: 'Reserved', count: 48, color: 'bg-amber-400' },
+            ]
+        }
     },
     {
         title: 'Failed GPUs',
         value: 6,
         icon: ZapOff,
         palette: 'red' as const,
-        description: 'Offline nodes: 4'
+        description: 'Offline nodes: 4',
+        dataViz: {
+            type: 'dotIndicator' as const,
+            items: [
+                { label: 'Hardware', count: 3, color: 'bg-green-400' },
+                { label: 'Network', count: 2, color: 'bg-gray-400' },
+                { label: 'Power', count: 1, color: 'bg-yellow-400' }
+            ]
+        }
     },
 ];
 
@@ -350,6 +409,7 @@ export default function SuperAdminDashboard() {
                         palette={stat.palette}
                         change={stat.change}
                         changeType={stat.changeType}
+                        dataViz={stat.dataViz}
                     />
                 ))}
             </section>
@@ -363,6 +423,7 @@ export default function SuperAdminDashboard() {
                         icon={stat.icon}
                         palette={stat.palette}
                         description={stat.description}
+                        dataViz={stat.dataViz}
                     />
                 ))}
             </section>
@@ -425,8 +486,8 @@ export default function SuperAdminDashboard() {
                                         key={filter}
                                         onClick={() => setAlertFilter(filter)}
                                         className={`px-3 py-1 rounded-full text-xs font-medium transition ${alertFilter === filter
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                                             }`}
                                     >
                                         {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -438,14 +499,14 @@ export default function SuperAdminDashboard() {
                                 {filteredAlerts.length > 0 ? (
                                     filteredAlerts.map((alert, idx) => (
                                         <li key={idx} className={`flex items-start gap-3 p-3 rounded-lg border transition hover:shadow-sm ${alert.severity === 'error' ? 'bg-red-50/50 border-red-200' :
-                                                alert.severity === 'warning' ? 'bg-yellow-50/50 border-yellow-200' :
-                                                    'bg-blue-50/50 border-blue-200'
+                                            alert.severity === 'warning' ? 'bg-yellow-50/50 border-yellow-200' :
+                                                'bg-blue-50/50 border-blue-200'
                                             }`}>
                                             <alert.icon
                                                 size={18}
                                                 className={`flex-shrink-0 mt-0.5 ${alert.severity === 'error' ? 'text-red-600' :
-                                                        alert.severity === 'warning' ? 'text-yellow-600' :
-                                                            'text-blue-600'
+                                                    alert.severity === 'warning' ? 'text-yellow-600' :
+                                                        'text-blue-600'
                                                     }`}
                                             />
                                             <div className="flex-1 min-w-0">
