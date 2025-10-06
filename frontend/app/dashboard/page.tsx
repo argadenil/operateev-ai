@@ -40,7 +40,7 @@ if (typeof window !== 'undefined') {
 import { fetchDashboard, secondsToH, capitalizeStatus, DashboardAPIResource } from "../../lib/dashboard"; // added
 import { addGPUResource, AddGPURequest } from "../../lib/gpu-resources";
 import { useToast } from "../components/toaster"; // added
-import SuperadminPanel from "../super-admin-dashboard/page";
+import SuperadminDashboard from "../super-admin-dashboard/page";
 
 type GPUResource = {
   id: number;
@@ -370,7 +370,7 @@ const Dashboard = React.memo(() => {
 
   // If superadmin, render superadmin panel immediately (no customer id required)
   if (role === 'superadmin') {
-    return <SuperadminPanel />;
+    return <SuperadminDashboard />;
   }
 
   if (loading || customerId === undefined) return <Loader />;
@@ -665,8 +665,8 @@ const Dashboard = React.memo(() => {
                 <tr
                   key={row.id}
                   className={`border-b border-gray-100 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200 ${i % 2 === 0
-                      ? "bg-gray-100"
-                      : "bg-white"
+                    ? "bg-gray-100"
+                    : "bg-white"
                     }`}
                 >
                   {row.getVisibleCells().map((cell) => {
