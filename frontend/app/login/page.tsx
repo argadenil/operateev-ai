@@ -81,7 +81,7 @@ export default function LoginPage() {
       try {
         const canonicalRole = (data.role || '').toString().toLowerCase().replace(/\s+/g, '');
         if (canonicalRole === 'superadmin') {
-          router.push('/super-admin-dashboard');
+          router.push('/super-admin');
         } else if (canonicalRole === 'admin') {
           router.push('/admin-dashboard');
         } else {

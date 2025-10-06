@@ -1,7 +1,13 @@
 import React from 'react';
 import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+export type DataVisualization =
+    | { type: 'miniChart'; data: number[]; label?: string }
+    | { type: 'dotIndicator'; items: { label: string; count: number; color?: string }[] }
+    | { type: 'comparison'; primary: { label: string; value: string | number }; secondary: { label: string; value: string | number } }
+    | { type: 'trendLine'; data: number[]; label?: string }
+    | { type: 'tags'; items: string[] }
+    | { type: 'none' };
 
-// Add sparkline prop
 export type StatCardProps = {
     title: string;
     value: React.ReactNode;
@@ -15,8 +21,7 @@ export type StatCardProps = {
     descriptionClassName?: string;
     change?: number;
     changeType?: 'increase' | 'decrease' | 'neutral';
-    progress?: number; // Progress percentage (0-100) for the progress bar
-    sparkline?: number[]; // Optional sparkline data
+    dataViz?: DataVisualization; // New flexible data visualization prop
 };
 
 // Add keyframes for animated gradient and pulse
@@ -255,8 +260,7 @@ const StatCard: React.FC<StatCardProps> = ({
     descriptionClassName,
     change,
     changeType = 'neutral',
-    progress = 65, // Default progress
-    sparkline
+    dataViz = { type: 'none' }
 }) => {
     const p = paletteMap[palette];
 
@@ -274,6 +278,140 @@ const StatCard: React.FC<StatCardProps> = ({
         icon: 22
     };
 
+    // Mini Chart Renderer
+    const renderMiniChart = (data: number[], label?: string) => {
+        if (!data || data.length === 0) return null;
+        const max = Math.max(...data);
+        if (max === 0) return null;
+
+        return (
+            <div className="mt-3 w-full">
+                {label && <p className="text-xs text-white/70 mb-2">{label}</p>}
+                <div className="flex items-end justify-between gap-0.5 h-12 w-full">
+                    {data.map((val, idx) => {
+                        const heightPercent = Math.max((val / max) * 100, 5); // Minimum 5% height for visibility
+                        return (
+                            <div key={idx} className="flex-1 bg-white/10 rounded-t relative overflow-hidden" style={{ minHeight: '2px' }}>
+                                <div
+                                    className={`absolute bottom-0 left-0 right-0 ${p.progressBar} transition-all duration-500 rounded-t`}
+                                    style={{ height: `${heightPercent}%` }}
+                                    title={`${val}`}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    };
+
+    // Dot Indicator Renderer
+    const renderDotIndicator = (items: { label: string; count: number; color?: string }[]) => {
+        if (!items || items.length === 0) return null;
+
+        return (
+            <div className="mt-3 w-full space-y-2">
+                {items.map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${item.color || 'bg-white/70'}`} />
+                            <span className="text-white/80">{item.label}</span>
+                        </div>
+                        <span className="text-white/90 font-semibold">{item.count}</span>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
+    // Comparison Renderer
+    const renderComparison = (primary: { label: string; value: string | number }, secondary: { label: string; value: string | number }) => {
+        return (
+            <div className="mt-3 w-full grid grid-cols-2 gap-3">
+                <div className="bg-white/10 rounded-lg p-2">
+                    <p className="text-[10px] text-white/60 uppercase tracking-wide">{primary.label}</p>
+                    <p className="text-lg font-bold text-white mt-1">{primary.value}</p>
+                </div>
+                <div className="bg-white/10 rounded-lg p-2">
+                    <p className="text-[10px] text-white/60 uppercase tracking-wide">{secondary.label}</p>
+                    <p className="text-lg font-bold text-white mt-1">{secondary.value}</p>
+                </div>
+            </div>
+        );
+    };
+
+    // Trend Line Renderer (Simple Sparkline)
+    const renderTrendLine = (data: number[], label?: string) => {
+        if (!data || data.length === 0) return null;
+
+        const max = Math.max(...data);
+        const min = Math.min(...data);
+        const range = max - min || 1;
+
+        const points = data.map((val, idx) => {
+            const x = data.length === 1 ? 50 : (idx / (data.length - 1)) * 100;
+            const y = 100 - ((val - min) / range) * 100;
+            return `${x},${y}`;
+        }).join(' ');
+
+        return (
+            <div className="mt-3 w-full">
+                {label && <p className="text-xs text-white/70 mb-2">{label}</p>}
+                <svg className="w-full h-10" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <polyline
+                        fill="none"
+                        stroke="rgba(255,255,255,0.6)"
+                        strokeWidth="2"
+                        points={points}
+                    />
+                    <polyline
+                        fill="rgba(255,255,255,0.1)"
+                        stroke="none"
+                        points={`0,100 ${points} 100,100`}
+                    />
+                </svg>
+            </div>
+        );
+    };
+
+    // Tags Renderer
+    const renderTags = (items: string[]) => {
+        if (!items || items.length === 0) return null;
+
+        return (
+            <div className="mt-3 w-full flex flex-wrap gap-1.5">
+                {items.map((item, idx) => (
+                    <span
+                        key={idx}
+                        className="px-2 py-0.5 bg-white/15 rounded-full text-[10px] text-white/90 font-medium"
+                    >
+                        {item}
+                    </span>
+                ))}
+            </div>
+        );
+    };
+
+    // Render appropriate data visualization
+    const renderDataViz = () => {
+        if (!dataViz || dataViz.type === 'none') return null;
+
+        switch (dataViz.type) {
+            case 'miniChart':
+                return renderMiniChart(dataViz.data, dataViz.label);
+            case 'dotIndicator':
+                return renderDotIndicator(dataViz.items);
+            case 'comparison':
+                return renderComparison(dataViz.primary, dataViz.secondary);
+            case 'trendLine':
+                return renderTrendLine(dataViz.data, dataViz.label);
+            case 'tags':
+                return renderTags(dataViz.items);
+            default:
+                return null;
+        }
+    };
+
     return (
         <div
             className={`relative rounded-2xl ${p.shadow} ${p.gradient} group ${className} cursor-pointer transform transition-transform duration-500 ease-in-out hover:scale-105 hover:shadow-2xl animate-gradient-x`} style={{ transitionProperty: "transform, translate, scale, rotate", backgroundSize: '200% 200%' }}
@@ -287,30 +425,13 @@ const StatCard: React.FC<StatCardProps> = ({
                     </div>
                 </div>
 
-                {/* Row 2: Value + Progress */}
+                {/* Row 2: Value + Data Visualization */}
                 <div className="flex flex-col w-full">
                     <h3 className={`text-3xl font-bold ${p.value}`}>{value}{valueSuffix}</h3>
 
-                    {progress !== undefined && (
-                        <div className="mt-2 w-full">
-                            <div className="flex items-center justify-between text-xs text-white/70 mb-1">
-                                <span>Progress</span>
-                                <span className="font-semibold">{progress}%</span>
-                            </div>
-                            <div className="relative h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                                <div
-                                    className={`absolute inset-y-0 left-0 ${p.progressBar} rounded-full transition-all duration-700 ease-out`}
-                                    style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-                                />
-                            </div>
-                        </div>
-                    )}
+                    {/* Render data visualization component */}
+                    {renderDataViz()}
                 </div>
-
-                {/* Optional description */}
-                {description && (
-                    <p className="text-xs mt-4 font-medium text-white/70 text-center">{description}</p>
-                )}
             </div>
         </div>
 
