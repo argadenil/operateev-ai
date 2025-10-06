@@ -276,8 +276,7 @@ const StatCard: React.FC<StatCardProps> = ({
 
     return (
         <div
-            className={`relative overflow-hidden rounded-2xl ${p.shadow} ${p.gradient} group ${className} cursor-pointer hover:shadow-2xl hover:scale-[1.02] transition-transform duration-300 ease-in-out ${sizeClasses.padding} animate-gradient-x`}
-            style={{ backgroundSize: '200% 200%' }}
+            className={`relative rounded-2xl ${p.shadow} ${p.gradient} group ${className} cursor-pointer transform transition-transform duration-500 ease-in-out hover:scale-105 hover:shadow-2xl animate-gradient-x`} style={{ transitionProperty: "transform, translate, scale, rotate", backgroundSize: '200% 200%' }}
         >
             <div className="flex flex-col w-full py-4 px-4">
                 {/* Row 1: Title left, Icon right */}
