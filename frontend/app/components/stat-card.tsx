@@ -273,40 +273,34 @@ const StatCard: React.FC<StatCardProps> = ({
         icon: 22
     };
 
-    const ChangeIcon = changeType === 'increase' ? TrendingUp : changeType === 'decrease' ? TrendingDown : null;
-
-    // Sparkline SVG generator (simple line chart)
-    const renderSparkline = (data?: number[]) => {
-        if (!data || data.length < 2) return null;
-        const max = Math.max(...data);
-        const min = Math.min(...data);
-        const points = data.map((d, i) => {
-            const x = (i / (data.length - 1)) * 40;
-            const y = 16 - ((d - min) / (max - min || 1)) * 16;
-            return `${x},${y}`;
-        }).join(' ');
-        return (
-            <svg width="40" height="16" viewBox="0 0 40 16" className="absolute right-2 top-2 opacity-80">
-                <polyline points={points} fill="none" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
-        );
-    };
-
     return (
-        <div className={`relative overflow-hidden rounded-2xl border-2 ${p.shadow} ${p.gradient} group transition-all duration-300 hover:scale-[1.04] hover:shadow-2xl hover:z-10 ${className}`}
-            style={{ backgroundSize: '200% 200%' }}>
-            <div className={`flex flex-col items-center justify-center w-full h-full py-8 px-6`}>
-                <div className={`flex flex-col items-center justify-center mb-6`}>
-                    <div className={`${p.iconWrap} rounded-xl w-12 h-12 flex items-center justify-center mb-4`}>
-                        <Icon size={28} className={`${p.iconColor}`} />
+        <div
+            className={`
+    relative overflow-hidden rounded-2xl ${p.gradient} ${p.shadow} 
+    group transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:z-10
+    ${className}
+  `}
+            style={{ backgroundSize: '200% 200%' }}
+        >
+            <div className="flex flex-col items-center justify-center w-full py-4 px-6">
+                {/* Icon + Title + Value Side by Side */}
+                <div className="flex items-center justify-start mb-4 w-full space-x-4">
+                    <div className={`${p.iconWrap} rounded-xl w-16 h-16 flex items-center justify-center`}>
+                        <Icon size={36} className={p.iconColor} />
                     </div>
-                    <p className={`text-base font-medium ${p.title} mb-1 text-center`}>{title}</p>
-                    <h3 className={`text-3xl font-bold ${p.value} text-center`}>{value}{valueSuffix}</h3>
+                    <div className="flex flex-col justify-center">
+                        <p className={`text-sm font-medium ${p.title} mb-1`}>{title}</p>
+                        <h3 className={`text-2xl font-bold ${p.value}`}>
+                            {value}{valueSuffix && <span>{valueSuffix}</span>}
+                        </h3>
+                    </div>
                 </div>
-                <div className="w-full mt-2">
+
+                {/* Progress Bar */}
+                <div className="w-full mt-1">
                     <div className="flex items-center justify-between text-xs text-white/70 mb-1">
                         <span>Progress</span>
-                        <span className="font-semibold">{progress}%</span>
+                        <span className="font-semibold">{Math.min(100, Math.max(0, progress))}%</span>
                     </div>
                     <div className="relative h-2 w-full bg-white/20 rounded-full overflow-hidden">
                         <div
@@ -315,11 +309,17 @@ const StatCard: React.FC<StatCardProps> = ({
                         />
                     </div>
                 </div>
+
+                {/* Optional Description */}
                 {description && (
-                    <p className={`text-xs mt-4 font-medium text-white/70 text-center`}>{description}</p>
+                    <p className="text-xs mt-2 font-medium text-white/70 text-center">
+                        {description}
+                    </p>
                 )}
             </div>
         </div>
+
+
     );
 };
 
