@@ -62,7 +62,7 @@ const LineChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Line
 
 const headlineStats = [
     { title: 'Total Admins', value: 18, icon: UserCog, palette: 'blue' as const, change: +2, changeType: 'increase' as const },
-    { title: 'Total Customers', value: 1264, icon: Users, palette: 'emerald' as const, valueSuffix: '+', change: +156, changeType: 'increase' as const },
+    { title: 'Total Customers', value: 1264, icon: Users, palette: 'emerald' as const, change: +156, changeType: 'increase' as const },
     { title: 'Clusters', value: 12, icon: Server, palette: 'violet' as const, change: 0, changeType: 'neutral' as const },
     { title: 'Nodes', value: 84, icon: MonitorSmartphone, palette: 'orange' as const, change: -4, changeType: 'decrease' as const },
     { title: 'GPUs', value: 512, icon: Cpu, palette: 'indigo' as const, change: +32, changeType: 'increase' as const }
@@ -296,7 +296,6 @@ export default function SuperAdminDashboard() {
                         key={stat.title}
                         title={stat.title}
                         value={stat.value}
-                        valueSuffix={stat.valueSuffix}
                         icon={stat.icon}
                         palette={stat.palette}
                         change={stat.change}
