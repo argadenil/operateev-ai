@@ -61,75 +61,75 @@ const PieChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Pie),
 const LineChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Line), { ssr: false });
 
 const headlineStats = [
-  { 
-    title: 'Total Admins', 
-    value: 18, 
-    icon: UserCog, 
-    palette: 'blue' as const, 
-    change: +2, 
-    changeType: 'increase' as const,
-    description: 'Compared to last week' 
-  },
-  { 
-    title: 'Total Customers', 
-    value: 1264, 
-    icon: Users, 
-    palette: 'emerald' as const, 
-    change: +156, 
-    changeType: 'increase' as const,
-    description: 'New signups this month'
-  },
-  { 
-    title: 'Clusters', 
-    value: 12, 
-    icon: Server, 
-    palette: 'violet' as const, 
-    change: 0, 
-    changeType: 'neutral' as const,
-    description: 'Stable since last update'
-  },
-  { 
-    title: 'Nodes', 
-    value: 84, 
-    icon: MonitorSmartphone, 
-    palette: 'orange' as const, 
-    change: -4, 
-    changeType: 'decrease' as const,
-    description: 'Some nodes offline'
-  },
-  { 
-    title: 'GPUs', 
-    value: 512, 
-    icon: Cpu, 
-    palette: 'indigo' as const, 
-    change: +32, 
-    changeType: 'increase' as const,
-    description: 'Available for allocation'
-  }
+    {
+        title: 'Total Admins',
+        value: 18,
+        icon: UserCog,
+        palette: 'blue' as const,
+        change: +2,
+        changeType: 'increase' as const,
+        description: 'Compared to last week'
+    },
+    {
+        title: 'Total Customers',
+        value: 1264,
+        icon: Users,
+        palette: 'emerald' as const,
+        change: +156,
+        changeType: 'increase' as const,
+        description: 'New signups this month'
+    },
+    {
+        title: 'Clusters',
+        value: 12,
+        icon: Server,
+        palette: 'violet' as const,
+        change: 0,
+        changeType: 'neutral' as const,
+        description: 'Stable since last update'
+    },
+    {
+        title: 'Nodes',
+        value: 84,
+        icon: MonitorSmartphone,
+        palette: 'orange' as const,
+        change: -4,
+        changeType: 'decrease' as const,
+        description: 'Some nodes offline'
+    },
+    {
+        title: 'GPUs',
+        value: 512,
+        icon: Cpu,
+        palette: 'indigo' as const,
+        change: +32,
+        changeType: 'increase' as const,
+        description: 'Available for allocation'
+    }
 ];
 
 const secondaryStats = [
-  { 
-    title: 'Active Users', 
-    value: '1.1k', 
-    icon: UserCheck, 
-    palette: 'emerald' as const, 
-    description: 'Inactive: 58' 
-  },
-  { 
-    title: 'Used GPUs', 
-    value: 356, 
-    icon: Cpu, 
-    palette: 'sky' as const, 
-    description: 'Available: 156' 
-  },
-  { 
-    title: 'Failed GPUs', 
-    value: 6, 
-    icon: ZapOff, 
-    palette: 'red' as const, 
-    description: 'Offline nodes: 4' 
-  },
+    {
+        title: 'Active Users',
+        value: '1.1k',
+        icon: UserCheck,
+        palette: 'emerald' as const,
+        description: 'Inactive: 58'
+    },
+    {
+        title: 'Used GPUs',
+        value: 356,
+        icon: Cpu,
+        palette: 'sky' as const,
+        description: 'Available: 156'
+    },
+    {
+        title: 'Failed GPUs',
+        value: 6,
+        icon: ZapOff,
+        palette: 'red' as const,
+        description: 'Offline nodes: 4'
+    },
 ];
 
 
@@ -293,7 +293,7 @@ export default function SuperAdminDashboard() {
     // Auto-refresh logic
     useEffect(() => {
         if (!autoRefresh) return;
-        
+
         const interval = setInterval(() => {
             handleRefresh();
         }, 30000); // Refresh every 30 seconds
@@ -331,8 +331,8 @@ export default function SuperAdminDashboard() {
     };
 
     // Filter alerts by severity
-    const filteredAlerts = alertFilter === 'all' 
-        ? alerts 
+    const filteredAlerts = alertFilter === 'all'
+        ? alerts
         : alerts.filter(alert => alert.severity === alertFilter);
 
     // Filter activities by search
@@ -390,7 +390,7 @@ export default function SuperAdminDashboard() {
                     </div>
                     <p className="text-sm text-slate-500">Showing data for: {timeRange === '24h' ? 'Last 24 hours' : timeRange === '7d' ? 'Last 7 days' : timeRange === '30d' ? 'Last 30 days' : 'Last 90 days'}</p>
                 </div>
-                
+
                 {expandedSections.charts && (
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         <ChartCard title="Customers per Admin" subtitle="Distribution across all admin accounts">
@@ -424,7 +424,7 @@ export default function SuperAdminDashboard() {
                             {filteredAlerts.length}
                         </span>
                     </div>
-                    
+
                     {expandedSections.alerts && (
                         <>
                             {/* Alert Filter */}
@@ -433,11 +433,10 @@ export default function SuperAdminDashboard() {
                                     <button
                                         key={filter}
                                         onClick={() => setAlertFilter(filter)}
-                                        className={`px-3 py-1 rounded-full text-xs font-medium transition ${
-                                            alertFilter === filter
+                                        className={`px-3 py-1 rounded-full text-xs font-medium transition ${alertFilter === filter
                                                 ? 'bg-blue-600 text-white'
                                                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                                        }`}
+                                            }`}
                                     >
                                         {filter.charAt(0).toUpperCase() + filter.slice(1)}
                                     </button>
@@ -447,18 +446,16 @@ export default function SuperAdminDashboard() {
                             <ul className="space-y-3 max-h-[400px] overflow-y-auto">
                                 {filteredAlerts.length > 0 ? (
                                     filteredAlerts.map((alert, idx) => (
-                                        <li key={idx} className={`flex items-start gap-3 p-3 rounded-lg border transition hover:shadow-sm ${
-                                            alert.severity === 'error' ? 'bg-red-50/50 border-red-200' :
-                                            alert.severity === 'warning' ? 'bg-yellow-50/50 border-yellow-200' :
-                                            'bg-blue-50/50 border-blue-200'
-                                        }`}>
-                                            <alert.icon 
-                                                size={18} 
-                                                className={`flex-shrink-0 mt-0.5 ${
-                                                    alert.severity === 'error' ? 'text-red-600' :
-                                                    alert.severity === 'warning' ? 'text-yellow-600' :
-                                                    'text-blue-600'
-                                                }`}
+                                        <li key={idx} className={`flex items-start gap-3 p-3 rounded-lg border transition hover:shadow-sm ${alert.severity === 'error' ? 'bg-red-50/50 border-red-200' :
+                                                alert.severity === 'warning' ? 'bg-yellow-50/50 border-yellow-200' :
+                                                    'bg-blue-50/50 border-blue-200'
+                                            }`}>
+                                            <alert.icon
+                                                size={18}
+                                                className={`flex-shrink-0 mt-0.5 ${alert.severity === 'error' ? 'text-red-600' :
+                                                        alert.severity === 'warning' ? 'text-yellow-600' :
+                                                            'text-blue-600'
+                                                    }`}
                                             />
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium text-slate-900">{alert.text}</p>
