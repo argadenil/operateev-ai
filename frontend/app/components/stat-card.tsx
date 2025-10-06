@@ -282,7 +282,7 @@ const StatCard: React.FC<StatCardProps> = ({
                 {/* Row 1: Title left, Icon right */}
                 <div className="flex items-center justify-between mb-4">
                     <p className={`text-xl font-bold ${p.title}`}>{title}</p>
-                    <div className={`${p.iconWrap} rounded-xl w-12 h-12 flex items-center justify-center`}>
+                    <div className={`${p.iconWrap} rounded-xl w-12 h-12 flex items-center justify-center transform transition-transform duration-500 ease-in-out group-hover:scale-110`} style={{ transitionProperty: "transform, translate, scale, rotate" }}>
                         <Icon size={28} className={p.iconColor} />
                     </div>
                 </div>
