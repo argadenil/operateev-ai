@@ -69,11 +69,25 @@ export default function LoginPage() {
       try {
         localStorage.setItem("auth_token", data.token);
       } catch { }
-
-      localStorage.setItem("customer_id", data.customer_id);
-      localStorage.setItem("username", data.username);
-      success(`Welcome ${data.username}`, { title: "Login successful" });
-      router.push("/dashboard/" + data.customer_id);
+      try { localStorage.setItem("customer_id", data.customer_id); } catch { }
+      try { localStorage.setItem("username", data.name || data.username || ''); } catch { }
+      // Normalize role to a canonical key (e.g. "Super Admin" -> "superadmin")
+      try {
+        const canonicalRole = (data.role || '').toString().toLowerCase().replace(/\s+/g, '');
+        localStorage.setItem("role", canonicalRole);
+      } catch { }
+      success(`Welcome ${data.username || data.name || ''}`, { title: "Login successful" });
+      // Redirect: superadmin -> /dashboard (will render superadmin panel), others -> customer dashboard
+      try {
+        const canonicalRole = (data.role || '').toString().toLowerCase().replace(/\s+/g, '');
+        if (canonicalRole === 'superadmin') {
+          router.push('/dashboard');
+        } else {
+          router.push('/dashboard/' + data.customer_id);
+        }
+      } catch {
+        router.push('/dashboard');
+      }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Network error";
       setError(msg);

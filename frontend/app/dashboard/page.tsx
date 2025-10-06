@@ -31,6 +31,7 @@ import {
 import { Line, Pie } from "react-chartjs-2";
 import { X } from "lucide-react";
 
+
 // Register ChartJS components once
 if (typeof window !== 'undefined') {
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
@@ -39,6 +40,7 @@ if (typeof window !== 'undefined') {
 import { fetchDashboard, secondsToH, capitalizeStatus, DashboardAPIResource } from "../../lib/dashboard"; // added
 import { addGPUResource, AddGPURequest } from "../../lib/gpu-resources";
 import { useToast } from "../components/toaster"; // added
+import SuperadminPanel from "../superAdminDashboard/SuperAdminDashboard";
 
 type GPUResource = {
   id: number;
@@ -151,7 +153,11 @@ const chartOptions = {
   }
 };
 
+// SuperadminPanel extracted to ../components/superadmin-panel
+
 const Dashboard = React.memo(() => {
+  // Role aware: read role synchronously from localStorage so superadmin can be rendered immediately
+  const role = typeof window !== 'undefined' ? (localStorage.getItem('role') || '').toLowerCase() : null;
   const router = useRouter();
   const { error: pushError, success: pushSuccess } = useToast(); // added
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -201,7 +207,7 @@ const Dashboard = React.memo(() => {
     // Nothing found -> mark explicitly missing
     setCustomerId(null);
   }, [router]);
-  
+
   // Load customer display name from localStorage
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -234,7 +240,7 @@ const Dashboard = React.memo(() => {
           idle: data.summary?.idle || 0,
           avgPower: data.summary?.avg_power || 0,
         });
-  setLastUpdated(new Date());
+        setLastUpdated(new Date());
       })
       .catch((e: unknown) => {
         if (!signal.aborted) {
@@ -361,6 +367,11 @@ const Dashboard = React.memo(() => {
       }
     } catch { }
   }, [router]);
+
+  // If superadmin, render superadmin panel immediately (no customer id required)
+  if (role === 'superadmin') {
+    return <SuperadminPanel />;
+  }
 
   if (loading || customerId === undefined) return <Loader />;
 
@@ -653,11 +664,10 @@ const Dashboard = React.memo(() => {
               {table.getRowModel().rows.map((row, i) => (
                 <tr
                   key={row.id}
-                  className={`border-b border-gray-100 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200 ${
-                    i % 2 === 0 
-                      ? "bg-gray-100" 
+                  className={`border-b border-gray-100 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200 ${i % 2 === 0
+                      ? "bg-gray-100"
                       : "bg-white"
-                  }`}
+                    }`}
                 >
                   {row.getVisibleCells().map((cell) => {
                     const isCenter = ["status", "actions"].includes(cell.column.id);

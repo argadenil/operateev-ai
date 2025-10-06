@@ -20,7 +20,18 @@ export function clearAuthData() {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('customer_id');
     localStorage.removeItem('username');
+    localStorage.removeItem('role');
   } catch {}
+}
+
+export function getRole(): string | null {
+  if (typeof window === 'undefined') return null;
+  try { return localStorage.getItem('role'); } catch { return null; }
+}
+
+export function setRole(role: string) {
+  if (typeof window === 'undefined') return;
+  try { localStorage.setItem('role', role); } catch {}
 }
 
 export async function authFetch(input: RequestInfo, init: RequestInit = {}) {

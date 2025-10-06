@@ -64,12 +64,47 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     }, []);
 
     // Memoized navigation items (dashboard link adapts to presence of id)
-    const navigationItems: NavItemType[] = useMemo(() => [
-        { name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" },
-        { name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" },
-        { name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" },
-        { name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" },
-    ], [customerId]);
+    const navigationItems: NavItemType[] = useMemo(() => {
+        // Determine role from localStorage (client-only)
+        let role = "";
+        try { role = (localStorage.getItem('role') || '').toLowerCase(); } catch { role = ""; }
+
+        const base = [] as NavItemType[];
+
+        // Superadmin sees everything
+        if (role === 'superadmin') {
+            base.push({ name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" });
+            base.push({ name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" });
+            base.push({ name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" });
+            base.push({ name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" });
+            return base;
+        }
+
+        // Admin sees admin-level and customer-level pages
+        if (role === 'admin') {
+            base.push({ name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" });
+            base.push({ name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" });
+            base.push({ name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" });
+            base.push({ name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" });
+            return base;
+        }
+
+        // Customer sees only customer-scoped pages
+        if (role === 'customer') {
+            base.push({ name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" });
+            base.push({ name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" });
+            base.push({ name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" });
+            base.push({ name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" });
+            return base;
+        }
+
+        // Default: show customer-scoped pages
+        base.push({ name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" });
+        base.push({ name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" });
+        base.push({ name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" });
+        base.push({ name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" });
+        return base;
+    }, [customerId]);
 
     // Preload (prefetch) target routes once on mount for snappier nav
     useEffect(() => {
@@ -83,14 +118,14 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
     const pageTitle = useMemo(() => {
         if (!pathname) return "PAGE";
-        
+
         // Handle dynamic routes with IDs
         if (pathname.startsWith("/dashboard")) return "Dashboard";
         if (pathname.startsWith("/gpu-resources")) return "GPU Resources";
         if (pathname.startsWith("/job-management")) return "Job Management";
-    // Profile page removed
+        // Profile page removed
         if (pathname.startsWith("/settings")) return "Settings";
-        
+
         // Fallback for exact matches or unknown routes
         return "PAGE";
     }, [pathname]);
@@ -117,8 +152,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
             {/* Sidebar */}
             <aside
-                className={`bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white sidebar-transition ${
-                    sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"
+                className={`bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white sidebar-transition ${sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"
                     } flex flex-col relative z-30 shadow-2xl border-slate-700/50 md:relative fixed`}
                 style={{
                     transform: 'translateZ(0)', // Force hardware acceleration
@@ -188,8 +222,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             {/* Main Area */}
             <div className="flex flex-col flex-grow relative z-20 bg-white/80 backdrop-blur-sm main-content-transition">
                 <MemoHeader />
-                <main className={`bg-gray-200 flex-grow overflow-auto bg-gradient-to-br from-white/90 via-indigo-50/30 to-purple-50/30 main-content-transition px-4 py-4 md:px-6 md:py-6 ${
-                    sidebarOpen ? 'lg:px-6 lg:py-6' : 'lg:px-8 lg:py-6'
+                <main className={`bg-gray-200 flex-grow overflow-auto bg-gradient-to-br from-white/90 via-indigo-50/30 to-purple-50/30 main-content-transition px-4 py-4 md:px-6 md:py-6 ${sidebarOpen ? 'lg:px-6 lg:py-6' : 'lg:px-8 lg:py-6'
                     }`}>
                     <div className="flex items-center justify-between mb-6 transition-all duration-300 ease-in-out">
                         <h1 className="font-bold text-gray-900 tracking-tight relative transition-all duration-300 ease-in-out text-xl sm:text-2xl lg:text-2xl">
@@ -248,8 +281,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             {/* Slide-over panel */}
             <div
                 className={`fixed inset-y-0 right-0 bg-white/95 backdrop-blur-xl shadow-2xl border-l border-gray-200/50 z-50 chat-slide-transition w-full h-full md:w-96 md:max-w-[90vw] lg:max-w-[400px] md:h-[96vh] ${slideOverOpen
-                        ? "chat-slide-open"
-                        : "chat-slide-closed"
+                    ? "chat-slide-open"
+                    : "chat-slide-closed"
                     }`}
             >
                 <div className="flex flex-col h-full">

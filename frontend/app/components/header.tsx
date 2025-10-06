@@ -25,8 +25,9 @@ export default function Header({
   const profileButtonRef = useRef<HTMLDivElement>(null);
   const menuItemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [displayName, setDisplayName] = useState<string>("User");
+  const [displayName, setDisplayName] = useState<string>("");
   const [customerId, setCustomerId] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
 
   // Load username and customer_id from localStorage (set during login)
   useEffect(() => {
@@ -36,6 +37,8 @@ export default function Header({
       if (name && name.trim()) setDisplayName(name);
       const cid = localStorage.getItem('customer_id');
       if (cid) setCustomerId(cid);
+      const r = localStorage.getItem('role');
+      if (r) setRole(r);
     } catch { }
   }, []);
 
@@ -156,13 +159,13 @@ export default function Header({
       {/* Left - Logo / Brand */}
       <div className="flex items-center space-x-3">
         <div className="flex items-center space-x-2">
-      <div className={`bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg ${isMobile ? 'w-8 h-8' : 'w-10 h-10'
+          <div className={`bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg ${isMobile ? 'w-8 h-8' : 'w-10 h-10'
             }`}>
             <span className={`font-bold text-white ${isMobile ? 'text-sm' : 'text-xl'}`}>O</span>
           </div>
           {!isMobile && (
             <h1 className="text-3xl font-bold text-white tracking-tight">
-        Operateev.<span className="text-indigo-400">ai</span>
+              Operateev.<span className="text-indigo-400">ai</span>
             </h1>
           )}
         </div>
@@ -231,55 +234,51 @@ export default function Header({
             </div>
 
             {dropdownOpen && (
-            <div
-              role="menu"
-              aria-labelledby="profile-button"
-              onKeyDown={onMenuKeyDown}
-              className={`fixed bg-white/95 backdrop-blur-xl text-gray-900 rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden z-[9999] animate-slide-up will-change-transform focus:outline-none ${
-              isMobile 
+              <div
+                role="menu"
+                aria-labelledby="profile-button"
+                onKeyDown={onMenuKeyDown}
+                className={`fixed bg-white/95 backdrop-blur-xl text-gray-900 rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden z-[9999] animate-slide-up will-change-transform focus:outline-none ${isMobile
                   ? 'top-14 right-2 w-44'
                   : 'top-16 right-6 w-48'
-                }`}
-            >
-              <div className={`border-b border-gray-200/60 bg-gradient-to-r from-indigo-50 to-purple-50 ${
-                isMobile ? 'p-3' : 'p-4'
-              }`}>
+                  }`}
+              >
+                <div className={`border-b border-gray-200/60 bg-gradient-to-r from-indigo-50 to-purple-50 ${isMobile ? 'p-3' : 'p-4'
+                  }`}>
                   <div className="flex items-center space-x-3">
-                  <div className={`rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-medium ${
-                    isMobile ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-sm'
+                    <div className={`rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-medium ${isMobile ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-sm'
                       }`}>
-                      N
+                      {initial}
                     </div>
                     <div>
-                    <div className={`font-semibold text-gray-900 ${isMobile ? 'text-xs' : 'text-sm'}`}>{displayName}</div>
-                    <div className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-xs'}`}>Administrator</div>
+                      <div className={`font-semibold text-gray-900 ${isMobile ? 'text-xs' : 'text-sm'}`}>{displayName}</div>
+                      <div className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-xs'}`}>{role}</div>
                     </div>
                   </div>
                 </div>
-              {menuItems.map((item, index) => (
-                <button
-                  key={index}
-                  onClick={item.onClick}
-                  ref={(el) => { menuItemRefs.current[index] = el; }}
-                  role="menuitem"
-                  tabIndex={activeIndex === index ? 0 : -1}
-                  className={`w-full text-left hover:bg-indigo-50 hover:cursor-pointer focus:bg-indigo-50 focus:text-indigo-800 focus-visible:outline-none transition-colors duration-150 text-gray-700 hover:text-indigo-700 font-medium ${
-                    isMobile ? 'px-3 py-2 text-sm' : 'px-4 py-3'
-                  }`}
-                  onKeyDown={(e) => {
-                    // Allow Enter/Space activation (already default for button) but handle Left/Right optionally
-                    if (e.key === 'ArrowRight') {
-                      e.preventDefault();
-                      moveFocus(1);
-                    } else if (e.key === 'ArrowLeft') {
-                      e.preventDefault();
-                      moveFocus(-1);
-                    }
-                  }}
-                >
-                  {item.label}
-                </button>
-              ))}
+                {menuItems.map((item, index) => (
+                  <button
+                    key={index}
+                    onClick={item.onClick}
+                    ref={(el) => { menuItemRefs.current[index] = el; }}
+                    role="menuitem"
+                    tabIndex={activeIndex === index ? 0 : -1}
+                    className={`w-full text-left hover:bg-indigo-50 hover:cursor-pointer focus:bg-indigo-50 focus:text-indigo-800 focus-visible:outline-none transition-colors duration-150 text-gray-700 hover:text-indigo-700 font-medium ${isMobile ? 'px-3 py-2 text-sm' : 'px-4 py-3'
+                      }`}
+                    onKeyDown={(e) => {
+                      // Allow Enter/Space activation (already default for button) but handle Left/Right optionally
+                      if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        moveFocus(1);
+                      } else if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        moveFocus(-1);
+                      }
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
               </div>
             )}
           </div>

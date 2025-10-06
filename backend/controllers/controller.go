@@ -39,19 +39,19 @@ func Login(c echo.Context) error {
 	for role, query := range roleQueries {
 		switch role {
 		case "superadmin":
-			err := db.Conn.QueryRow(query, req.Username).Scan(&user.ID, &user.FullName, &user.PasswordHash)
+			err := db.Conn.QueryRow(query, req.Username).Scan(&user.ID, &user.DisplayName, &user.PasswordHash)
 			if err == nil {
 				user.Role = role
 				valid = checkPassword(user.PasswordHash, req.Password, user.ID, role)
 			}
 		case "admin":
-			err := db.Conn.QueryRow(query, req.Username).Scan(&user.ID, &user.FullName, &user.PasswordHash)
+			err := db.Conn.QueryRow(query, req.Username).Scan(&user.ID, &user.DisplayName, &user.PasswordHash)
 			if err == nil {
 				user.Role = role
 				valid = checkPassword(user.PasswordHash, req.Password, user.ID, role)
 			}
 		case "customer":
-			err := db.Conn.QueryRow(query, req.Username).Scan(&user.ID, &user.FullName, &user.PasswordHash)
+			err := db.Conn.QueryRow(query, req.Username).Scan(&user.ID, &user.DisplayName, &user.PasswordHash)
 			if err == nil {
 				user.Role = role
 				valid = checkPassword(user.PasswordHash, req.Password, user.ID, role)
@@ -84,9 +84,10 @@ func Login(c echo.Context) error {
 	}
 	user.Role = roleMap[user.Role]
 	return c.JSON(http.StatusOK, models.LoginResponse{
-		Token:      tokenString,
-		CustomerID: user.CustomerID,
-		Role:       user.Role,
+		Token:       tokenString,
+		CustomerID:  user.CustomerID,
+		DisplayName: user.DisplayName,
+		Role:        user.Role,
 	})
 }
 
