@@ -16,7 +16,7 @@ export type StatCardProps = {
     changeType?: 'increase' | 'decrease' | 'neutral';
 };
 
-// Central palette map so variants stay consistent across pages
+// Central palette map with changeType colors
 const paletteMap: Record<string, {
     container: string;
     gradient: string;
@@ -26,6 +26,11 @@ const paletteMap: Record<string, {
     title: string;
     value: string;
     shadow: string;
+    changeColors: {
+        increase: { text: string; bg: string; border: string };
+        decrease: { text: string; bg: string; border: string };
+        neutral: { text: string; bg: string; border: string };
+    };
 }> = {
     blue: {
         container: 'bg-blue-50/80',
@@ -35,7 +40,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-blue-700',
         title: 'text-blue-800',
         value: 'text-blue-900',
-        shadow: 'shadow-blue-500/20'
+        shadow: 'shadow-blue-500/20',
+        changeColors: {
+            increase: { text: 'text-blue-900', bg: 'bg-blue-100', border: 'border-blue-300' },
+            decrease: { text: 'text-blue-900', bg: 'bg-blue-200', border: 'border-blue-400' },
+            neutral: { text: 'text-blue-800', bg: 'bg-blue-50', border: 'border-blue-200' }
+        }
     },
     emerald: {
         container: 'bg-emerald-50/80',
@@ -45,7 +55,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-emerald-700',
         title: 'text-emerald-800',
         value: 'text-emerald-900',
-        shadow: 'shadow-emerald-500/20'
+        shadow: 'shadow-emerald-500/20',
+        changeColors: {
+            increase: { text: 'text-emerald-900', bg: 'bg-emerald-100', border: 'border-emerald-300' },
+            decrease: { text: 'text-emerald-900', bg: 'bg-emerald-200', border: 'border-emerald-400' },
+            neutral: { text: 'text-emerald-800', bg: 'bg-emerald-50', border: 'border-emerald-200' }
+        }
     },
     violet: {
         container: 'bg-violet-50/80',
@@ -55,7 +70,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-violet-700',
         title: 'text-violet-800',
         value: 'text-violet-900',
-        shadow: 'shadow-violet-500/20'
+        shadow: 'shadow-violet-500/20',
+        changeColors: {
+            increase: { text: 'text-violet-900', bg: 'bg-violet-100', border: 'border-violet-300' },
+            decrease: { text: 'text-violet-900', bg: 'bg-violet-200', border: 'border-violet-400' },
+            neutral: { text: 'text-violet-800', bg: 'bg-violet-50', border: 'border-violet-200' }
+        }
     },
     amber: {
         container: 'bg-amber-50/80',
@@ -65,7 +85,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-amber-700',
         title: 'text-amber-800',
         value: 'text-amber-900',
-        shadow: 'shadow-amber-500/20'
+        shadow: 'shadow-amber-500/20',
+        changeColors: {
+            increase: { text: 'text-amber-900', bg: 'bg-amber-100', border: 'border-amber-300' },
+            decrease: { text: 'text-amber-900', bg: 'bg-amber-200', border: 'border-amber-400' },
+            neutral: { text: 'text-amber-800', bg: 'bg-amber-50', border: 'border-amber-200' }
+        }
     },
     pink: {
         container: 'bg-pink-50/80',
@@ -75,7 +100,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-pink-700',
         title: 'text-pink-800',
         value: 'text-pink-900',
-        shadow: 'shadow-pink-500/20'
+        shadow: 'shadow-pink-500/20',
+        changeColors: {
+            increase: { text: 'text-pink-900', bg: 'bg-pink-100', border: 'border-pink-300' },
+            decrease: { text: 'text-pink-900', bg: 'bg-pink-200', border: 'border-pink-400' },
+            neutral: { text: 'text-pink-800', bg: 'bg-pink-50', border: 'border-pink-200' }
+        }
     },
     indigo: {
         container: 'bg-indigo-50/80',
@@ -85,7 +115,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-indigo-700',
         title: 'text-indigo-800',
         value: 'text-indigo-900',
-        shadow: 'shadow-indigo-500/20'
+        shadow: 'shadow-indigo-500/20',
+        changeColors: {
+            increase: { text: 'text-indigo-900', bg: 'bg-indigo-100', border: 'border-indigo-300' },
+            decrease: { text: 'text-indigo-900', bg: 'bg-indigo-200', border: 'border-indigo-400' },
+            neutral: { text: 'text-indigo-800', bg: 'bg-indigo-50', border: 'border-indigo-200' }
+        }
     },
     teal: {
         container: 'bg-teal-50/80',
@@ -95,7 +130,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-teal-700',
         title: 'text-teal-800',
         value: 'text-teal-900',
-        shadow: 'shadow-teal-500/20'
+        shadow: 'shadow-teal-500/20',
+        changeColors: {
+            increase: { text: 'text-teal-900', bg: 'bg-teal-100', border: 'border-teal-300' },
+            decrease: { text: 'text-teal-900', bg: 'bg-teal-200', border: 'border-teal-400' },
+            neutral: { text: 'text-teal-800', bg: 'bg-teal-50', border: 'border-teal-200' }
+        }
     },
     orange: {
         container: 'bg-orange-50/80',
@@ -105,7 +145,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-orange-700',
         title: 'text-orange-800',
         value: 'text-orange-900',
-        shadow: 'shadow-orange-500/20'
+        shadow: 'shadow-orange-500/20',
+        changeColors: {
+            increase: { text: 'text-orange-900', bg: 'bg-orange-100', border: 'border-orange-300' },
+            decrease: { text: 'text-orange-900', bg: 'bg-orange-200', border: 'border-orange-400' },
+            neutral: { text: 'text-orange-800', bg: 'bg-orange-50', border: 'border-orange-200' }
+        }
     },
     red: {
         container: 'bg-red-50/80',
@@ -115,7 +160,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-red-700',
         title: 'text-red-800',
         value: 'text-red-900',
-        shadow: 'shadow-red-500/20'
+        shadow: 'shadow-red-500/20',
+        changeColors: {
+            increase: { text: 'text-red-900', bg: 'bg-red-100', border: 'border-red-300' },
+            decrease: { text: 'text-red-900', bg: 'bg-red-200', border: 'border-red-400' },
+            neutral: { text: 'text-red-800', bg: 'bg-red-50', border: 'border-red-200' }
+        }
     },
     sky: {
         container: 'bg-sky-50/80',
@@ -125,7 +175,12 @@ const paletteMap: Record<string, {
         iconColor: 'text-sky-700',
         title: 'text-sky-800',
         value: 'text-sky-900',
-        shadow: 'shadow-sky-500/20'
+        shadow: 'shadow-sky-500/20',
+        changeColors: {
+            increase: { text: 'text-sky-900', bg: 'bg-sky-100', border: 'border-sky-300' },
+            decrease: { text: 'text-sky-900', bg: 'bg-sky-200', border: 'border-sky-400' },
+            neutral: { text: 'text-sky-800', bg: 'bg-sky-50', border: 'border-sky-200' }
+        }
     },
     gray: {
         container: 'bg-gray-50/80',
@@ -135,10 +190,14 @@ const paletteMap: Record<string, {
         iconColor: 'text-gray-700',
         title: 'text-gray-800',
         value: 'text-gray-900',
-        shadow: 'shadow-gray-400/20'
+        shadow: 'shadow-gray-400/20',
+        changeColors: {
+            increase: { text: 'text-gray-900', bg: 'bg-gray-100', border: 'border-gray-300' },
+            decrease: { text: 'text-gray-900', bg: 'bg-gray-200', border: 'border-gray-400' },
+            neutral: { text: 'text-gray-800', bg: 'bg-gray-50', border: 'border-gray-200' }
+        }
     }
 };
-
 
 const StatCard: React.FC<StatCardProps> = ({ 
     title, 
@@ -155,6 +214,7 @@ const StatCard: React.FC<StatCardProps> = ({
     changeType = 'neutral'
 }) => {
     const p = paletteMap[palette];
+
     const sizeClasses = size === 'sm' ? {
         padding: 'p-4 sm:p-5',
         title: 'text-[11px] sm:text-xs',
@@ -170,9 +230,10 @@ const StatCard: React.FC<StatCardProps> = ({
     };
 
     const getChangeColor = () => {
-        if (changeType === 'increase') return 'text-green-600 bg-green-50';
-        if (changeType === 'decrease') return 'text-red-600 bg-red-50';
-        return 'text-gray-600 bg-gray-50';
+        if (!p.changeColors) return 'text-gray-800 bg-gray-100 border border-gray-300';
+        if (changeType === 'increase') return `${p.changeColors.increase.text} ${p.changeColors.increase.bg} ${p.changeColors.increase.border}`;
+        if (changeType === 'decrease') return `${p.changeColors.decrease.text} ${p.changeColors.decrease.bg} ${p.changeColors.decrease.border}`;
+        return `${p.changeColors.neutral.text} ${p.changeColors.neutral.bg} ${p.changeColors.neutral.border}`;
     };
 
     const getChangeIcon = () => {
@@ -192,7 +253,7 @@ const StatCard: React.FC<StatCardProps> = ({
                     <div className="flex items-end gap-2">
                         <p className={`${sizeClasses.value} font-bold tracking-tight ${p.value}`}>{value}{valueSuffix}</p>
                         {change !== undefined && change !== 0 && (
-                            <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${getChangeColor()} mb-1.5`}>
+                            <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border ${getChangeColor()} mb-1.5 shadow-sm`}>
                                 {ChangeIcon && <ChangeIcon size={12} />}
                                 {change > 0 ? '+' : ''}{change}
                             </span>
@@ -204,7 +265,7 @@ const StatCard: React.FC<StatCardProps> = ({
                 </div>
                 <div className="relative group/icon">
                     <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${p.iconWrap} blur-lg opacity-70 group-hover:opacity-90 transition`} />
-                    <div className={`relative ${sizeClasses.iconWrap} rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ${p.iconWrap.split(' ')[2]} shadow-md`}> {/* reuse ring color */}
+                    <div className={`relative ${sizeClasses.iconWrap} rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center ring-1 ${p.iconWrap.split(' ')[2]} shadow-md`}>
                         <Icon className={`${p.iconColor} group-hover:scale-110 transition-transform`} size={sizeClasses.icon} />
                     </div>
                 </div>
