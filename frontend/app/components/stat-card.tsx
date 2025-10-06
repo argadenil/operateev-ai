@@ -100,25 +100,25 @@ const paletteMap: Record<string, {
         progressBar: 'bg-pink-400',
         progressBg: 'bg-white/20'
     },
-red: {
-  gradient: "bg-[linear-gradient(to_right,_#d15241,_#e57373,_#f28f79)]", // warm red-to-copper gradient
-  iconWrap: "bg-white/15 backdrop-blur-sm", // subtle blur
-  iconColor: "text-white", // clean contrast
-  title: "text-white/90", // soft readable title
-  value: "text-white", // clear strong value
-  shadow: "shadow-[0_4px_20px_rgba(210,82,65,0.35)]", // red-copper soft shadow
-  changeColors: {
-    increase: "text-white/90 bg-white/15 border-white/20",
-    decrease: "text-white/80 bg-white/10 border-white/15",
-    neutral: "text-white/70 bg-white/5 border-white/10",
-  },
-  progressBar: "bg-[#e2725b]", // copper red progress
-  progressBg: "bg-white/10", // subtle track background
-},
+    red: {
+        gradient: "bg-[linear-gradient(to_right,_#d15241,_#e57373,_#f28f79)]", // warm red-to-copper gradient
+        iconWrap: "bg-white/15 backdrop-blur-sm", // subtle blur
+        iconColor: "text-white", // clean contrast
+        title: "text-white/90", // soft readable title
+        value: "text-white", // clear strong value
+        shadow: "shadow-[0_4px_20px_rgba(210,82,65,0.35)]", // red-copper soft shadow
+        changeColors: {
+            increase: "text-white/90 bg-white/15 border-white/20",
+            decrease: "text-white/80 bg-white/10 border-white/15",
+            neutral: "text-white/70 bg-white/5 border-white/10",
+        },
+        progressBar: "bg-[#e2725b]", // copper red progress
+        progressBg: "bg-white/10", // subtle track background
+    },
 
 
 
-    
+
     yellow: {
         gradient: "bg-[linear-gradient(to_right,_#f7971e,_#ffd200)]",
         iconWrap: 'bg-white/20 backdrop-blur-md',
@@ -276,13 +276,13 @@ const StatCard: React.FC<StatCardProps> = ({
 
     return (
         <div
-            className={`relative overflow-hidden rounded-2xl ${p.shadow} ${p.gradient} group ${className} cursor-pointer transform will-change-transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl`}
+            className={`relative overflow-hidden rounded-2xl ${p.shadow} ${p.gradient} group ${className} cursor-pointer hover:shadow-2xl hover:scale-[1.02] transition-transform duration-300 ease-in-out ${sizeClasses.padding} animate-gradient-x`}
             style={{ backgroundSize: '200% 200%' }}
         >
             <div className="flex flex-col w-full py-4 px-4">
                 {/* Row 1: Title left, Icon right */}
                 <div className="flex items-center justify-between mb-4">
-                    <p className={`text-base font-medium ${p.title}`}>{title}</p>
+                    <p className={`text-xl font-bold ${p.title}`}>{title}</p>
                     <div className={`${p.iconWrap} rounded-xl w-12 h-12 flex items-center justify-center`}>
                         <Icon size={28} className={p.iconColor} />
                     </div>
