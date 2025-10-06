@@ -73,28 +73,19 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
         // Superadmin sees everything
         if (role === 'superadmin') {
-            base.push({ name: "Dashboard", icon: "🏠", href: "/superAdminDashboard" });
-            base.push({ name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" });
-            base.push({ name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" });
-            base.push({ name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" });
+            base.push({ name: "Dashboard", icon: "🏠", href: "/super-admin" });
             return base;
         }
 
         // Admin sees admin-level and customer-level pages
         if (role === 'admin') {
-            base.push({ name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" });
-            base.push({ name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" });
-            base.push({ name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" });
-            base.push({ name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" });
+            base.push({ name: "Dashboard", icon: "🏠", href: "/admin-dashboard" });
             return base;
         }
 
         // Customer sees only customer-scoped pages
         if (role === 'customer') {
-            base.push({ name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" });
-            base.push({ name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" });
-            base.push({ name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" });
-            base.push({ name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" });
+            base.push({ name: "Dashboard", icon: "🏠", href: "/customer-dashboard" });
             return base;
         }
 
@@ -114,15 +105,12 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
     const pageTitle = useMemo(() => {
         if (!pathname) return "PAGE";
-
-        // Handle dynamic routes with IDs
-        if (pathname.startsWith("/dashboard")) return "Dashboard";
+        if (pathname.startsWith("/super-admin")) return "Super Admin Dashboard";
+        if (pathname.startsWith("/admin-dashboard")) return "Admin Dashboard";
+        if (pathname.startsWith("/customer-dashboard")) return "Customer Dashboard";
         if (pathname.startsWith("/gpu-resources")) return "GPU Resources";
         if (pathname.startsWith("/job-management")) return "Job Management";
-        // Profile page removed
         if (pathname.startsWith("/settings")) return "Settings";
-
-        // Fallback for exact matches or unknown routes
         return "PAGE";
     }, [pathname]);
 
@@ -164,7 +152,10 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                         let isActive = false;
                         if (pathname) {
                             if (item.name === 'Dashboard') {
-                                isActive = pathname.startsWith('/dashboard');
+                                isActive =
+                                    pathname.startsWith('/super-admin') ||
+                                    pathname.startsWith('/admin-dashboard') ||
+                                    pathname.startsWith('/customer-dashboard');
                             } else if (item.name === 'GPU Resources') {
                                 isActive = pathname.startsWith('/gpu-resources');
                             } else if (item.name === 'Job Management') {
