@@ -275,50 +275,44 @@ const StatCard: React.FC<StatCardProps> = ({
 
     return (
         <div
-            className={`
-    relative overflow-hidden rounded-2xl ${p.gradient} ${p.shadow} 
-    group transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:z-10
-    ${className}
-  `}
+            className={`relative overflow-hidden rounded-2xl ${p.shadow} ${p.gradient} group ${className} cursor-pointer transition-all duration-500 hover:scale-105`}
             style={{ backgroundSize: '200% 200%' }}
         >
-            <div className="flex flex-col items-center justify-center w-full py-4 px-6">
-                {/* Icon + Title + Value Side by Side */}
-                <div className="flex items-center justify-start mb-4 w-full space-x-4">
-                    <div className={`${p.iconWrap} rounded-xl w-16 h-16 flex items-center justify-center`}>
-                        <Icon size={36} className={p.iconColor} />
-                    </div>
-                    <div className="flex flex-col justify-center">
-                        <p className={`text-sm font-medium ${p.title} mb-1`}>{title}</p>
-                        <h3 className={`text-2xl font-bold ${p.value}`}>
-                            {value}{valueSuffix && <span>{valueSuffix}</span>}
-                        </h3>
+            <div className="flex flex-col w-full py-4 px-4">
+                {/* Row 1: Title left, Icon right */}
+                <div className="flex items-center justify-between mb-4">
+                    <p className={`text-base font-medium ${p.title}`}>{title}</p>
+                    <div className={`${p.iconWrap} rounded-xl w-12 h-12 flex items-center justify-center`}>
+                        <Icon size={28} className={p.iconColor} />
                     </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="w-full mt-1">
-                    <div className="flex items-center justify-between text-xs text-white/70 mb-1">
-                        <span>Progress</span>
-                        <span className="font-semibold">{Math.min(100, Math.max(0, progress))}%</span>
-                    </div>
-                    <div className="relative h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                        <div
-                            className={`absolute inset-y-0 left-0 ${p.progressBar} rounded-full transition-all duration-700 ease-out`}
-                            style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-                        />
-                    </div>
+                {/* Row 2: Value + Progress */}
+                <div className="flex flex-col w-full">
+                    <h3 className={`text-3xl font-bold ${p.value}`}>{value}{valueSuffix}</h3>
+
+                    {progress !== undefined && (
+                        <div className="mt-2 w-full">
+                            <div className="flex items-center justify-between text-xs text-white/70 mb-1">
+                                <span>Progress</span>
+                                <span className="font-semibold">{progress}%</span>
+                            </div>
+                            <div className="relative h-2 w-full bg-white/20 rounded-full overflow-hidden">
+                                <div
+                                    className={`absolute inset-y-0 left-0 ${p.progressBar} rounded-full transition-all duration-700 ease-out`}
+                                    style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {/* Optional Description */}
+                {/* Optional description */}
                 {description && (
-                    <p className="text-xs mt-2 font-medium text-white/70 text-center">
-                        {description}
-                    </p>
+                    <p className="text-xs mt-4 font-medium text-white/70 text-center">{description}</p>
                 )}
             </div>
         </div>
-
 
     );
 };
