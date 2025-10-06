@@ -293,49 +293,30 @@ const StatCard: React.FC<StatCardProps> = ({
     };
 
     return (
-        <div className={`relative overflow-hidden rounded-xl sm:rounded-2xl ${p.shadow} border border-white/10 ${p.gradient} group transition-all duration-300 hover:scale-[1.04] hover:shadow-2xl hover:z-10 animate-gradient-x ${className}`}
+        <div className={`relative overflow-hidden rounded-2xl border-2 ${p.shadow} ${p.gradient} group transition-all duration-300 hover:scale-[1.04] hover:shadow-2xl hover:z-10 ${className}`}
             style={{ backgroundSize: '200% 200%' }}>
-            {/* Decorative Animated Blurred Circles */}
-            <div className="absolute -right-6 -top-6 w-32 h-32 sm:w-40 sm:h-40 bg-white/10 rounded-full blur-2xl animate-pulse-slow" />
-            <div className="absolute -right-12 top-1/2 w-28 h-28 sm:w-36 sm:h-36 bg-white/10 rounded-full blur-xl animate-pulse-slow" />
-            {/* Sparkline mini-chart */}
-            {renderSparkline(sparkline)}
-            {/* Content */}
-            <div className={`relative ${sizeClasses.padding} flex flex-col h-full`}>
-                {/* Header with Title and Change Badge */}
-                <div className="flex items-start justify-between mb-2">
-                    <p className={`${sizeClasses.title} font-semibold tracking-wide ${p.title} ${uppercaseTitle ? 'uppercase' : ''}`}>
-                        {title}
-                    </p>
-                    {change !== undefined && change !== 0 && (
-                        <span className={`flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-lg ${p.changeColors[changeType]} shadow-md animate-pulse group-hover:animate-none transition-transform duration-300 group-hover:scale-110 group-hover:shadow-xl`}>
-                            {change > 0 ? '+' : ''}{change}%
-                            {ChangeIcon && <ChangeIcon size={12} strokeWidth={3} className="animate-pulse group-hover:animate-none" />}
-                        </span>
-                    )}
+            <div className={`flex flex-col items-center justify-center w-full h-full py-8 px-6`}>
+                <div className={`flex flex-col items-center justify-center mb-6`}>
+                    <div className={`${p.iconWrap} rounded-xl w-12 h-12 flex items-center justify-center mb-4`}>
+                        <Icon size={28} className={`${p.iconColor}`} />
+                    </div>
+                    <p className={`text-base font-medium ${p.title} mb-1 text-center`}>{title}</p>
+                    <h3 className={`text-3xl font-bold ${p.value} text-center`}>{value}{valueSuffix}</h3>
                 </div>
-                {/* Value & Icon */}
-                <div className="flex-1 flex items-center mb-3 gap-2">
-                    <p className={`${sizeClasses.value} font-extrabold tracking-tight ${p.value}`}>
-                        {value}{valueSuffix}
-                    </p>
-                    <span className={`${sizeClasses.iconWrap} flex items-center justify-center rounded-full ml-2 transition-transform duration-300 group-hover:scale-110 group-hover:shadow-xl animate-pulse`}>
-                        <Icon size={sizeClasses.icon} className={`${p.iconColor} animate-pulse group-hover:animate-none`} />
-                    </span>
-                </div>
-                {/* Progress Bar */}
-                <div className="mt-auto">
-                    <div className={`w-full h-1.5 rounded-full ${p.progressBg} overflow-hidden`}>
+                <div className="w-full mt-2">
+                    <div className="flex items-center justify-between text-xs text-white/70 mb-1">
+                        <span>Progress</span>
+                        <span className="font-semibold">{progress}%</span>
+                    </div>
+                    <div className="relative h-2 w-full bg-white/20 rounded-full overflow-hidden">
                         <div
-                            className={`h-full ${p.progressBar} rounded-full transition-all duration-700 ease-out animate-gradient-x`}
-                            style={{ width: `${Math.min(100, Math.max(0, progress))}%`, backgroundSize: '200% 200%' }}
+                            className={`absolute inset-y-0 left-0 ${p.progressBar} rounded-full transition-all duration-700 ease-out`}
+                            style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
                         />
                     </div>
                 </div>
                 {description && (
-                    <p className={`text-[10px] sm:text-xs mt-1.5 font-medium ${descriptionClassName || 'text-white/70'}`}>
-                        {description}
-                    </p>
+                    <p className={`text-xs mt-4 font-medium text-white/70 text-center`}>{description}</p>
                 )}
             </div>
         </div>
