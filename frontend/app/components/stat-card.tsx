@@ -275,7 +275,7 @@ const StatCard: React.FC<StatCardProps> = ({
 
     return (
         <div
-            className={`relative overflow-hidden rounded-2xl ${p.shadow} ${p.gradient} group ${className} cursor-pointer transition-all duration-500 hover:scale-105`}
+            className={`relative overflow-hidden rounded-2xl ${p.shadow} ${p.gradient} group ${className} cursor-pointer transform will-change-transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl`}
             style={{ backgroundSize: '200% 200%' }}
         >
             <div className="flex flex-col w-full py-4 px-4">
