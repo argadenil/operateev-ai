@@ -73,7 +73,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
         // Superadmin sees everything
         if (role === 'superadmin') {
-            base.push({ name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" });
+            base.push({ name: "Dashboard", icon: "🏠", href: "/superAdminDashboard" });
             base.push({ name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" });
             base.push({ name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" });
             base.push({ name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" });
@@ -98,11 +98,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             return base;
         }
 
-        // Default: show customer-scoped pages
-        base.push({ name: "Dashboard", icon: "🏠", href: customerId ? `/dashboard/${customerId}` : "/dashboard" });
-        base.push({ name: "GPU Resources", icon: "📁", href: customerId ? `/gpu-resources/${customerId}` : "/gpu-resources" });
-        base.push({ name: "Job Management", icon: "📊", href: customerId ? `/job-management/${customerId}` : "/job-management" });
-        base.push({ name: "Settings", icon: "⚙️", href: customerId ? `/settings/${customerId}` : "/settings" });
+
         return base;
     }, [customerId]);
 

@@ -5,7 +5,5 @@
 import Dashboard from "../page";
 
 export default function DashboardById() {
-  // Placeholder: you can pass the ID down or trigger a fetch using params.id.
-  // console.log('Dashboard ID route param:', params.id);
-  return <Dashboard />;
+  return <div>working</div>;
 }

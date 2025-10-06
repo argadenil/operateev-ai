@@ -77,16 +77,18 @@ export default function LoginPage() {
         localStorage.setItem("role", canonicalRole);
       } catch { }
       success(`Welcome ${data.username || data.name || ''}`, { title: "Login successful" });
-      // Redirect: superadmin -> /dashboard (will render superadmin panel), others -> customer dashboard
+      // Redirect based on role
       try {
         const canonicalRole = (data.role || '').toString().toLowerCase().replace(/\s+/g, '');
         if (canonicalRole === 'superadmin') {
-          router.push('/dashboard');
+          router.push('/super-admin-dashboard');
+        } else if (canonicalRole === 'admin') {
+          router.push('/admin-dashboard');
         } else {
-          router.push('/dashboard/' + data.customer_id);
+          router.push('/customer-dashboard');
         }
       } catch {
-        router.push('/dashboard');
+        router.push('/customer-dashboard');
       }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Network error";
