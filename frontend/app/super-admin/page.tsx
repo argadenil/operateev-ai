@@ -397,7 +397,7 @@ export default function SuperAdminDashboard() {
     const totalPages = Math.ceil(filteredActivities.length / activitiesPerPage);
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6 lg:p-10 space-y-10">
+        <div className="min-h-screen p-6 lg:p-10 space-y-10">
             {/* Summary Cards */}
             <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
                 {headlineStats.map((stat) => (

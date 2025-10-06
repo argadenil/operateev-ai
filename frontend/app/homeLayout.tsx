@@ -43,6 +43,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [slideOverOpen, setSlideOverOpen] = useState(false);
     const [displayName, setDisplayName] = useState<string>("User");
+    const [mounted, setMounted] = useState(false); // Add mounted state
 
     const pathname = usePathname(); // current route
     const router = useRouter();
@@ -54,44 +55,48 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
     // Load customer id after mount to avoid SSR / hydration mismatch and allow direct deep-links
     const [customerId, setCustomerId] = useState<string | null>(null);
+    const [userRole, setUserRole] = useState<string>("");
+    
     useEffect(() => {
+        setMounted(true); // Mark as mounted
         try {
             const cid = localStorage.getItem('customer_id');
             if (cid) setCustomerId(cid);
             const name = localStorage.getItem('username');
             if (name && name.trim()) setDisplayName(name);
+            const role = (localStorage.getItem('role') || '').toLowerCase();
+            setUserRole(role);
         } catch { }
     }, []);
 
     // Memoized navigation items (dashboard link adapts to presence of id)
     const navigationItems: NavItemType[] = useMemo(() => {
-        // Determine role from localStorage (client-only)
-        let role = "";
-        try { role = (localStorage.getItem('role') || '').toLowerCase(); } catch { role = ""; }
+        // Return empty array during SSR to prevent hydration mismatch
+        if (!mounted) return [];
 
         const base = [] as NavItemType[];
 
         // Superadmin sees everything
-        if (role === 'superadmin') {
+        if (userRole === 'superadmin') {
             base.push({ name: "Dashboard", icon: "🏠", href: "/super-admin" });
             return base;
         }
 
         // Admin sees admin-level and customer-level pages
-        if (role === 'admin') {
+        if (userRole === 'admin') {
             base.push({ name: "Dashboard", icon: "🏠", href: "/admin-dashboard" });
             return base;
         }
 
         // Customer sees only customer-scoped pages
-        if (role === 'customer') {
+        if (userRole === 'customer') {
             base.push({ name: "Dashboard", icon: "🏠", href: "/customer-dashboard" });
             return base;
         }
 
 
         return base;
-    }, [customerId]);
+    }, [customerId, userRole, mounted]);
 
     // Preload (prefetch) target routes once on mount for snappier nav
     useEffect(() => {
@@ -119,6 +124,31 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     if (lightweightRoutes.includes(pathname)) {
         // Let the page itself control header/footer; bypass app shell to avoid duplication
         return <>{children}</>;
+    }
+
+    // During SSR, render a minimal placeholder to prevent hydration mismatch
+    if (!mounted) {
+        return (
+            <div className="flex h-screen relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+                {/* Sidebar placeholder */}
+                <aside className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white w-20 flex flex-col relative z-30 shadow-2xl border-slate-700/50">
+                    <nav className="flex flex-col mt-40 space-y-2 relative z-10">
+                        {/* Empty nav during SSR */}
+                    </nav>
+                </aside>
+                
+                {/* Main content placeholder */}
+                <div className="flex flex-col flex-grow relative z-20 bg-white/80 backdrop-blur-sm">
+                    <div className="h-16 bg-white border-b border-gray-200"></div>
+                    <main className="bg-gray-200 flex-grow overflow-auto">
+                        <div className="animate-pulse p-6">
+                            <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
+                            {children}
+                        </div>
+                    </main>
+                </div>
+            </div>
+        );
     }
 
     return (
