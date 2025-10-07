@@ -121,236 +121,196 @@ func Logout(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{"message": "logged out"})
 }
 
-func GetDashboard(c echo.Context) error {
-	rows, err := db.Conn.Query(`
-        SELECT admin_name
-        FROM "operateevSchema"."admin"
-    `)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"error": "failed to query dashboard data",
-		})
-	}
-	defer rows.Close()
+func GetSuperAdminDashboard(c echo.Context) error {
+	var resp models.SuperAdminDashboardResponse
 
-	// Collect admin names
-	var admins []string
-	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"error": "failed to read row",
-			})
-		}
-		admins = append(admins, name)
+	// Query counts from database
+	var totalAdmins, activeAdmins, inactiveAdmins int
+	var totalCustomers, activeCustomers, inactiveCustomers int
+	var totalClusters, activeClusters, idleClusters int
+	var totalNodes, onlineNodes, maintenanceNodes, offlineNodes int
+	var totalGPUs, usedGPUs, availableGPUs, reservedGPUs, failedGPUs int
+	var hardwareFailures, networkFailures, powerFailures int
+
+	// Fetch admins data
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."admin"`).Scan(&totalAdmins)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."admin" WHERE status='active'`).Scan(&activeAdmins)
+	inactiveAdmins = totalAdmins - activeAdmins
+
+	// Fetch customers data
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."customer"`).Scan(&totalCustomers)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."customer" WHERE status='active'`).Scan(&activeCustomers)
+	inactiveCustomers = totalCustomers - activeCustomers
+
+	// Fetch clusters data
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."cluster"`).Scan(&totalClusters)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."cluster" WHERE status='active'`).Scan(&activeClusters)
+	idleClusters = totalClusters - activeClusters
+
+	// Fetch nodes data
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."node"`).Scan(&totalNodes)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."node" WHERE status='online'`).Scan(&onlineNodes)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."node" WHERE status='maintenance'`).Scan(&maintenanceNodes)
+	offlineNodes = totalNodes - onlineNodes - maintenanceNodes
+
+	// Fetch GPUs data
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."gpu"`).Scan(&totalGPUs)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."gpu" WHERE status='in_use'`).Scan(&usedGPUs)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."gpu" WHERE status='available'`).Scan(&availableGPUs)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."gpu" WHERE status='reserved'`).Scan(&reservedGPUs)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."gpu" WHERE status='failed'`).Scan(&failedGPUs)
+
+	// Fetch GPU failure types (if you have a failure_reason column)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."gpu" WHERE status='failed' AND failure_reason='hardware'`).Scan(&hardwareFailures)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."gpu" WHERE status='failed' AND failure_reason='network'`).Scan(&networkFailures)
+	db.Conn.QueryRow(`SELECT COUNT(*) FROM "operateevSchema"."gpu" WHERE status='failed' AND failure_reason='power'`).Scan(&powerFailures)
+
+	// Build headline stats
+	resp.HeadlineStats = []models.StatCard{
+		{
+			Title:       "Total Admins",
+			Value:       totalAdmins,
+			Icon:        "UserCog",
+			Palette:     "blue",
+			Change:      2,
+			ChangeType:  "increase",
+			Description: "2 new this week",
+			DataViz: &models.DataViz{
+				Type: "dotIndicator",
+				Items: []models.DataVizItem{
+					{Label: "Active", Count: activeAdmins, Color: "bg-green-400"},
+					{Label: "Inactive", Count: inactiveAdmins, Color: "bg-red-400"},
+				},
+			},
+		},
+		{
+			Title:       "Total Customers",
+			Value:       fmt.Sprintf("%.2fK", float64(totalCustomers)/1000),
+			Icon:        "Users",
+			Palette:     "emerald",
+			Change:      156,
+			ChangeType:  "increase",
+			Description: "+12.3% growth this month",
+			DataViz: &models.DataViz{
+				Type: "dotIndicator",
+				Items: []models.DataVizItem{
+					{Label: "Active", Count: activeCustomers, Color: "bg-green-400"},
+					{Label: "Inactive", Count: inactiveCustomers, Color: "bg-red-400"},
+				},
+			},
+		},
+		{
+			Title:       "Clusters",
+			Value:       totalClusters,
+			Icon:        "Server",
+			Palette:     "gray",
+			Change:      0,
+			ChangeType:  "neutral",
+			Description: "Stable since last update",
+			DataViz: &models.DataViz{
+				Type: "comparison",
+				Primary: &models.DataVizItem{
+					Label: "Active",
+					Value: fmt.Sprintf("%d", activeClusters),
+				},
+				Secondary: &models.DataVizItem{
+					Label: "Idle",
+					Value: fmt.Sprintf("%d", idleClusters),
+				},
+			},
+		},
+		{
+			Title:       "Nodes",
+			Value:       totalNodes,
+			Icon:        "MonitorSmartphone",
+			Palette:     "orange",
+			Change:      -4,
+			ChangeType:  "decrease",
+			Description: "Some nodes offline",
+			DataViz: &models.DataViz{
+				Type: "dotIndicator",
+				Items: []models.DataVizItem{
+					{Label: "Online", Count: onlineNodes, Color: "bg-green-400"},
+					{Label: "Maintenance", Count: maintenanceNodes, Color: "bg-yellow-400"},
+					{Label: "Offline", Count: offlineNodes, Color: "bg-red-400"},
+				},
+			},
+		},
+		{
+			Title:       "GPUs",
+			Value:       totalGPUs,
+			Icon:        "Cpu",
+			Palette:     "indigo",
+			Change:      32,
+			ChangeType:  "increase",
+			Description: "Available for allocation",
+			DataViz: &models.DataViz{
+				Type: "tags",
+				Tags: []string{"V100", "A100", "H100", "RTX 4090", "RTX 3090", "T4", "L40S", "MI300X", "H200", "A800"},
+			},
+		},
 	}
-	var summary = map[string]int{
-		"total_admins": len(admins),
+
+	// Build secondary stats
+	resp.SecondaryStats = []models.StatCard{
+		{
+			Title:       "Active Users",
+			Value:       fmt.Sprintf("%.1fk", float64(activeCustomers)/1000),
+			Icon:        "UserCheck",
+			Palette:     "emerald",
+			Description: fmt.Sprintf("Inactive: %d", inactiveCustomers),
+			DataViz: &models.DataViz{
+				Type: "comparison",
+				Primary: &models.DataVizItem{
+					Label: "Active",
+					Value: fmt.Sprintf("%.1fk", float64(activeCustomers)/1000),
+				},
+				Secondary: &models.DataVizItem{
+					Label: "Inactive",
+					Value: fmt.Sprintf("%d", inactiveCustomers),
+				},
+			},
+		},
+		{
+			Title:       "Used GPUs",
+			Value:       usedGPUs,
+			Icon:        "Cpu",
+			Palette:     "sky",
+			Description: fmt.Sprintf("Available: %d", availableGPUs),
+			DataViz: &models.DataViz{
+				Type: "dotIndicator",
+				Items: []models.DataVizItem{
+					{Label: "In Use", Count: usedGPUs, Color: "bg-red-400"},
+					{Label: "Available", Count: availableGPUs, Color: "bg-green-400"},
+					{Label: "Reserved", Count: reservedGPUs, Color: "bg-amber-400"},
+				},
+			},
+		},
+		{
+			Title:       "Failed GPUs",
+			Value:       failedGPUs,
+			Icon:        "ZapOff",
+			Palette:     "red",
+			Description: fmt.Sprintf("Offline nodes: %d", offlineNodes),
+			DataViz: &models.DataViz{
+				Type: "dotIndicator",
+				Items: []models.DataVizItem{
+					{Label: "Hardware", Count: hardwareFailures, Color: "bg-green-400"},
+					{Label: "Network", Count: networkFailures, Color: "bg-gray-400"},
+					{Label: "Power", Count: powerFailures, Color: "bg-yellow-400"},
+				},
+			},
+		},
 	}
-	return c.JSON(http.StatusOK, echo.Map{
-		"resources": admins,
-		"summary":   summary,
-	})
+
+	return c.JSON(http.StatusOK, resp)
 }
 
-// GetAdmins returns all admins (id, name, status)
-func GetAdmins(c echo.Context) error {
-	rows, err := db.Conn.Query(`
-		SELECT id, admin_name, status FROM "operateevSchema"."admin"
-	`)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"error": "failed to query admins",
-		})
-	}
-	defer rows.Close()
-
-	type Admin struct {
-		ID     int    `json:"id"`
-		Name   string `json:"name"`
-		Status string `json:"status"`
-	}
-	var admins []Admin
-	for rows.Next() {
-		var a Admin
-		if err := rows.Scan(&a.ID, &a.Name, &a.Status); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"error": "failed to read row",
-			})
-		}
-		admins = append(admins, a)
-	}
-	return c.JSON(http.StatusOK, echo.Map{
-		"admins": admins,
-		"total":  len(admins),
-	})
+func GetAdminsDashboard(c echo.Context) error {
+	return c.JSON(http.StatusOK, echo.Map{"message": "Admin Dashboard"})
 }
-
-// GetAdminByID returns a single admin by ID
-func GetAdminByID(c echo.Context) error {
-	adminId := c.Param("adminId")
-	row := db.Conn.QueryRow(`SELECT id, admin_name, status FROM "operateevSchema"."admin" WHERE id=$1`, adminId)
-	var a struct {
-		ID     int    `json:"id"`
-		Name   string `json:"name"`
-		Status string `json:"status"`
-	}
-	if err := row.Scan(&a.ID, &a.Name, &a.Status); err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "admin not found"})
-	}
-	return c.JSON(http.StatusOK, a)
-}
-
-// GetCustomersByAdmin returns all customers under a specific admin
-func GetCustomersByAdmin(c echo.Context) error {
-	adminId := c.Param("adminId")
-	rows, err := db.Conn.Query(`SELECT id, customer_name, status FROM "operateevSchema"."customer" WHERE admin_id=$1`, adminId)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to query customers"})
-	}
-	defer rows.Close()
-	type Customer struct {
-		ID     int    `json:"id"`
-		Name   string `json:"name"`
-		Status string `json:"status"`
-	}
-	var customers []Customer
-	for rows.Next() {
-		var cst Customer
-		if err := rows.Scan(&cst.ID, &cst.Name, &cst.Status); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to read row"})
-		}
-		customers = append(customers, cst)
-	}
-	return c.JSON(http.StatusOK, echo.Map{"customers": customers, "total": len(customers)})
-}
-
-// GetCustomerByAdmin returns a specific customer under a specific admin
-func GetCustomerByAdmin(c echo.Context) error {
-	adminId := c.Param("adminId")
-	customerId := c.Param("customerId")
-	row := db.Conn.QueryRow(`SELECT id, customer_name, status FROM "operateevSchema"."customer" WHERE id=$1 AND admin_id=$2`, customerId, adminId)
-	var cst struct {
-		ID     int    `json:"id"`
-		Name   string `json:"name"`
-		Status string `json:"status"`
-	}
-	if err := row.Scan(&cst.ID, &cst.Name, &cst.Status); err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "customer not found"})
-	}
-	return c.JSON(http.StatusOK, cst)
-}
-
-// GetCustomers returns all customers
-func GetCustomers(c echo.Context) error {
-	rows, err := db.Conn.Query(`SELECT id, customer_name, status FROM "operateevSchema"."customer"`)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to query customers"})
-	}
-	defer rows.Close()
-	type Customer struct {
-		ID     int    `json:"id"`
-		Name   string `json:"name"`
-		Status string `json:"status"`
-	}
-	var customers []Customer
-	for rows.Next() {
-		var cst Customer
-		if err := rows.Scan(&cst.ID, &cst.Name, &cst.Status); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to read row"})
-		}
-		customers = append(customers, cst)
-	}
-	return c.JSON(http.StatusOK, echo.Map{"customers": customers, "total": len(customers)})
-}
-
-// GetCustomerByID returns a single customer by ID
-func GetCustomerByID(c echo.Context) error {
-	customerId := c.Param("customerId")
-	row := db.Conn.QueryRow(`SELECT id, customer_name, status FROM "operateevSchema"."customer" WHERE id=$1`, customerId)
-	var cst struct {
-		ID     int    `json:"id"`
-		Name   string `json:"name"`
-		Status string `json:"status"`
-	}
-	if err := row.Scan(&cst.ID, &cst.Name, &cst.Status); err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "customer not found"})
-	}
-	return c.JSON(http.StatusOK, cst)
-}
-
-// GetOwnCustomers returns all customers under the authenticated admin
-func GetOwnCustomers(c echo.Context) error {
-	// Assume admin ID is in JWT claims
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	adminId, _ := claims["user_id"].(float64)
-	rows, err := db.Conn.Query(`SELECT id, customer_name, status FROM "operateevSchema"."customer" WHERE admin_id=$1`, int(adminId))
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to query customers"})
-	}
-	defer rows.Close()
-	type Customer struct {
-		ID     int    `json:"id"`
-		Name   string `json:"name"`
-		Status string `json:"status"`
-	}
-	var customers []Customer
-	for rows.Next() {
-		var cst Customer
-		if err := rows.Scan(&cst.ID, &cst.Name, &cst.Status); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to read row"})
-		}
-		customers = append(customers, cst)
-	}
-	return c.JSON(http.StatusOK, echo.Map{"customers": customers, "total": len(customers)})
-}
-
-// GetOwnCustomerByID returns a specific customer under the authenticated admin
-func GetOwnCustomerByID(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	adminId, _ := claims["user_id"].(float64)
-	customerId := c.Param("customerId")
-	row := db.Conn.QueryRow(`SELECT id, customer_name, status FROM "operateevSchema"."customer" WHERE id=$1 AND admin_id=$2`, customerId, int(adminId))
-	var cst struct {
-		ID     int    `json:"id"`
-		Name   string `json:"name"`
-		Status string `json:"status"`
-	}
-	if err := row.Scan(&cst.ID, &cst.Name, &cst.Status); err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "customer not found"})
-	}
-	return c.JSON(http.StatusOK, cst)
-}
-
-// GetCustomerDashboard returns dashboard info for authenticated customer
-func GetCustomerDashboard(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	customerId, _ := claims["user_id"].(float64)
-	// Example: return some dashboard info
-	return c.JSON(http.StatusOK, echo.Map{
-		"customer_id": int(customerId),
-		"dashboard":   "This is your dashboard info.",
-	})
-}
-
-// GetCustomerProfile returns profile info for authenticated customer
-func GetCustomerProfile(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	customerId, _ := claims["user_id"].(float64)
-	row := db.Conn.QueryRow(`SELECT id, customer_name, status FROM "operateevSchema"."customer" WHERE id=$1`, int(customerId))
-	var cst struct {
-		ID     int    `json:"id"`
-		Name   string `json:"name"`
-		Status string `json:"status"`
-	}
-	if err := row.Scan(&cst.ID, &cst.Name, &cst.Status); err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "profile not found"})
-	}
-	return c.JSON(http.StatusOK, cst)
+func GetViewersDashboard(c echo.Context) error {
+	return c.JSON(http.StatusOK, echo.Map{"message": "Viewer Dashboard"})
 }
 
 // GenerateToken issues a JWT token for a given user_id and role
