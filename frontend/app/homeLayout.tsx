@@ -40,7 +40,8 @@ const NavItem = React.memo(function NavItem({ item, isActive, sidebarOpen, onNav
 NavItem.displayName = 'NavItem';
 
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    // Initialize sidebar as open on desktop (will be adjusted after mount for mobile)
+    const [sidebarOpen, setSidebarOpen] = useState(true);
     const [slideOverOpen, setSlideOverOpen] = useState(false);
     const [displayName, setDisplayName] = useState<string>("User");
     const [mounted, setMounted] = useState(false); // Add mounted state
@@ -56,7 +57,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     // Load customer id after mount to avoid SSR / hydration mismatch and allow direct deep-links
     const [customerId, setCustomerId] = useState<string | null>(null);
     const [userRole, setUserRole] = useState<string>("");
-    
+
     useEffect(() => {
         setMounted(true); // Mark as mounted
         try {
@@ -67,6 +68,11 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             const role = (localStorage.getItem('role') || '').toLowerCase();
             setUserRole(role);
         } catch { }
+        
+        // Close sidebar on mobile by default
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setSidebarOpen(false);
+        }
     }, []);
 
     // Memoized navigation items (dashboard link adapts to presence of id)
@@ -97,7 +103,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
 
         return base;
-    }, [customerId, userRole, mounted]);
+    }, [userRole, mounted]);
 
     // Preload (prefetch) target routes once on mount for snappier nav
     useEffect(() => {
@@ -140,7 +146,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                         {/* Empty nav during SSR */}
                     </nav>
                 </aside>
-                
+
                 {/* Main content placeholder */}
                 <div className="flex flex-col flex-grow relative z-20 bg-white/80 backdrop-blur-sm">
                     <div className="h-16 bg-white border-b border-gray-200"></div>
