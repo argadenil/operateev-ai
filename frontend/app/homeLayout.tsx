@@ -79,6 +79,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         // Superadmin sees everything
         if (userRole === 'superadmin') {
             base.push({ name: "Dashboard", icon: "🏠", href: "/super-admin" });
+            base.push({ name: "Admin Management", icon: "👤", href: "/admin-management" });
             return base;
         }
 
@@ -103,15 +104,18 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         navigationItems.forEach(i => router.prefetch(i.href));
     }, [navigationItems, router]);
 
-    // Navigation handler (close sidebar on route change for mobile). Route change handled by Link.
+    // Navigation handler (close sidebar on route change for mobile only). Route change handled by Link.
     const handleNavigateClose = useCallback(() => {
-        setSidebarOpen(false);
+        // Only close sidebar on mobile devices (screen width < 768px)
+        if (window.innerWidth < 768) {
+            setSidebarOpen(false);
+        }
     }, []);
 
     const pageTitle = useMemo(() => {
         if (!pathname) return "PAGE";
         if (pathname.startsWith("/super-admin")) return "Super Admin Dashboard";
-        if (pathname.startsWith("/admin-dashboard")) return "Admin Dashboard";
+        if (pathname.startsWith("/admin-management")) return "Admin Management";
         if (pathname.startsWith("/customer-dashboard")) return "Customer Dashboard";
         if (pathname.startsWith("/gpu-resources")) return "GPU Resources";
         if (pathname.startsWith("/job-management")) return "Job Management";
