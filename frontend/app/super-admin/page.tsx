@@ -60,12 +60,11 @@ const headlineStats = [
         change: +2,
         changeType: 'increase' as const,
         description: '2 new this week',
-        dataViz: { 
-            type: 'dotIndicator' as const, 
+        dataViz: {
+            type: 'dotIndicator' as const,
             items: [
-                { label: 'Super Admins', count: 3, color: 'bg-purple-400' },
-                { label: 'Admins', count: 10, color: 'bg-blue-400' },
-                { label: 'Support', count: 5, color: 'bg-cyan-400' }
+                { label: 'Active', count: 3, color: 'bg-green-400' },
+                { label: 'Inactive', count: 10, color: 'bg-red-400' },
             ]
         }
     },
@@ -77,10 +76,12 @@ const headlineStats = [
         change: +156,
         changeType: 'increase' as const,
         description: '+12.3% growth this month',
-        dataViz: { 
-            type: 'comparison' as const,
-            primary: { label: 'Enterprise', value: '842' },
-            secondary: { label: 'Startup', value: '422' }
+        dataViz: {
+            type: 'dotIndicator' as const,
+            items: [
+                { label: 'Active', count: 3, color: 'bg-green-400' },
+                { label: 'Inactive', count: 10, color: 'bg-red-400' },
+            ]
         }
     },
     {
