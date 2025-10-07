@@ -59,3 +59,110 @@ export function capitalizeStatus(s: string): string {
   if (!s) return 'Unknown';
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
+
+// Super Admin Dashboard Types (matching backend models)
+export interface AdminsStats {
+  total: number;
+  active: number;
+  inactive: number;
+}
+
+export interface CustomersStats {
+  total: number;
+  active: number;
+  inactive: number;
+}
+
+export interface ClustersStats {
+  total: number;
+  active: number;
+  idle: number;
+}
+
+export interface NodesStats {
+  total: number;
+  online: number;
+  maintenance: number;
+  offline: number;
+}
+
+export interface GpusStats {
+  total: number;
+  gpuList: string[];
+}
+
+export interface JobsStats {
+  total: number;
+  running: number;
+  completed: number;
+  failed: number;
+  queued: number;
+}
+
+export interface UsedGPUsStats {
+  total: number;
+  inUse: number;
+  available: number;
+  reserved: number;
+}
+
+export interface FailedGPUsStats {
+  total: number;
+  hardwareFailures: number;
+  softwareFailures: number;
+  networkFailures: number;
+  powerFailures: number;
+}
+
+export interface SuperAdminDashboardData {
+  totalAdmins: AdminsStats;
+  totalCustomers: CustomersStats;
+  totalClusters: ClustersStats;
+  totalNodes: NodesStats;
+  totalGpus: GpusStats;
+  totalJobs: JobsStats;
+  usedGPUs: UsedGPUsStats;
+  failedGPUs: FailedGPUsStats;
+}
+
+export interface SuperAdminDashboardResponse {
+  status: string;
+  dashboard: SuperAdminDashboardData;
+  error?: string;
+}
+
+// Fetch Super Admin Dashboard
+export async function fetchSuperAdminDashboard(signal?: AbortSignal): Promise<SuperAdminDashboardResponse> {
+  const url = `${API_BASE}/api/dashboard/super-admins`;
+  try {
+    const resp = await authFetch(url, { method: 'GET', signal });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      return {
+        status: 'error',
+        dashboard: getEmptyDashboardData(),
+        error: data.error || 'Failed to load super admin dashboard'
+      };
+    }
+    return data;
+  } catch (error) {
+    return {
+      status: 'error',
+      dashboard: getEmptyDashboardData(),
+      error: error instanceof Error ? error.message : 'Network error'
+    };
+  }
+}
+
+function getEmptyDashboardData(): SuperAdminDashboardData {
+  return {
+    totalAdmins: { total: 0, active: 0, inactive: 0 },
+    totalCustomers: { total: 0, active: 0, inactive: 0 },
+    totalClusters: { total: 0, active: 0, idle: 0 },
+    totalNodes: { total: 0, online: 0, maintenance: 0, offline: 0 },
+    totalGpus: { total: 0, gpuList: [] },
+    totalJobs: { total: 0, running: 0, completed: 0, failed: 0, queued: 0 },
+    usedGPUs: { total: 0, inUse: 0, available: 0, reserved: 0 },
+    failedGPUs: { total: 0, hardwareFailures: 0, softwareFailures: 0, networkFailures: 0, powerFailures: 0 }
+  };
+}
