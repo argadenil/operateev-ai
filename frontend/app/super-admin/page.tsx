@@ -35,6 +35,7 @@ import {
 } from 'chart.js';
 import type { ChartData, ChartOptions } from 'chart.js';
 import StatCard from '../components/stat-card';
+import { fetchSuperAdminDashboard, type SuperAdminDashboardData } from '@/lib/dashboard';
 
 ChartJS.register(
     CategoryScale,
@@ -51,138 +52,13 @@ const BarChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Bar),
 const PieChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Pie), { ssr: false });
 const LineChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Line), { ssr: false });
 
-const headlineStats = [
-    {
-        title: 'Total Admins',
-        value: 18,
-        icon: UserCog,
-        palette: 'blue' as const,
-        change: +2,
-        changeType: 'increase' as const,
-        description: '2 new this week',
-        dataViz: {
-            type: 'dotIndicator' as const,
-            items: [
-                { label: 'Active', count: 3, color: 'bg-green-400' },
-                { label: 'Inactive', count: 10, color: 'bg-red-400' },
-            ]
-        }
-    },
-    {
-        title: 'Total Customers',
-        value: '1.26K',
-        icon: Users,
-        palette: 'emerald' as const,
-        change: +156,
-        changeType: 'increase' as const,
-        description: '+12.3% growth this month',
-        dataViz: {
-            type: 'dotIndicator' as const,
-            items: [
-                { label: 'Active', count: 3, color: 'bg-green-400' },
-                { label: 'Inactive', count: 10, color: 'bg-red-400' },
-            ]
-        }
-    },
-    {
-        title: 'Clusters',
-        value: 12,
-        icon: Server,
-        palette: 'gray' as const,
-        change: 0,
-        changeType: 'neutral' as const,
-        description: 'Stable since last update',
-        dataViz: {
-            type: 'comparison' as const,
-            primary: { label: 'Active', value: '10' },
-            secondary: { label: 'Idle', value: '2' }
-        }
-    },
-    {
-        title: 'Nodes',
-        value: 84,
-        icon: MonitorSmartphone,
-        palette: 'orange' as const,
-        change: -4,
-        changeType: 'decrease' as const,
-        description: 'Some nodes offline',
-        dataViz: {
-            type: 'dotIndicator' as const,
-            items: [
-                { label: 'Online', count: 76, color: 'bg-green-400' },
-                { label: 'Maintenance', count: 4, color: 'bg-yellow-400' },
-                { label: 'Offline', count: 4, color: 'bg-red-400' }
-            ]
-        }
-    },
-    {
-        title: 'GPUs',
-        value: 512,
-        icon: Cpu,
-        palette: 'indigo' as const,
-        change: +32,
-        changeType: 'increase' as const,
-        description: 'Available for allocation',
-        dataViz: {
-            type: 'tags' as const, items: ['V100',
-                'A100',
-                'H100',
-                'RTX 4090',
-                'RTX 3090',
-                'T4',
-                'L40S',
-                'MI300X',
-                'H200',
-                'A800']
-        }
+// Helper function to format large numbers
+const formatNumber = (num: number): string | number => {
+    if (num >= 1000) {
+        return `${(num / 1000).toFixed(2)}K`;
     }
-];
-
-const secondaryStats = [
-    {
-        title: 'Active Users',
-        value: '1.1k',
-        icon: UserCheck,
-        palette: 'emerald' as const,
-        description: 'Inactive: 58',
-        dataViz: {
-            type: 'comparison' as const,
-            primary: { label: 'Active', value: '1.1k' },
-            secondary: { label: 'Inactive', value: '58' }
-        }
-    },
-    {
-        title: 'Used GPUs',
-        value: 356,
-        icon: Cpu,
-        palette: 'sky' as const,
-        description: 'Available: 156',
-        dataViz: {
-            type: 'dotIndicator' as const,
-            items: [
-                { label: 'In Use', count: 356, color: 'bg-red-400' },
-                { label: 'Available', count: 156, color: 'bg-green-400' },
-                { label: 'Reserved', count: 48, color: 'bg-amber-400' },
-            ]
-        }
-    },
-    {
-        title: 'Failed GPUs',
-        value: 6,
-        icon: ZapOff,
-        palette: 'red' as const,
-        description: 'Offline nodes: 4',
-        dataViz: {
-            type: 'dotIndicator' as const,
-            items: [
-                { label: 'Hardware', count: 3, color: 'bg-green-400' },
-                { label: 'Network', count: 2, color: 'bg-gray-400' },
-                { label: 'Power', count: 1, color: 'bg-yellow-400' }
-            ]
-        }
-    },
-];
-
+    return num;
+};
 
 const customersPerAdminData: ChartData<'bar'> = {
     labels: ['Avery', 'Jordan', 'Morgan', 'Taylor', 'Riley', 'Bailey'],
@@ -322,6 +198,9 @@ const getHeatColor = (value: number) => {
 };
 
 export default function SuperAdminDashboard() {
+    const [dashboardData, setDashboardData] = useState<SuperAdminDashboardData | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [autoRefresh, setAutoRefresh] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [timeRange, setTimeRange] = useState('7d');
@@ -335,34 +214,185 @@ export default function SuperAdminDashboard() {
     const [currentPage, setCurrentPage] = useState(1);
     const activitiesPerPage = 4;
 
+    // Fetch dashboard data
+    const loadDashboardData = async () => {
+        setIsRefreshing(true);
+        try {
+            const response = await fetchSuperAdminDashboard();
+            if (response.status === 'success' && response.dashboard) {
+                setDashboardData(response.dashboard);
+                setError(null);
+            } else {
+                setError(response.error || 'Failed to load dashboard data');
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setIsLoading(false);
+            setIsRefreshing(false);
+        }
+    };
+
+    // Initial load
+    useEffect(() => {
+        loadDashboardData();
+    }, []);
+
     // Auto-refresh logic
     useEffect(() => {
         if (!autoRefresh) return;
 
         const interval = setInterval(() => {
-            handleRefresh();
+            loadDashboardData();
         }, 30000); // Refresh every 30 seconds
 
         return () => clearInterval(interval);
     }, [autoRefresh]);
 
     const handleRefresh = () => {
-        setIsRefreshing(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsRefreshing(false);
-        }, 1000);
+        loadDashboardData();
     };
+
+    // Build headline stats from API data
+    const headlineStats = dashboardData ? [
+        {
+            title: 'Total Admins',
+            value: dashboardData.totalAdmins.total,
+            icon: UserCog,
+            palette: 'blue' as const,
+            change: 0,
+            changeType: 'neutral' as const,
+            description: `${dashboardData.totalAdmins.active} active, ${dashboardData.totalAdmins.inactive} inactive`,
+            dataViz: {
+                type: 'dotIndicator' as const,
+                items: [
+                    { label: 'Active', count: dashboardData.totalAdmins.active, color: 'bg-green-400' },
+                    { label: 'Inactive', count: dashboardData.totalAdmins.inactive, color: 'bg-red-400' },
+                ]
+            }
+        },
+        {
+            title: 'Total Customers',
+            value: formatNumber(dashboardData.totalCustomers.total),
+            icon: Users,
+            palette: 'emerald' as const,
+            change: 0,
+            changeType: 'neutral' as const,
+            description: `${dashboardData.totalCustomers.active} active customers`,
+            dataViz: {
+                type: 'dotIndicator' as const,
+                items: [
+                    { label: 'Active', count: dashboardData.totalCustomers.active, color: 'bg-green-400' },
+                    { label: 'Inactive', count: dashboardData.totalCustomers.inactive, color: 'bg-red-400' },
+                ]
+            }
+        },
+        {
+            title: 'Clusters',
+            value: dashboardData.totalClusters.total,
+            icon: Server,
+            palette: 'gray' as const,
+            change: 0,
+            changeType: 'neutral' as const,
+            description: `${dashboardData.totalClusters.active} active clusters`,
+            dataViz: {
+                type: 'comparison' as const,
+                primary: { label: 'Active', value: dashboardData.totalClusters.active.toString() },
+                secondary: { label: 'Idle', value: dashboardData.totalClusters.idle.toString() }
+            }
+        },
+        {
+            title: 'Nodes',
+            value: dashboardData.totalNodes.total,
+            icon: MonitorSmartphone,
+            palette: 'orange' as const,
+            change: 0,
+            changeType: 'neutral' as const,
+            description: `${dashboardData.totalNodes.online} nodes online`,
+            dataViz: {
+                type: 'dotIndicator' as const,
+                items: [
+                    { label: 'Online', count: dashboardData.totalNodes.online, color: 'bg-green-400' },
+                    { label: 'Maintenance', count: dashboardData.totalNodes.maintenance, color: 'bg-yellow-400' },
+                    { label: 'Offline', count: dashboardData.totalNodes.offline, color: 'bg-red-400' }
+                ]
+            }
+        },
+        {
+            title: 'GPUs',
+            value: dashboardData.totalGpus.total,
+            icon: Cpu,
+            palette: 'indigo' as const,
+            change: 0,
+            changeType: 'neutral' as const,
+            description: `${dashboardData.totalGpus.gpuList.length} GPU models`,
+            dataViz: {
+                type: 'tags' as const,
+                items: dashboardData.totalGpus.gpuList
+            }
+        }
+    ] : [];
+
+    // Build secondary stats from API data
+    const secondaryStats = dashboardData ? [
+        {
+            title: 'Total Jobs',
+            value: dashboardData.totalJobs.total,
+            icon: Activity,
+            palette: 'violet' as const,
+            description: `Running: ${dashboardData.totalJobs.running}`,
+            dataViz: {
+                type: 'dotIndicator' as const,
+                items: [
+                    { label: 'Running', count: dashboardData.totalJobs.running, color: 'bg-green-400' },
+                    { label: 'Queued', count: dashboardData.totalJobs.queued, color: 'bg-yellow-400' },
+                    { label: 'Completed', count: dashboardData.totalJobs.completed, color: 'bg-blue-400' },
+                ]
+            }
+        },
+        {
+            title: 'Used GPUs',
+            value: dashboardData.usedGPUs.inUse,
+            icon: Cpu,
+            palette: 'sky' as const,
+            description: `Available: ${dashboardData.usedGPUs.available}`,
+            dataViz: {
+                type: 'dotIndicator' as const,
+                items: [
+                    { label: 'In Use', count: dashboardData.usedGPUs.inUse, color: 'bg-red-400' },
+                    { label: 'Available', count: dashboardData.usedGPUs.available, color: 'bg-green-400' },
+                    { label: 'Reserved', count: dashboardData.usedGPUs.reserved, color: 'bg-amber-400' },
+                ]
+            }
+        },
+        {
+            title: 'Failed GPUs',
+            value: dashboardData.failedGPUs.total,
+            icon: ZapOff,
+            palette: 'red' as const,
+            description: `${dashboardData.failedGPUs.hardwareFailures} hardware failures`,
+            dataViz: {
+                type: 'dotIndicator' as const,
+                items: [
+                    { label: 'Hardware', count: dashboardData.failedGPUs.hardwareFailures, color: 'bg-red-400' },
+                    { label: 'Software', count: dashboardData.failedGPUs.softwareFailures, color: 'bg-orange-400' },
+                    { label: 'Network', count: dashboardData.failedGPUs.networkFailures, color: 'bg-gray-400' },
+                    { label: 'Power', count: dashboardData.failedGPUs.powerFailures, color: 'bg-yellow-400' }
+                ]
+            }
+        },
+    ] : [];
 
     const handleExport = () => {
         // Export dashboard data as JSON
-        const dashboardData = {
+        const exportData = {
+            dashboardData,
             stats: { headlineStats, secondaryStats },
             alerts,
             activities: recentActivities,
             timestamp: new Date().toISOString()
         };
-        const dataStr = JSON.stringify(dashboardData, null, 2);
+        const dataStr = JSON.stringify(exportData, null, 2);
         const dataBlob = new Blob([dataStr], { type: 'application/json' });
         const url = URL.createObjectURL(dataBlob);
         const link = document.createElement('a');
@@ -391,8 +421,49 @@ export default function SuperAdminDashboard() {
     const currentActivities = filteredActivities.slice(indexOfFirstActivity, indexOfLastActivity);
     const totalPages = Math.ceil(filteredActivities.length / activitiesPerPage);
 
+    // Show loading state
+    if (isLoading) {
+        return (
+            <div className="min-h-screen p-6 lg:p-10 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="text-slate-600">Loading dashboard data...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Show error state
+    if (error && !dashboardData) {
+        return (
+            <div className="min-h-screen p-6 lg:p-10 flex items-center justify-center">
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-6 max-w-md">
+                    <div className="flex items-center gap-3 mb-3">
+                        <AlertTriangle className="text-red-600" size={24} />
+                        <h3 className="text-lg font-semibold text-red-900">Error Loading Dashboard</h3>
+                    </div>
+                    <p className="text-red-700 mb-4">{error}</p>
+                    <button
+                        onClick={handleRefresh}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen p-6 lg:p-10 space-y-10">
+            {/* Error banner (if error but we have cached data) */}
+            {error && dashboardData && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-center gap-3">
+                    <AlertTriangle className="text-yellow-600" size={20} />
+                    <p className="text-yellow-800 text-sm">{error}</p>
+                </div>
+            )}
+
             {/* Summary Cards */}
             <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
                 {headlineStats.map((stat) => (

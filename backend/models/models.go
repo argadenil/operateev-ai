@@ -68,7 +68,72 @@ type StatCard struct {
 	DataViz     *DataViz `json:"dataViz,omitempty"`
 }
 
-type SuperAdminDashboardResponse struct {
-	HeadlineStats  []StatCard `json:"headlineStats"`
-	SecondaryStats []StatCard `json:"secondaryStats"`
+// New dashboard structure
+type AdminsStats struct {
+	Total    int `json:"total"`
+	Active   int `json:"active"`
+	Inactive int `json:"inactive"`
+}
+
+type CustomersStats struct {
+	Total    int `json:"total"`
+	Active   int `json:"active"`
+	Inactive int `json:"inactive"`
+}
+
+type ClustersStats struct {
+	Total  int `json:"total"`
+	Active int `json:"active"`
+	Idle   int `json:"idle"`
+}
+
+type NodesStats struct {
+	Total       int `json:"total"`
+	Online      int `json:"online"`
+	Maintenance int `json:"maintenance"`
+	Offline     int `json:"offline"`
+}
+
+type GpusStats struct {
+	Total   int      `json:"total"`
+	GpuList []string `json:"gpuList"`
+}
+
+type JobsStats struct {
+	Total     int `json:"total"`
+	Running   int `json:"running"`
+	Completed int `json:"completed"`
+	Failed    int `json:"failed"`
+	Queued    int `json:"queued"`
+}
+
+type UsedGPUsStats struct {
+	Total     int `json:"total"`
+	InUse     int `json:"inUse"`
+	Available int `json:"available"`
+	Reserved  int `json:"reserved"`
+}
+
+type FailedGPUsStats struct {
+	Total            int `json:"total"`
+	HardwareFailures int `json:"hardwareFailures"`
+	SoftwareFailures int `json:"softwareFailures"`
+	NetworkFailures  int `json:"networkFailures"`
+	PowerFailures    int `json:"powerFailures"`
+}
+
+type DashboardData struct {
+	TotalAdmins    AdminsStats     `json:"totalAdmins"`
+	TotalCustomers CustomersStats  `json:"totalCustomers"`
+	TotalClusters  ClustersStats   `json:"totalClusters"`
+	TotalNodes     NodesStats      `json:"totalNodes"`
+	TotalGpus      GpusStats       `json:"totalGpus"`
+	TotalJobs      JobsStats       `json:"totalJobs"`
+	UsedGPUs       UsedGPUsStats   `json:"usedGPUs"`
+	FailedGPUs     FailedGPUsStats `json:"failedGPUs"`
+}
+
+type NewSuperAdminDashboardResponse struct {
+	Status    string        `json:"status"`
+	Dashboard DashboardData `json:"dashboard"`
 }
