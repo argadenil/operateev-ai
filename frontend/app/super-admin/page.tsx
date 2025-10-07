@@ -315,12 +315,6 @@ const recentActivities: Array<{ text: string; icon: LucideIcon; timestamp: strin
     { text: 'Cluster Nova firmware updated', icon: Activity, timestamp: '48 min ago' }
 ];
 
-const shortcuts: Array<{ text: string; href: string; icon: LucideIcon }> = [
-    { text: 'Create Admin', href: '/admin/create', icon: UserPlus },
-    { text: 'View All Customers', href: '/admin/customers', icon: Users },
-    { text: 'Infrastructure Overview', href: '/infrastructure', icon: LayoutDashboard }
-];
-
 const getHeatColor = (value: number) => {
     const hue = (100 - value) * 1.2; // map intensity to green->red spectrum
     return `hsl(${hue}, 80%, 50%)`;
@@ -617,12 +611,6 @@ export default function SuperAdminDashboard() {
                         </>
                     )}
                 </div>
-            </section>
-
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {shortcuts.map((shortcut) => (
-                    <ShortcutButton key={shortcut.text} text={shortcut.text} href={shortcut.href} icon={shortcut.icon} />
-                ))}
             </section>
         </div>
     );
